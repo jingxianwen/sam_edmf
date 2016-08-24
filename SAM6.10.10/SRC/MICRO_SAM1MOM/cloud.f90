@@ -38,6 +38,8 @@ do k = 1, nzm
 
     tabs(i,j,k) = t(i,j,k)-gamaz(k)
     tabs1=(tabs(i,j,k)+fac1*qp(i,j,k))/(1.+fac2*qp(i,j,k))
+    !WL the correct form should be 
+    !tabs1= tabs(i,j,k)*(1.- fac2*qp(i,j,k)) + fac1*qp(i,j,k)
 
 ! Warm cloud:
 
