@@ -9,13 +9,13 @@ use params
 implicit none
 
 real def2(nx,ny,nzm)
-real buoy_sgs_below(nx,ny), buoy_sgs_above(nx,ny) 
-real a_prod_bu_below(nx,ny), a_prod_bu_above(nx,ny)
-real grd,betdz,Ck,smix,Pr,Cee
+real grd,betdz,Ck,smix,Pr,Cee,pblh,thetav_c,thetav_b,thetav_k
 real buoy_sgs,a_prod_sh,a_prod_bu,a_diss
 real lstarn, lstarp, bbb, omn, omp
 real qsatt,dqsat
 integer i,j,k,kc,kb
+real thetavs, sgs_thv_flx, tketau, l23, tke_thvflx
+real dtkedtsum, dtkedtmin
 
 real tabs_interface, qp_interface, qtot_interface, qsat_check, qctot
 
@@ -31,12 +31,6 @@ if(RUN3D) then
 else
   call shear_prod2D(def2)
 endif
-
-if((nstep.eq.1).AND.(icycle.eq.1)) then
- ! initialize positive TKE, tk, and tkh
-
-
-end if ! if(nstep.eq.1.AND.icycle.eq.1)
 
 do k=1,nzm
   kb=k-1

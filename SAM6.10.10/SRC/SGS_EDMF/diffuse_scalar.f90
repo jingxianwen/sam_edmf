@@ -1,21 +1,24 @@
-subroutine diffuse_scalar (f,fluxb,fluxt, &
-                          fdiff,flux,f2lediff,f2lediss,fwlediff,doit)
+subroutine diffuse_scalar (f,fluxb,fluxt,sumMs, &
+                          fdiff,flux,f2lediff,f2lediss,fwlediff,doit,massflux)
 
 use grid
 use vars, only: rho, rhow
-use sgs, only: tkh
+use sgs, only: tkh, sgs_field_sumM
 implicit none
 
 ! input:	
 real f(dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm)	! scalar
 real fluxb(nx,ny)		! bottom flux
 real fluxt(nx,ny)		! top flux
+real sumMs(dimx1_s:dimx2_s, dimy1_s:dimy2_s,nz)		! MF flux of scalar
 real flux(nz)
 real fdiff(nz)
 real f2lediff(nzm)
 real f2lediss(nzm)
 real fwlediff(nzm)
-logical doit
+real,dimension(nzm) :: a, b, c, d
+real, parameter :: betap = 1., betam = 0.
+logical doit, massflux
 ! Local
 real df(dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm)	! scalar
 real f0(nzm),df0(nzm),factor_xy
@@ -36,13 +39,21 @@ if(dostatis) then
 
 endif
 
+flux = 0.
+do i=1,nx
+  do j=1,ny
+    call get_abcd(betap,betam,f(i,j,:),sumMs(i,j,:),tkh(i,j,:),a,b,c,d, massflux, fluxb(i,j))
+    call tridiag(a,b,c,d)
+    flux(1) = flux(1) + fluxb(i,j)
+    flux(nz)= 0.
+    flux(2:nzm) = flux(2:nzm) + rhow(i,j,2:nzm) * (  &
+              (-1.) /adzw(2:nzm)/dz *         0.5*(tkh(i,j,1:nzm-1) + tkh(i,j,2:nzm)) *                  &
+                           (betap* (d(2:nzm)- d(1:nzm-1))+betam*(f(i,j,2:nzm)-f(i,j,1:nzm-1)) ) &
+                           +(sumMs(i,j,2:nzm) - (betap*d(2:nzm) + betam*f(i,j,2:nzm)) * sgs_field_sumM(i,j,2:nzm,1) ))
+    f(i,j,1:nzm) = d(1:nzm)
+  end do
+end do
 
-!if(RUN3D) then
-!  call diffuse_scalar3D (f,fluxb,fluxt,tkh,rho,rhow,flux)
-!else  
-!  call diffuse_scalar2D (f,fluxb,fluxt,tkh,rho,rhow,flux)
-!endif
-  call diffuse_scalar1D (f,fluxb,fluxt,tkh,rho,rhow,flux)
 
 if(dostatis) then
 	

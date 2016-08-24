@@ -5,6 +5,8 @@ module sgs
 
 use grid, only: nx,nxp1,ny,nyp1,YES3D,nzm,nz,dimx1_s,dimx2_s,dimy1_s,dimy2_s 
 use params, only: dosgs
+use microphysics, only : nmicro_fields
+use tracers, only : ntracers
 implicit none
 
 !----------------------------------------------------------------------
@@ -24,6 +26,9 @@ integer, parameter :: nsgs_fields_diag = 2   ! total number of diagnostic sgs va
 integer, parameter :: dimx1_d=0, dimx2_d=nxp1, dimy1_d=1-YES3D, dimy2_d=nyp1
 
 real sgs_field_diag(dimx1_d:dimx2_d, dimy1_d:dimy2_d, nzm, nsgs_fields_diag)
+! mass fluxes from multiplume model: sumM, sumMu, sumMv, sumMtke, sumMt, sumMmicro(:), sumMtr(:)
+real sgs_field_sumM(dimx1_d:dimx2_d, dimy1_d:dimy2_d, nz, 5+nmicro_fields+ntracers)
+! note that an additional array has to be used since vertical size is different; boundary exchange has been added to task_boundary and periodic
 
 logical:: advect_sgs = .true. ! advect prognostics
 logical, parameter:: do_sgsdiag_bound = .true.  ! exchange boundaries for diagnostics fields
@@ -135,6 +140,7 @@ subroutine sgs_init()
   if(nrestart.eq.0) then
 
      sgs_field = 0.
+     sgs_field_sumM = 0.
      sgs_field_diag = 0.
 
      fluxbsgs = 0.
@@ -298,7 +304,7 @@ end subroutine kurant_sgs
 !
 subroutine sgs_mom()
 
-   call diffuse_mom()
+   !call diffuse_mom()
 
 end subroutine sgs_mom
 
@@ -318,12 +324,12 @@ subroutine sgs_scalars()
     integer k
 
 
-      call diffuse_scalar(t,fluxbt,fluxtt,tdiff,twsb, &
-                           t2lediff,t2lediss,twlediff,.true.)
+      call diffuse_scalar(t,fluxbt,fluxtt,sgs_field_sumM(:,:,:,5),tdiff,twsb, &
+                           t2lediff,t2lediss,twlediff,.true.,.true.)
     
       if(advect_sgs) then
-         call diffuse_scalar(tke,fzero,fzero,dummy,sgswsb, &
-                                    dummy,dummy,dummy,.false.)
+         call diffuse_scalar(tke,fzero,fzero,sgs_field_sumM(:,:,:,4),dummy,sgswsb, &
+                                    dummy,dummy,dummy,.false.,.false.)
       end if
 
 
@@ -340,8 +346,8 @@ subroutine sgs_scalars()
          .or. doprecip.and.flag_precip(k).eq.1 ) then
            fluxbtmp(1:nx,1:ny) = fluxbmk(1:nx,1:ny,k)
            fluxttmp(1:nx,1:ny) = fluxtmk(1:nx,1:ny,k)
-           call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp, &
-                mkdiff(:,k),mkwsb(:,k), dummy,dummy,dummy,.false.)
+           call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp,sgs_field_sumM(:,:,:,5+k), &
+                mkdiff(:,k),mkwsb(:,k), dummy,dummy,dummy,.false.,.true.)
        end if
       end do
 
@@ -357,9 +363,9 @@ subroutine sgs_scalars()
 
           fluxbtmp = fluxbtr(:,:,k)
           fluxttmp = fluxttr(:,:,k)
-          call diffuse_scalar(tracer(:,:,:,k),fluxbtmp,fluxttmp, &
+          call diffuse_scalar(tracer(:,:,:,k),fluxbtmp,fluxttmp,sgs_field_sumM(:,:,:,5+nmicro_fields+k), &
                trdiff(:,k),trwsb(:,k), &
-               dummy,dummy,dummy,.false.)
+               dummy,dummy,dummy,.false.,.false.)
 !!$          call diffuse_scalar(tracer(:,:,:,k),fluxbtr(:,:,k),fluxttr(:,:,k),trdiff(:,k),trwsb(:,k), &
 !!$                           dummy,dummy,dummy,.false.)
 
