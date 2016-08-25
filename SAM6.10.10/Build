@@ -3,7 +3,7 @@
 # specify the scratch directory where object files as well as
 # restart and large output data file will be located :
 
-setenv SAM_SCR `pwd`
+setenv SAM_SCR /global/scratch/langhans
 
 # ----------------------------------
 # specify scalar-advection directory in SRC
@@ -11,7 +11,7 @@ setenv SAM_SCR `pwd`
 setenv ADV_DIR ADV_MPDATA
 
 # specify SGS directory in SRC
-setenv SGS_DIR SGS_TKE
+setenv SGS_DIR SGS_EDMF
 
 # specify radiation directory in SRC
 setenv RAD_DIR RAD_CAM
@@ -26,7 +26,7 @@ setenv MICRO_DIR MICRO_M2005
 # ----------------------------------
 # specify (GNU) make utility
 
-setenv GNUMAKE 'gnumake -j8'
+setenv GNUMAKE 'gmake -j8'
 
 #--------------------------------------------
 #--------------------------------------------
