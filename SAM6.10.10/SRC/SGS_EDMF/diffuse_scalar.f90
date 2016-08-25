@@ -42,11 +42,11 @@ endif
 flux = 0.
 do i=1,nx
   do j=1,ny
-    call get_abcd(betap,betam,f(i,j,:),sumMs(i,j,:),tkh(i,j,:),a,b,c,d, massflux, fluxb(i,j))
+    call get_abcd(i,j,betap,betam,f(i,j,:),sumMs(i,j,:),tkh(i,j,:),a,b,c,d, massflux, fluxb(i,j))
     call tridiag(a,b,c,d)
     flux(1) = flux(1) + fluxb(i,j)
     flux(nz)= 0.
-    flux(2:nzm) = flux(2:nzm) + rhow(i,j,2:nzm) * (  &
+    flux(2:nzm) = flux(2:nzm) + rhow(2:nzm) * (  &
               (-1.) /adzw(2:nzm)/dz *         0.5*(tkh(i,j,1:nzm-1) + tkh(i,j,2:nzm)) *                  &
                            (betap* (d(2:nzm)- d(1:nzm-1))+betam*(f(i,j,2:nzm)-f(i,j,1:nzm-1)) ) &
                            +(sumMs(i,j,2:nzm) - (betap*d(2:nzm) + betam*f(i,j,2:nzm)) * sgs_field_sumM(i,j,2:nzm,1) ))

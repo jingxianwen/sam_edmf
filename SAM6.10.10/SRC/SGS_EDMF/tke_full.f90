@@ -14,8 +14,9 @@ real buoy_sgs,a_prod_sh,a_prod_bu,a_diss
 real lstarn, lstarp, bbb, omn, omp
 real qsatt,dqsat
 integer i,j,k,kc,kb
-real thetavs, sgs_thv_flx, tketau, l23, tke_thvflx
+real thetavs, sgs_thv_flux, tketau, l23, tke_thvflx, wstar
 real dtkedtsum, dtkedtmin
+real, parameter :: xkar=0.4
 
 real tabs_interface, qp_interface, qtot_interface, qsat_check, qctot
 
@@ -64,7 +65,7 @@ do k=1,nzm
   l23 = (tketau*sqrt(tke(i,j,k)))**(-1)
   l23 = l23**(-1)
   smix=  l23 + (xkar*z(k)-l23)*exp(-z(k)/100.)
-  tk(k) = Ck*smix*sqrt(tke(i,j,k))
+  tk(i,j,k) = Ck*smix*sqrt(tke(i,j,k))
 
 
   ! buoyancy flux

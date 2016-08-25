@@ -1,5 +1,5 @@
 ! ==================================================================
-      SUBROUTINE get_abcd(betap,betam,s,sumMs,tkin,a,b,c,d, massflux, kinflx)
+      SUBROUTINE get_abcd(iin,jin,betap,betam,s,sumMs,tkin,a,b,c,d, massflux, kinflx)
 
       use grid
       use vars, only : rho, rhow 
@@ -22,6 +22,7 @@
                                                            ! note that sumMs needs to be zero then (and this is 
                                                            ! ensured in edmf.f90)
         REAL, INTENT(in)                     :: kinflx,betap,betam
+        INTEGER, INTENT(in) :: iin,jin
         ! output
         REAL, DIMENSION(nzm),    INTENT(out) :: a,b,c,d
         
@@ -29,14 +30,13 @@
         ! local
         INTEGER :: k
         REAL, DIMENSION(nz) :: tkf, sumMloc                   ! tk on faces
-        REAL, parameter :: betap=1., betam=0.
  
         ! these rhow values are actually never used
         tkf(1)  = 0.
         tkf(nz) = 0.
 
         if (massflux) then
-          sumMloc = sgs_field_sumM(:,:,:,1)
+          sumMloc = sgs_field_sumM(iin,jin,:,1)
         else
           sumMloc = 0.0
         end if
