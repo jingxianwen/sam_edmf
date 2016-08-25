@@ -5,19 +5,18 @@ dosmagor = .false.
 &PARAMETERS
 
 caseid ='64x64x106_4km_20s',
-dz_constant=.false.
+doconstdz=.false.,
 
 nrestart = 0,
 
 CEM = .true.,
 LES = .false.,
 OCEAN = .true.,
-ocean_type=0
+ocean_type=0,
 doseawater = .false.,
-dodynamicocean=.false.
+dodynamicocean=.false.,
 perturb_type  = 0,
 day0 = 0.,
-
 dosgs           = .true.,
 dodamping       = .true.,
 doupperbound    = .false.,
@@ -33,19 +32,16 @@ dosfcforcing    = .false.,
 docoriolis      = .false.,
 donudging_uv    = .true.,
 donudging_tq    = .false.,
-
-tauls = 14400.,
-
+tauls = 7200.,
 SFC_FLX_FXD    = .false.,
 SFC_TAU_FXD    = .false.,
-
 
 nrad = 30,
 
 dx =    4000.,
 dy =    4000.,
 
-dt =    20.,
+dt =    10.,
 
 doseasons = .false.,
 doradhomo=.false.,
@@ -59,27 +55,27 @@ domisr = .false.,
 
 nstop   = 172800,
 nprint  = 180,
-nstat = 180,
+nstat = 360,
 nstatfrq = 30,
 
 doSAMconditionals = .false.,
 dosatupdnconditionals = .false.,
 
-nsave2D = 180,
+nsave2D = 360,
 save2Davg=.true.,
 nsave2Dstart    = 0,
 nsave2Dend      = 9999999,
 save2Dsep = .false.,
-save2Dbin      = .false.
+save2Dbin      = .false.,
 
-nsave3D = 180,
+nsave3D = 360,
 nsave3Dstart    = 0,
 nsave3Dend      = 999999999,
-save3Dbin      = .false.
-rad3Dout  = .true.
+save3Dbin      = .false.,
+rad3Dout  = .true.,
 
-nmovie       = 2
-nmoviestart  = 99999990
+nmovie       = 2,
+nmoviestart  = 99999990,
 nmovieend    = 99960480
 
 /
