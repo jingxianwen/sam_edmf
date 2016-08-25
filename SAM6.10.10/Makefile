@@ -57,29 +57,55 @@ LDFLAGS = -L${LIB_MPI} -L${LIB_NETCDF} -lmpi -lnetcdf
 
 endif
 #----------------------------------------------------------------------
+# Linux, Intel Compiler, Lawrencium
+#
+
+ifeq ($(PLATFORM),Linux)
+
+LIB_MPI = ${OPENMPI_DIR}/lib
+INC_MPI = ${OPENMPI_DIR}/include
+INC_NETCDF = ${NETCDF_DIR}/include
+LIB_NETCDF = ${NETCDF_DIR}/lib
+
+
+FF77 = ${OPENMPI_DIR}/bin/mpif90 -c -fixed -extend_source
+FF90 = ${OPENMPI_DIR}/bin/mpif90 -c
+CC = mpicc -c -DLINUX
+
+
+FFLAGS = -O3 
+#FFLAGS = -g -ftrapuv -check all
+
+FFLAGS += -I${INC_MPI} -I${INC_NETCDF}
+LD = ${OPENMPI_DIR}/bin/mpif90
+LDFLAGS = -L${LIB_NETCDF} -lnetcdf -lnetcdff
+
+
+endif
+#----------------------------------------------------------------------
 # Linux, Intel Compiler
 #
 
 #ifeq ($(PLATFORM),Linux)
-#
+
 #LIB_MPI = /usr/local/pkg/iopenmpi/lib
 #INC_MPI = /usr/local/pkg/iopenmpi/include
 #INC_NETCDF = /nfs/user08/marat/local/include
 #LIB_NETCDF = /nfs/user08/marat/local/lib
-#
-#
+
+
 #FF77 = /usr/local/pkg/iopenmpi/bin/mpif90 -c -fixed -extend_source
 #FF90 = /usr/local/pkg/iopenmpi/bin/mpif90 -c
 #CC = mpicc -c -DLINUX
-#
-#
+
+
 #FFLAGS = -O3 
-##FFLAGS = -g -ftrapuv -check all
-#
+#FFLAGS = -g -ftrapuv -check all
+
 #FFLAGS += -I${INC_MPI} -I${INC_NETCDF}
 #LD = /usr/local/pkg/iopenmpi/bin/mpif90
 #LDFLAGS = -L${LIB_NETCDF} -lnetcdf
-#
+
 
 #endif
 #----------------------------------------------------------------------
@@ -126,23 +152,23 @@ endif
 # Linux, Yellowstone
 # #
 
- ifeq ($(PLATFORM),Linux)
+# ifeq ($(PLATFORM),Linux)
 
 
- FF77 = ftn -c -fixed -extend_source
- FF90 = ftn -c -free
- CC = mpcc -c -DLINUX
+# FF77 = ftn -c -fixed -extend_source
+# FF90 = ftn -c -free
+# CC = mpcc -c -DLINUX
 
 
- FFLAGS = -g -O2 -pad
+# FFLAGS = -g -O2 -pad
 # FFLAGS = -g -ftrapuv -check all -traceback
 
- FFLAGS += -I${INC_NETCDF}
- LD = mpiifort
- LDFLAGS = -L${LIB_NETCDF} -lnetcdff
+# FFLAGS += -I${INC_NETCDF}
+# LD = mpiifort
+# LDFLAGS = -L${LIB_NETCDF} -lnetcdff
 
 
- endif
+# endif
 #----------------------------------------------------------------------
 # Linux, Portland Group Compiler
 #
