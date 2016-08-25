@@ -89,7 +89,7 @@
               !d(k) = -s(k)/dtn - 1./rho(k)/adz(k)/dz * (                       &
               !      tkf(k+1)*rhow(k+1)/adzw(k+1)/dz*betam*(s(k+1)-s(k))   &
               !     -rhow(k+1)*sumMs(k+1) )
-              d(k) = d(k) - kinflx/adz(k)/dz
+              d(k) = d(k) - rhow(k)/rho(k)*kinflx/adz(k)/dz
            ELSE
               a(k) = rhow(k)/rho(k)/adz(k)/dz * betap *                  &
                     (tkf(k)/adzw(k)/dz)
