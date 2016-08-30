@@ -80,6 +80,7 @@ real grdf_y(nzm)! grid factor for eddy diffusion in y
 real grdf_z(nzm)! grid factor for eddy diffusion in z
 
 logical:: dosgsclouds   ! if true, Subgrid scale clouds are diagnosed using PDF scheme
+logical :: dofixedtau   ! if true, tau=600 sec
 
 ! Local diagnostics:
 
@@ -100,11 +101,12 @@ subroutine sgs_setparm()
 
   !======================================================================
   NAMELIST /SGS_TKE/ &
-       dosgsclouds ! Subgrid scale clouds are diagnosed using PDF scheme
+       dosgsclouds, dofixedtau
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
   dosgsclouds = .false. ! default 
+  dofixedtau  = .true.  
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
