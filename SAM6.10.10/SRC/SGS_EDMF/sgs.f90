@@ -355,7 +355,7 @@ subroutine sgs_scalars()
     integer k
 
 
-      call diffuse_scalar(t,fluxbt,fluxtt,sgs_field_sumM(:,:,:,5),tdiff,twsb,twsb3 &
+      call diffuse_scalar(t,fluxbt,fluxtt,sgs_field_sumM(:,:,:,5),tdiff,twsb,twsb3, &
                            t2lediff,t2lediss,twlediff,.true.,.true.)
     
       if(advect_sgs) then
