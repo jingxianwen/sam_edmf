@@ -81,6 +81,8 @@ real grdf_z(nzm)! grid factor for eddy diffusion in z
 
 logical:: dosgsclouds   ! if true, Subgrid scale clouds are diagnosed using PDF scheme
 logical :: dofixedtau   ! if true, tau=600 sec
+logical :: dotkedirichlet ! if true, then downward tke surface fluxes are computed based on tke on first model level 
+                          ! and assuming tke(z=0) = 0
 
 ! Local diagnostics:
 
@@ -101,12 +103,13 @@ subroutine sgs_setparm()
 
   !======================================================================
   NAMELIST /SGS_TKE/ &
-       dosgsclouds, dofixedtau
+       dosgsclouds, dofixedtau,dotkedirichlet
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
   dosgsclouds = .false. ! default 
   dofixedtau  = .true.  
+  dotkedirichlet = .true.
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
@@ -361,7 +364,16 @@ subroutine sgs_scalars()
                            t2lediff,t2lediss,twlediff,.true.,.true.)
     
       if(advect_sgs) then
-         call diffuse_scalar(tke,fzero,fzero,sgs_field_sumM(:,:,:,4),dummy,sgswsb,tkewsb3, &
+         if (dotkedirichlet) then
+            do i=1,nx
+            do j=1,ny
+              tkewsb3(i,j,1) = - 2.*tk(i,j,1)/adz(1)/dz * tke(i,j,1)   
+            end do
+            end do
+         else
+            tkewsb3 = 0.
+         end if
+         call diffuse_scalar(tke,tkewsb3(:,:,1),fzero,sgs_field_sumM(:,:,:,4),dummy,sgswsb,tkewsb3, &
                                     dummy,dummy,dummy,.false.,.false.)
       end if
 
