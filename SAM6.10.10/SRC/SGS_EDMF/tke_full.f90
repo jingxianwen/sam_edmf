@@ -17,6 +17,7 @@ integer i,j,k,kc,kb
 real thetavs, sgs_thv_flux, tketau, l23, tke_thvflx, wstar
 real dtkedtsum, dtkedtmin
 real, parameter :: xkar=0.4
+real wthl, wqt
 
 real tabs_interface, qp_interface, qtot_interface, qsat_check, qctot
 
@@ -26,6 +27,8 @@ Ck=0.5
 Cee= 0.16 * 2.5
 Pr=1. 
 pblh=1000.
+
+thvflx = 0.
 
 if(RUN3D) then
   call shear_prod3D(def2)
@@ -69,18 +72,20 @@ do k=1,nzm
 
 
   ! buoyancy flux
-  !wthl = (0.5*(t_flux_ed(k) + t_flux_ed(k+1)))* (pres0/pres(k))**(rgas/cp) / cp
-  !if (qp(i,j,k).gt.0.0) then
-  !  wthl = wthl +  ((lcond*qpl(i,j,k)+lsub*qpi(i,j,k))/qp(i,j,k) * 0.5*(qp_flux_ed(k) + qp_flux_ed(k+1)))  &
-  !         * (pres0/pres(k))**(rgas/cp) / cp
-  !end if
-  !wqt  = 0.5*(qt_flux_ed(k) + qt_flux_ed(k+1))
-  ! get buoyancy flux from PDF scheme
-  tke_thvflx = - thetav_k/ggr * (tk(i,j,k)+0.001) * Pr * buoy_sgs !cthl(i,j,k) * wthl + cqt(i,j,k) * wqt
+  wthl = (0.5*(twsb3(i,j,k) + twsb3(i,j,k+1)))* (pres0/pres(k))**(rgas/cp) 
+  if (qp(i,j,k).gt.0.0) then
+    wthl = wthl +  ((fac_cond*qpl(i,j,k)+fac_sub*qpi(i,j,k))/qp(i,j,k) * 0.5*(mkwsb3(i,j,k,2) + mkwsb3(i,j,k+1,2)))  &
+           * (pres0/pres(k))**(rgas/cp) 
+  end if
+  wqt  = 0.5*(mkwsb3(i,j,k,1) + mkwsb3(i,j,k+1,1))
 
+  ! get buoyancy flux from PDF scheme
+  !thvflx(i,j,k) = cthl(i,j,k) * wthl + cqt(i,j,k) * wqt
+  ! assume fully unsaturated for now
+  thvflx(i,j,k) = (1.+epsv*qv(i,j,k)) *  wthl + epsv * thetav_k/(1.+epsv*qv(i,j,k)) * wqt 
  
   a_prod_sh=(tk(i,j,k)+0.001)*def2(i,j,k)
-  a_prod_bu= ggr/thetav_k * tke_thvflx
+  a_prod_bu= ggr/thetav_k * thvflx(i,j,k)
   a_diss=Cee / smix*tke(i,j,k)**1.5 
   dtkedtsum = a_prod_sh+a_prod_bu-a_diss
   dtkedtmin = -tke(i,j,k)/dtn

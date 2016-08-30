@@ -33,6 +33,14 @@ real sgs_field_diag(dimx1_d:dimx2_d, dimy1_d:dimy2_d, nzm, nsgs_fields_diag)
 real sgs_field_sumM(dimx1_d:dimx2_d, dimy1_d:dimy2_d, nz, 5+nmicro_fields+ntracers)
 ! note that an additional array has to be used since vertical size is different; boundary exchange has been added to task_boundary and periodic
 
+! these fluxes hold sum of ED and MF parts of fluxes
+real twsb3 (nx,ny,nz)                         ! sgs vertical flux of h/cp
+real mkwsb3(nx,ny,nz,1:nmicro_fields)         ! sgs vertical flux of qx
+real uwsb3(nx,ny,nz)                          ! sgs vertical flux of u
+real vwsb3(nx,ny,nz)                          ! sgs vertical flux of v
+real tkewsb3(nx,ny,nz)                        ! sgs vertical flux of tke
+real thvflx(nx,ny,nzm)                        ! sgs buoyancy flux in TKE equation
+
 logical:: advect_sgs = .true. ! advect prognostics
 logical, parameter:: do_sgsdiag_bound = .true.  ! exchange boundaries for diagnostics fields
 
@@ -148,6 +156,12 @@ subroutine sgs_init()
 
      fluxbsgs = 0.
      fluxtsgs = 0.
+
+     twsb3 = 0.
+     mkwsb3 = 0.
+     uwsb3 = 0. 
+     vwsb3 = 0. 
+     tkewsb3 = 0.       
 
   end if
 
@@ -336,15 +350,16 @@ subroutine sgs_scalars()
   implicit none
 
     real dummy(nz)
+    real dummy3(nx,ny,nz)
     real fluxbtmp(nx,ny), fluxttmp(nx,ny) !bloss
     integer k
 
 
-      call diffuse_scalar(t,fluxbt,fluxtt,sgs_field_sumM(:,:,:,5),tdiff,twsb, &
+      call diffuse_scalar(t,fluxbt,fluxtt,sgs_field_sumM(:,:,:,5),tdiff,twsb,twsb3 &
                            t2lediff,t2lediss,twlediff,.true.,.true.)
     
       if(advect_sgs) then
-         call diffuse_scalar(tke,fzero,fzero,sgs_field_sumM(:,:,:,4),dummy,sgswsb, &
+         call diffuse_scalar(tke,fzero,fzero,sgs_field_sumM(:,:,:,4),dummy,sgswsb,tkewsb3, &
                                     dummy,dummy,dummy,.false.,.false.)
       end if
 
@@ -363,7 +378,7 @@ subroutine sgs_scalars()
            fluxbtmp(1:nx,1:ny) = fluxbmk(1:nx,1:ny,k)
            fluxttmp(1:nx,1:ny) = fluxtmk(1:nx,1:ny,k)
            call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp,sgs_field_sumM(:,:,:,5+k), &
-                mkdiff(:,k),mkwsb(:,k), dummy,dummy,dummy,.false.,.true.)
+                mkdiff(:,k),mkwsb(:,k),mkwsb3(:,:,:,k), dummy,dummy,dummy,.false.,.true.)
        end if
       end do
 
@@ -380,7 +395,7 @@ subroutine sgs_scalars()
           fluxbtmp = fluxbtr(:,:,k)
           fluxttmp = fluxttr(:,:,k)
           call diffuse_scalar(tracer(:,:,:,k),fluxbtmp,fluxttmp,sgs_field_sumM(:,:,:,5+nmicro_fields+k), &
-               trdiff(:,k),trwsb(:,k), &
+               trdiff(:,k),trwsb(:,k),dummy3, &
                dummy,dummy,dummy,.false.,.false.)
 !!$          call diffuse_scalar(tracer(:,:,:,k),fluxbtr(:,:,k),fluxttr(:,:,k),trdiff(:,k),trwsb(:,k), &
 !!$                           dummy,dummy,dummy,.false.)
