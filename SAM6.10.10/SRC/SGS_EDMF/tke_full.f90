@@ -6,6 +6,7 @@ subroutine tke_full
 use vars
 use sgs
 use params
+use microphysics, only : qp
 implicit none
 
 real def2(nx,ny,nzm)
