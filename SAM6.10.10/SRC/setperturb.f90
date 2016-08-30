@@ -22,6 +22,10 @@ call setperturb_sgs(ptype)  ! set sgs fields
 
 select case (ptype)
 
+  case(-1)
+
+    if(masterproc) print*,'perturb_type=-1; No perturbation added...'
+
   case(0)
 
      do k=1,nzm

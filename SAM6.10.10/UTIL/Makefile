@@ -56,17 +56,34 @@ LDFLAGS = -L${LIB_NETCDF} -lnetcdf
 endif
 #---------------------------------------------------------
 #
-ifeq ($(PLATFORM),Linux)
+ifeq ($(PLATFORM),Linux) #  lawrencium
+
+
+LIB_NETCDF  := $(NETCDF_DIR)/lib
+INC_NETCDF  := $(NETCDF_DIR)/include
+
+#INC_NETCDF   := /gpfs/home2/marat/netcdf-vis-3.6.2/include
+#LIB_NETCDF   := /gpfs/home2/marat/netcdf-vis-3.6.2/lib
+
+#FF = xlf90 -qsuffix=f=f -qfixed=132 -I$(INC_NETCDF)
+FF = gfortran  -O3 -ffixed-form -ffixed-line-length-0 -I$(INC_NETCDF)
+DFLAGS = -L${LIB_NETCDF} -lnetcdf
+LDFLAGS = -L${LIB_NETCDF} -L/usr/lib -lnetcdf -lnetcdff -lpthread
+
+
+#---------------------------------------------------------
+#
+#ifeq ($(PLATFORM),Linux)
 
 
 
 
-INC_NETCDF   := /gpfs/home2/marat/netcdf-vis-3.6.2/include
-LIB_NETCDF   := /gpfs/home2/marat/netcdf-vis-3.6.2/lib
+#INC_NETCDF   := /gpfs/home2/marat/netcdf-vis-3.6.2/include
+#LIB_NETCDF   := /gpfs/home2/marat/netcdf-vis-3.6.2/lib
 
-FF = xlf90 -qsuffix=f=f -qfixed=132 -I$(INC_NETCDF)
-DFLAGS = -L${LIB_NETCDF} -lnetcdf 
-LDFLAGS = -L${LIB_NETCDF} -L/usr/lib -lnetcdf -lpthread
+#FF = xlf90 -qsuffix=f=f -qfixed=132 -I$(INC_NETCDF)
+#DFLAGS = -L${LIB_NETCDF} -lnetcdf 
+#LDFLAGS = -L${LIB_NETCDF} -L/usr/lib -lnetcdf -lpthread
 
 
 

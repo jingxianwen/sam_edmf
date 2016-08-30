@@ -2,7 +2,7 @@
 rd=287.
 cp=1004.
 
-z=fspan(10.,5000.,300)
+z=fspan(10.,4990.,250)
 nzm=dimsizes(z)
 p=z
 theta=z

@@ -14,6 +14,9 @@ implicit none
 
 !!! prognostic scalar (need to be advected arround the grid):
 
+! sum of betap and betam has to be one
+real, parameter :: betap = 1., betam = 0.
+
 integer, parameter :: nsgs_fields = 1   ! total number of prognostic sgs vars
 
 real sgs_field(dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm, nsgs_fields)
@@ -181,10 +184,17 @@ end subroutine sgs_init
 subroutine setperturb_sgs(ptype)
 
 use vars, only: q0, z
+use grid, only: masterproc
 integer, intent(in) :: ptype
 integer i,j,k
 
 select case (ptype)
+
+
+  case(-1)
+
+    if (masterproc) print*, 'Initial TKE=0'
+    tke =0.
 
   case(0)
 
@@ -284,17 +294,23 @@ real, intent(out) :: cfl
 integer k
 real tkhmax(nz)
 
+cfl=0.
+if (betap.ne.1.) then
+! Only needed if not fully implicit
+! Also, only vertical
+
 do k = 1,nzm
  tkhmax(k) = maxval(tkh(1:nx,1:ny,k))
 end do
 
-cfl = 0.
 do k=1,nzm
   cfl = max(cfl,        &
-     0.5*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2, &
-     0.5*tkhmax(k)*grdf_x(k)*dt/dx**2, &
-     YES3D*0.5*tkhmax(k)*grdf_y(k)*dt/dy**2)
+     !0.5*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2, &
+     !0.5*tkhmax(k)*grdf_x(k)*dt/dx**2, &
+     !YES3D*0.5*tkhmax(k)*grdf_y(k)*dt/dy**2)
+     0.5*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2) 
 end do
+end if
 
 end subroutine kurant_sgs
 

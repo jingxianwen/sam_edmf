@@ -3,7 +3,7 @@ subroutine diffuse_scalar (f,fluxb,fluxt,sumMs, &
 
 use grid
 use vars, only: rho, rhow
-use sgs, only: tkh, sgs_field_sumM
+use sgs, only: tkh, sgs_field_sumM, betap, betam
 implicit none
 
 ! input:	
@@ -17,7 +17,6 @@ real f2lediff(nzm)
 real f2lediss(nzm)
 real fwlediff(nzm)
 real,dimension(nzm) :: a, b, c, d
-real, parameter :: betap = 1., betam = 0.
 logical doit, massflux
 ! Local
 real df(dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm)	! scalar

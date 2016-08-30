@@ -1,5 +1,6 @@
 &SGS_TKE
-dosmagor = .false.
+dosgsclouds = .false.
+!dosmagor = .false.
 /
 
 &PARAMETERS
@@ -7,20 +8,21 @@ dosmagor = .false.
 caseid ='1DCPBL',
 doconstdz=.true.,
 dz=20.
-docolumn=.true.
+docolumn=.false.
 
 nrestart = 0,
 
+LES = .true.,
 OCEAN = .true.,
 ocean_type=0,
 doseawater = .false.,
 dodynamicocean=.false.,
-perturb_type  = 0,
+perturb_type  = -1,
 day0 = 0.,
 dosgs           = .true.,
 dodamping       = .false.,
 doupperbound    = .false.,
-docloud         = .false.,
+docloud         = .true.,
 doprecip        = .false.,
 dolongwave      = .false.,
 doshortwave     = .false.,
@@ -36,6 +38,7 @@ tauls = 7200.,
 SFC_FLX_FXD    = .true.,
 SFC_TAU_FXD    = .true.,
 
+dokinunits=.true.,
 fluxt0 = 0.06,
 fluxq0 = 2.5e-05,
 tau0 = 0.,
@@ -57,22 +60,23 @@ doisccp = .false.,
 domodis = .false.,
 domisr = .false.,
 
-nstop   = 2880,
-nprint  = 180,
-nstat = 360,
-nstatfrq = 30,
+ nstop   = 2880,
+ nprint  = 1,
+ nstat = 10,
+ nstatfrq = 1,
+
 
 doSAMconditionals = .false.,
 dosatupdnconditionals = .false.,
 
-nsave2D = 60,
-save2Davg=.true.,
+nsave2D = 180,
+save2Davg=.false.,
 nsave2Dstart    = 0,
 nsave2Dend      = 9999999,
 save2Dsep = .false.,
 save2Dbin      = .false.,
 
-nsave3D = 60,
+nsave3D = 180,
 nsave3Dstart    = 0,
 nsave3Dend      = 999999999,
 save3Dbin      = .false.,

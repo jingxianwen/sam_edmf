@@ -57,6 +57,7 @@ real:: timesimpleocean = 0. ! time to start simple ocean
 
 real::   fluxt0 =0.  ! surface sensible flux, Km/s
 real::   fluxq0 =0.  ! surface latent flux, m/s
+logical :: dokinunits=.false.
 real::   tau0   =0.  ! surface stress, m2/s2
 real::   z0     =0.035	! roughness length
 real::   soil_wetness =1.! wetness coeff for soil (from 0 to 1.)

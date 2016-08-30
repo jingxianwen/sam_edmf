@@ -17,7 +17,7 @@ integer icondavg, ierr
 NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 dolongwave, doshortwave, dosgs, dz, doconstdz, &
                 docoriolis, docoriolisz, dosurface, dolargescale, doradforcing, &
-		fluxt0,fluxq0,tau0,tabs_s,z0,nelapse, nelapsemin, dt, dx, dy,  &
+		fluxt0,fluxq0,dokinunits,tau0,tabs_s,z0,nelapse, nelapsemin, dt, dx, dy,  &
                 fcor, ug, vg, nstop, caseid, case_restart,caseid_restart, &
 		nstat, nstatfrq, nprint, nrestart, doradsimple, &
 		nsave3D, nsave3Dstart, nsave3Dend, dosfcforcing, &

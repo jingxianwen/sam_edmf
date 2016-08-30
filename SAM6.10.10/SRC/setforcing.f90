@@ -198,8 +198,10 @@ close(77)
 if(masterproc)print*,'Surface Forcing interval (days):',daysfc(1),daysfc(nsfc)
 
 else
-  fluxt0 = fluxt0/rhow(1)/cp
-  fluxq0 = fluxq0/rhow(1)/lcond
+  if (.not.dokinunits) then
+    fluxt0 = fluxt0/rhow(1)/cp
+    fluxq0 = fluxq0/rhow(1)/lcond
+  end if
 end if ! dosfcforcing
 
 end
