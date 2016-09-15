@@ -65,7 +65,11 @@ do k=1,nzm
   !thetavs
   thetavs = (1.+epsv*qv(i,j,1))*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)
   sgs_thv_flux = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)*fluxbq(i,j)
-  tketau= max(0.5 * pblh /  ((ggr/thetavs*sgs_thv_flux*pblh)**(1./3.)),0.0)
+  if (dofixedtau) then
+    tketau = 600.
+  else
+    tketau= max(0.5 * pblh /  ((ggr/thetavs*sgs_thv_flux*pblh)**(1./3.)),0.0)
+  end if
   l23 = (tketau*sqrt(tke(i,j,k)))**(-1)
   l23 = l23**(-1)
   smix=  l23 + (xkar*z(k)-l23)*exp(-z(k)/100.)
