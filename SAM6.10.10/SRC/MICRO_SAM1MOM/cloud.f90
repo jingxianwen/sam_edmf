@@ -114,10 +114,13 @@ do k = 1, nzm
 
       qsatt = qsatt + dqsat * dtabs
       qn(i,j,k) = max(0.,q(i,j,k)-qsatt)
+      if (qn(i,j,k).gt.0.0) cfrac_pdf(i,j,k) = 1. ! Note that cfrac_pdf will be overwritten with 
+                                                  ! a non-binary value in sgscloud wherever tke>0
 
     else
 
       qn(i,j,k) = 0.
+      cfrac_pdf(i,j,k) = 0.
 
     endif
 

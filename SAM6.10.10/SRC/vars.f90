@@ -21,6 +21,7 @@ real qcl     (nx, ny, nzm)                ! liquid water  (condensate)
 real qpl     (nx, ny, nzm)                ! liquid water  (precipitation)
 real qci     (nx, ny, nzm)                ! ice water  (condensate)
 real qpi     (nx, ny, nzm)                ! ice water  (precipitation)
+real cfrac_pdf(nx, ny, nzm)               ! sgs cloud cover  
         
 !--------------------------------------------------------------------
 ! time-tendencies for prognostic variables

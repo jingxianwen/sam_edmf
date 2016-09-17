@@ -83,6 +83,9 @@ logical:: dosgsclouds   ! if true, Subgrid scale clouds are diagnosed using PDF 
 logical :: dofixedtau   ! if true, tau=600 sec
 logical :: dotkedirichlet ! if true, then downward tke surface fluxes are computed based on tke on first model level 
                           ! and assuming tke(z=0) = 0
+logical :: pblhfluxmin    ! use level with minimum buoyancy flux
+logical :: pblhthvgrad    ! use height with max dthv gradient (may lie between levels)
+logical :: dofixedtau 
 
 ! Local diagnostics:
 
@@ -103,13 +106,16 @@ subroutine sgs_setparm()
 
   !======================================================================
   NAMELIST /SGS_TKE/ &
-       dosgsclouds, dofixedtau,dotkedirichlet
+       dosgsclouds, dofixedtau,dotkedirichlet,pblhfluxmin,pblhthvgrad,dofixedtau
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
   dosgsclouds = .false. ! default 
   dofixedtau  = .true.  
   dotkedirichlet = .true.
+  pblhfluxmin    = .false.
+  pblhthvgrad    = .true.
+  dofixedtau = .false.
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
@@ -129,6 +135,12 @@ subroutine sgs_setparm()
         call task_abort()
      end if
   end if
+
+  if (pblhfluxmin.eq.pblhthvgrad) then
+        if (masterproc) write(*,*) '****** ERROR: bad specification in SGS_TKE namelist for pblh diagnostic'
+        call task_abort()
+  end of
+
   close(55)
    ! write namelist values out to file for documentation
    if(masterproc) then

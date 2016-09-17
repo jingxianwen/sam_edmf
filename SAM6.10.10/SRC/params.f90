@@ -81,6 +81,7 @@ real:: tautqls = 99999999.! nudging-to-large-scaler-profile time-scale for scala
 logical:: dodamping = .false.
 logical:: doupperbound = .false. 
 logical:: docloud = .false. 
+logical:: dosgscloud = .false. 
 logical:: doprecip = .false.
 logical:: dolongwave = .false. 
 logical:: doshortwave = .false.

@@ -358,7 +358,7 @@ contains
 
           IWP(:, 1:nzm) = qci(:, lat, 1:nzm) * 1.e3 * layerMass(:, 1:nzm) 
           IWP(:, nzm+1) = 0. ! zero out extra layer
-          cloudFrac(:,:) = MERGE(1., 0., LWP(:,:)>0. .or. IWP(:,:)>0.)
+          cloudFrac(:,:) =cfrac_pdf(:,lat,1:nzm) ! MERGE(1., 0., LWP(:,:)>0. .or. IWP(:,:)>0.)
 
           if(have_cloud_optics) then
             if(use_m2005_cloud_optics) then

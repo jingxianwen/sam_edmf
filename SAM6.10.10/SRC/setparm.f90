@@ -43,7 +43,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 bubble_x0,bubble_y0,bubble_z0,bubble_radius_hor, &
                 bubble_radius_ver,bubble_dtemp,bubble_dq, dosmoke, dossthomo, &
                 rad3Dout, nxco2, dosimfilesout, notracegases, &
-                doradlat, doradlon, ncycle_max, doseawater
+                doradlat, doradlon, ncycle_max, doseawater, dosgscloud
 	
 !----------------------------------
 !  Read namelist variables from the standard input:

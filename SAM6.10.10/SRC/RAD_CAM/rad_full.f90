@@ -415,7 +415,11 @@ subroutine rad_full()
           qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)
           qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)
           qs_rad(i,j,k)=qs_rad(i,j,k)+SnowMassMixingRatio(i,j,k)
-          if(qcl(i,j,k)+qci(i,j,k)+SnowMassMixingRatio(i,j,k).gt.0.) cld_rad(i,j,k) = cld_rad(i,j,k)+1.
+          if(SnowMassMixingRatio(i,j,k).gt.0.) then 
+             cld_rad(i,j,k) = cld_rad(i,j,k)+1.
+          elseif (SnowMassMixingRatio(i,j,k).eq.0..and.cfrac_pdf(i,j,k).gt.0.0) then
+             cld_rad(i,j,k) = cld_rad(i,j,k)+ cfrac_pdf(i,j,k)
+          end if
         end do
       end do
     end do
@@ -426,7 +430,7 @@ subroutine rad_full()
         do i=1,nx
           qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)
           qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)
-          if(qcl(i,j,k)+qci(i,j,k).gt.0.) cld_rad(i,j,k) = cld_rad(i,j,k)+1.
+          cld_rad(i,j,k) = cld_rad(i,j,k)+cfrac_pdf(i,j,k)
         end do
       end do
     end do
