@@ -60,7 +60,7 @@ module rad
        dostatis, dostatisrad, nelapse, nrestart_skip, case, rundatadir, &
        doisccp, domodis, domisr, &
        restart_sep, caseid, case_restart, caseid_restart, rank
-  use vars, only : t, tabs, qv, qcl, qci, sstxy, rho, t00, &
+  use vars, only : t, tabs, qv, qcl, qci, sstxy, rho, t00, cfrac_pdf, &
        latitude, longitude,                         &
                                 ! Domain-average diagnostic fields
        radlwup, radlwdn, radswup, radswdn, radqrlw, radqrsw, &
@@ -358,7 +358,8 @@ contains
 
           IWP(:, 1:nzm) = qci(:, lat, 1:nzm) * 1.e3 * layerMass(:, 1:nzm) 
           IWP(:, nzm+1) = 0. ! zero out extra layer
-          cloudFrac(:,:) =cfrac_pdf(:,lat,1:nzm) ! MERGE(1., 0., LWP(:,:)>0. .or. IWP(:,:)>0.)
+          cloudFrac(:,1:nzm) =cfrac_pdf(:,lat,1:nzm) ! MERGE(1., 0., LWP(:,:)>0. .or. IWP(:,:)>0.)
+          cloudFrac(:,nzm+1) = 0.0
 
           if(have_cloud_optics) then
             if(use_m2005_cloud_optics) then

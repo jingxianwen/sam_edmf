@@ -17,6 +17,8 @@ use vars
 use params
 use grid
 use micro_params
+use microphysics, only : q,qp,qn
+use sgs, only : tke
 
 
 implicit none
@@ -25,7 +27,7 @@ implicit none
 integer i,j,k, kb, kc, n,ks
 real dtabs, an, omn
 real, dimension(nzm) :: qte
-real  qne, tabse, ds
+real  qne, tabse, ds, q1
 integer,parameter :: niter=10
 real :: lambdaf, alphaf, qsl, totheta, tl, qsw, qsi, tabsnoql, dqndt, domndt
 real,dimension (2) :: tabs1, tabs2
@@ -34,7 +36,7 @@ real, parameter :: q_crit=1.6
 real, parameter :: lcld = 150.
 
 real :: cab,ckk,leps
-real,dimension(nzm) :: qtqt, thlthl, qtthl, thetali
+real,dimension(nzm) :: qtqt, thlthl, qtthl, thetali, thetaligrad, qtgrad, sigmas
 
 
 
@@ -136,21 +138,21 @@ IF (tke(i,j,k).gt.0.0) then
    ! homogeneous grid box
    cfrac_pdf(i,j,k) =   ABS ( (SIGN(1.0,ds)+1.0)*0.5 )
    qne = cfrac_pdf(i,j,k) * ds
-   q1(k)=-999.
+   q1=-999.
    dqndt =  - (omn  * dtqsatw(tabse,pres(k)) + (1.-omn) * dtqsati(tabse,pres(k)))
  ELSE
-   q1(k)= ds/sigmas(k)
+   q1= ds/sigmas(k)
    cfrac_pdf(i,j,k) = MIN ( 1.0, MAX ( 0.0, &
-                                        0.5 * (1.0+q1(k)/q_crit) ) )
-   IF ( q1(k) .le. - q_crit ) THEN
+                                        0.5 * (1.0+q1/q_crit) ) )
+   IF ( q1 .le. - q_crit ) THEN
       qne = 0.0
       dqndt = 0.
-   ELSEIF ( q1(k) .ge. q_crit ) THEN
-      qne = sigmas(k) * q1(k) 
+   ELSEIF ( q1 .ge. q_crit ) THEN
+      qne = sigmas(k) * q1 
       dqndt = - (omn  * dtqsatw(tabse,pres(k)) + (1.-omn) * dtqsati(tabse,pres(k)))
    ELSE
-      qne = sigmas(k) * (q1(k)+q_crit) * (q1(k)+q_crit) / (2.*(q_crit+q_crit))
-      dqndt = - (q1(k)+q_crit)/(2.*q_crit) * (omn  * dtqsatw(tabse,pres(k)) + (1.-omn) * dtqsati(tabse,pres(k)))
+      qne = sigmas(k) * (q1+q_crit) * (q1+q_crit) / (2.*(q_crit+q_crit))
+      dqndt = - (q1+q_crit)/(2.*q_crit) * (omn  * dtqsatw(tabse,pres(k)) + (1.-omn) * dtqsati(tabse,pres(k)))
    ENDIF
  END IF
  

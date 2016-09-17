@@ -3,6 +3,8 @@ subroutine get_pblh(i,j,thetav,thvflux,pblh)
 use vars
 use params
 use grid
+use sgs, only : pblhfluxmin, pblhthvgrad, tke
+
 implicit none
 
 !input

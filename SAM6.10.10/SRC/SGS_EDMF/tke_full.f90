@@ -9,7 +9,7 @@ use params
 use microphysics, only : qp
 implicit none
 
-real def2(nx,ny,nzm),thvflx(nx,ny,nzm)
+real def2(nx,ny,nzm)
 real, dimension(nx,ny,nzm) :: cthl, cqt 
 real, dimension(nx,ny) :: pblh
 real, dimension(nzm) :: thetav

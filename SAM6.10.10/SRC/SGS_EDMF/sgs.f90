@@ -85,7 +85,6 @@ logical :: dotkedirichlet ! if true, then downward tke surface fluxes are comput
                           ! and assuming tke(z=0) = 0
 logical :: pblhfluxmin    ! use level with minimum buoyancy flux
 logical :: pblhthvgrad    ! use height with max dthv gradient (may lie between levels)
-logical :: dofixedtau 
 
 ! Local diagnostics:
 
@@ -139,7 +138,7 @@ subroutine sgs_setparm()
   if (pblhfluxmin.eq.pblhthvgrad) then
         if (masterproc) write(*,*) '****** ERROR: bad specification in SGS_TKE namelist for pblh diagnostic'
         call task_abort()
-  end of
+  end if
 
   close(55)
    ! write namelist values out to file for documentation
@@ -351,7 +350,7 @@ end subroutine kurant_sgs
 !
 subroutine sgs_mom()
 
-   !call diffuse_mom()
+   call diffuse_mom()
 
 end subroutine sgs_mom
 
@@ -369,7 +368,7 @@ subroutine sgs_scalars()
     real dummy(nz)
     real dummy3(nx,ny,nz)
     real fluxbtmp(nx,ny), fluxttmp(nx,ny) !bloss
-    integer k
+    integer i,j,k
 
 
       call diffuse_scalar(t,fluxbt,fluxtt,sgs_field_sumM(:,:,:,5),tdiff,twsb,twsb3, &

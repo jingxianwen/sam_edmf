@@ -9,6 +9,7 @@ use vars
 use params
 use grid
 use micro_params
+use microphysics, only : q
 
 
 implicit none
@@ -28,7 +29,7 @@ do i=1,nx
 do j=1,ny
 
 do k=1,nzm
-  totheta=(pres(k)/p00)**(rgas/cp)
+  totheta=(pres(k)/pres0)**(rgas/cp)
   !thetali
   thetali = (t(i,j,k)+fac_cond*qpl(i,j,k)+fac_sub*qpi(i,j,k)-ggr*z(k))  /  totheta 
   ! get liquid/ice water temperature Tl
