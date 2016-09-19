@@ -4,7 +4,7 @@ subroutine diffuse_mom2D
 !        momentum tendency due to SGS diffusion
 
 use vars
-use sgs, only: tk, grdf_x, grdf_z, betap, betam
+use sgs, only: tk, grdf_x, grdf_z, betap, betam, uwsb3, vwsb3, sgs_field_sumM
 use params, only: docolumn, dowallx
 implicit none
 
@@ -14,6 +14,9 @@ real dxz,dzx
 integer i,j,k,ic,ib,kc,kcu
 real tkx, tkz, rhoi, iadzw, iadz
 real fu(0:nx,1,nz),fv(0:nx,1,nz),fw(0:nx,1,nz)
+
+real,dimension(nzm) :: a, b, c, d
+logical :: massflux
 
 rdx2=1./dx/dx
 rdx25=0.25*rdx2
@@ -41,8 +44,11 @@ if(dowallx) then
 
 end if
 
+end if
+
 uwsb3 = 0.
 uwsb = 0.
+massflux=.false.
 do i=1,nx
   ib=i-1
     call get_abcd(i,j,betap,betam,u(i,j,:),0.5*(sgs_field_sumM(i,j,:,2)+sgs_field_sumM(ib,j,:,2) ),0.5*(tk(i,j,:)+tk(ib,j,:)),a,b,c,d, massflux, fluxbu(i,j))
@@ -53,13 +59,14 @@ do i=1,nx
     uwsb(nz)= 0.
     uwsb3(i,j,2:nzm) =  (-1.) /adzw(2:nzm)/dz *         0.25*(tk(i,j,1:nzm-1) + tk(i,j,2:nzm)+tk(ib,j,1:nzm-1) + tk(ib,j,2:nzm)) *                  &
                            (betap* (d(2:nzm)- d(1:nzm-1))+betam*(u(i,j,2:nzm)-u(i,j,1:nzm-1)) ) &
-                           +(0.5*(sgs_field_sumM(i,j,2:nzm,2)+sgs_field_sumM(ib,j,2:nzm),2) - (betap*d(2:nzm) + betam*u(i,j,2:nzm)) * sgs_field_sumM(i,j,2:nzm,1) )
+                           +(0.5*(sgs_field_sumM(i,j,2:nzm,2)+sgs_field_sumM(ib,j,2:nzm,2)) - (betap*d(2:nzm) + betam*u(i,j,2:nzm)) * sgs_field_sumM(i,j,2:nzm,1) )
     uwsb(2:nzm) = uwsb(2:nzm) + rhow(2:nzm) * uwsb3(i,j,2:nzm)
     dudt(i,j,:,na) = dudt(i,j,:,na) + (d-u(i,j,:))/dtn
 end do
 
 vwsb3 = 0.
 vwsb = 0.
+massflux=.false.
 do i=1,nx
     call get_abcd(i,j,betap,betam,v(i,j,:),sgs_field_sumM(i,j,:,3),tk(i,j,:),a,b,c,d, massflux, fluxbv(i,j))
     call tridiag(a,b,c,d)
