@@ -14,6 +14,7 @@ real dxz,dzx
 integer i,j,k,ic,ib,kc,kcu
 real tkx, tkz, rhoi, iadzw, iadz
 real fu(0:nx,1,nz),fv(0:nx,1,nz),fw(0:nx,1,nz)
+real var(nzm), sumMs1D(nz), tk1D(nzm)
 
 real,dimension(nzm) :: a, b, c, d
 logical :: massflux
@@ -51,7 +52,10 @@ uwsb = 0.
 massflux=.false.
 do i=1,nx
   ib=i-1
-    call get_abcd(i,j,betap,betam,u(i,j,:),0.5*(sgs_field_sumM(i,j,:,2)+sgs_field_sumM(ib,j,:,2) ),0.5*(tk(i,j,:)+tk(ib,j,:)),a,b,c,d, massflux, fluxbu(i,j))
+    var = u(i,j,1:nzm)
+    sumMs1D = 0.5*(sgs_field_sumM(i,j,1:nz,2)+sgs_field_sumM(ib,j,1:nz,2) )
+    tk1D = 0.5*(tk(i,j,1:nzm)+tk(ib,j,1:nzm))
+    call get_abcd(i,j,betap,betam,var,sumMs1D,tk1D,a,b,c,d, massflux, fluxbu(i,j))
     call tridiag(a,b,c,d)
     uwsb(1) = uwsb(1) + fluxbu(i,j)
     uwsb3(i,j,1) = fluxbu(i,j)
@@ -68,7 +72,10 @@ vwsb3 = 0.
 vwsb = 0.
 massflux=.false.
 do i=1,nx
-    call get_abcd(i,j,betap,betam,v(i,j,:),sgs_field_sumM(i,j,:,3),tk(i,j,:),a,b,c,d, massflux, fluxbv(i,j))
+    var = v(i,j,1:nzm)
+    sumMs1D = sgs_field_sumM(i,j,1:nz,3)
+    tk1D = tk(i,j,1:nzm)
+    call get_abcd(i,j,betap,betam,var,sumMs1D,tk1D,a,b,c,d, massflux, fluxbv(i,j))
     call tridiag(a,b,c,d)
     vwsb(1) = vwsb(1) + fluxbv(i,j)
     vwsb3(i,j,1) = fluxbv(i,j)

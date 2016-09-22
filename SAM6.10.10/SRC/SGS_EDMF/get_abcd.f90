@@ -36,7 +36,7 @@
         tkf(nz) = 0.
 
         if (massflux) then
-          sumMloc = sgs_field_sumM(iin,jin,:,1)
+          sumMloc = sgs_field_sumM(iin,jin,1:nz,1)
         else
           sumMloc = 0.0
         end if

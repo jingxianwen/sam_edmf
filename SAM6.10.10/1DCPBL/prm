@@ -1,6 +1,8 @@
 &SGS_TKE
-dosgsclouds = .false.
-!dosmagor = .false.
+dofixedtau = .false.,
+dotkedirichlet = .false.,
+pblhthvgrad = .true.
+pblhfluxmin = .false.
 /
 
 &PARAMETERS
@@ -8,7 +10,7 @@ dosgsclouds = .false.
 caseid ='1DCPBL',
 doconstdz=.true.,
 dz=20.
-docolumn=.false.
+docolumn=.true.
 
 nrestart = 0,
 
@@ -23,6 +25,7 @@ dosgs           = .true.,
 dodamping       = .false.,
 doupperbound    = .false.,
 docloud         = .true.,
+dosgscloud      = .false.,
 doprecip        = .false.,
 dolongwave      = .false.,
 doshortwave     = .false.,

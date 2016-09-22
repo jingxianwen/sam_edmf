@@ -10,13 +10,14 @@ implicit none
 real f(dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm)	! scalar
 real fluxb(nx,ny)		! bottom flux
 real fluxt(nx,ny)		! top flux
-real sumMs(dimx1_s:dimx2_s, dimy1_s:dimy2_s,nz)		! MF flux of scalar
+real sumMs(1:nx, 1:ny,nz)		! MF flux of scalar
 real flux(nz)
 real flux3(nx,ny,nz)
 real fdiff(nz)
 real f2lediff(nzm)
 real f2lediss(nzm)
 real fwlediff(nzm)
+real var(nzm),sumMs1D(nz),tkh1D(nzm)
 real,dimension(nzm) :: a, b, c, d
 logical doit, massflux
 ! Local
@@ -43,7 +44,10 @@ flux = 0.
 flux3 = 0.
 do i=1,nx
   do j=1,ny
-    call get_abcd(i,j,betap,betam,f(i,j,:),sumMs(i,j,:),tkh(i,j,:),a,b,c,d, massflux, fluxb(i,j))
+    var = f(i,j,1:nzm)
+    sumMs1D = sumMs(i,j,1:nz)
+    tkh1D   = tkh(i,j,1:nzm)
+    call get_abcd(i,j,betap,betam,var,sumMs1D,tkh1D,a,b,c,d, massflux, fluxb(i,j))
     call tridiag(a,b,c,d)
     flux(1) = flux(1) + fluxb(i,j)
     flux3(i,j,1) = fluxb(i,j)

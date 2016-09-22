@@ -54,8 +54,8 @@ do k=1,nzm
   wqt  = 0.5*(mkwsb3(i,j,k,1) + mkwsb3(i,j,k+1,1))
 
   thvflx(i,j,k) = cthl(i,j,k) * wthl + cqt(i,j,k) * wqt
-
   thetav(k) = (1.+epsv*qv(i,j,k))*tabs(i,j,k)*(pres0/pres(k))**(rgas/cp)
+  thvflx(i,j,k) = 1. * wthl + epsv * thetav(k) * wqt
 end do 
 
 ! compute PBL height
@@ -65,19 +65,6 @@ end do
 end do
 
 
-
-do j=1,ny
-do i=1,nx
-
-!thetavs
-thetavs = (1.+epsv*qv(i,j,1))*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)
-sfc_thv_flux = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)*fluxbq(i,j)
-wstar=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
-if (dofixedtau) then
-  tketau = 600.
-else
-  tketau= max(1.0 * pblh(i,j) /  wstar,0.0)
-end if
 
 do k=1,nzm
   kb=k-1
@@ -95,6 +82,19 @@ do k=1,nzm
   end if
 
 
+do j=1,ny
+do i=1,nx
+
+!thetavs
+thetavs = (1.+epsv*qv(i,j,1))*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)
+sfc_thv_flux = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)*fluxbq(i,j)
+wstar=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
+if (dofixedtau) then
+  tketau = 600.
+else
+  tketau= max(1.0 * pblh(i,j) /  wstar,0.0)
+end if
+
   tke(i,j,k)=max(0.,tke(i,j,k))
   !N**2 based on virtual potential temperature
   thetav_c = (1.+epsv*qv(i,j,kc))*tabs(i,j,kc)*(pres0/pres(kc))**(rgas/cp)
@@ -103,11 +103,10 @@ do k=1,nzm
   buoy_sgs=ggr/thetav_k * (thetav_c-thetav_b)/ (z(kc)-z(kb))
 
   l23 = (tketau*sqrt(tke(i,j,k)))**(-1)
-  if (buoy_sgs.gt.0.0) l23 = l23 + (max(0.7*sqrt(tke(i,j,k))/sqrt(buoy_sgs),adz(k)*dz/2.))**(-1)
+  !if (buoy_sgs.gt.0.0) l23 = l23 + (max(0.7*sqrt(tke(i,j,k))/sqrt(buoy_sgs),adz(k)*dz/2.))**(-1)
   l23 = l23**(-1)
   smix=  l23 + (xkar*z(k)-l23)*exp(-z(k)/100.)
   tk(i,j,k) = Ck*smix*sqrt(tke(i,j,k))
-
 
  
   a_prod_sh=(tk(i,j,k)+0.001)*def2(i,j,k)
@@ -123,10 +122,6 @@ do k=1,nzm
   end if
   tke(i,j,k)=tke(i,j,k)+dtn*(a_prod_sh+a_prod_bu-a_diss)
 
-  tkelediss(k) = 0.
-  tkesbdiss(k) = 0.
-  tkesbshear(k)= 0.
-  tkesbbuoy(k) = 0.
 
   tkh(i,j,k)=Pr*tk(i,j,k)
 
@@ -135,11 +130,12 @@ do k=1,nzm
   tkesbshear(k)= tkesbshear(k)+ a_prod_sh
   tkesbbuoy(k) = tkesbbuoy(k) + a_prod_bu
 
-  end do ! k
   end do ! i
   end do ! j
 
-  tkelediss(1:nzm) = tkelediss(1:nzm)/float(nx*ny)
+  tkelediss(k) = tkelediss(k)/float(nx*ny)
+
+  end do ! k
 
 
 call t_stopf('tke_full')

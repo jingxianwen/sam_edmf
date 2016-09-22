@@ -79,7 +79,6 @@ real grdf_x(nzm)! grid factor for eddy diffusion in x
 real grdf_y(nzm)! grid factor for eddy diffusion in y
 real grdf_z(nzm)! grid factor for eddy diffusion in z
 
-logical:: dosgsclouds   ! if true, Subgrid scale clouds are diagnosed using PDF scheme
 logical :: dofixedtau   ! if true, tau=600 sec
 logical :: dotkedirichlet ! if true, then downward tke surface fluxes are computed based on tke on first model level 
                           ! and assuming tke(z=0) = 0
@@ -105,16 +104,14 @@ subroutine sgs_setparm()
 
   !======================================================================
   NAMELIST /SGS_TKE/ &
-       dosgsclouds, dofixedtau,dotkedirichlet,pblhfluxmin,pblhthvgrad,dofixedtau
+       dofixedtau,dotkedirichlet,pblhfluxmin,pblhthvgrad
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
-  dosgsclouds = .false. ! default 
-  dofixedtau  = .true.  
+  dofixedtau = .false.
   dotkedirichlet = .true.
   pblhfluxmin    = .false.
   pblhthvgrad    = .true.
-  dofixedtau = .false.
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
@@ -224,7 +221,7 @@ select case (ptype)
   case(-1)
 
     if (masterproc) print*, 'Initial TKE=0'
-    tke =0.
+    tke =0.00
 
   case(0)
 
@@ -363,16 +360,18 @@ subroutine sgs_scalars()
   use microphysics
   use tracers
   use params, only: dotracers
+  use grid, only: nx, ny, nz, adz, dz 
   implicit none
 
     real dummy(nz)
-    real dummy3(nx,ny,nz)
+    real dummy3(nx,ny,nz), dummy3b(nx,ny,nz)
     real fluxbtmp(nx,ny), fluxttmp(nx,ny) !bloss
     integer i,j,k
 
+      dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,5)
 
-      call diffuse_scalar(t,fluxbt,fluxtt,sgs_field_sumM(:,:,:,5),tdiff,twsb,twsb3, &
-                           t2lediff,t2lediss,twlediff,.true.,.true.)
+      call diffuse_scalar(t,fluxbt,fluxtt,dummy3,tdiff,twsb,twsb3, &
+                           t2lediff,t2lediss,twlediff,.true.,.false.)
     
       if(advect_sgs) then
          if (dotkedirichlet) then
@@ -384,7 +383,9 @@ subroutine sgs_scalars()
          else
             tkewsb3 = 0.
          end if
-         call diffuse_scalar(tke,tkewsb3(:,:,1),fzero,sgs_field_sumM(:,:,:,4),dummy,sgswsb,tkewsb3, &
+         fluxbtmp(1:nx,1:ny) = tkewsb3(1:nx,1:ny,1)
+         dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,4)
+         call diffuse_scalar(tke,fluxbtmp,fzero,dummy3,dummy,sgswsb,tkewsb3, &
                                     dummy,dummy,dummy,.false.,.false.)
       end if
 
@@ -402,8 +403,9 @@ subroutine sgs_scalars()
          .or. doprecip.and.flag_precip(k).eq.1 ) then
            fluxbtmp(1:nx,1:ny) = fluxbmk(1:nx,1:ny,k)
            fluxttmp(1:nx,1:ny) = fluxtmk(1:nx,1:ny,k)
-           call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp,sgs_field_sumM(:,:,:,5+k), &
-                mkdiff(:,k),mkwsb(:,k),mkwsb3(:,:,:,k), dummy,dummy,dummy,.false.,.true.)
+           dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,5+k)
+           call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp,dummy3, &
+                mkdiff(:,k),mkwsb(:,k),mkwsb3(:,:,:,k), dummy,dummy,dummy,.false.,.false.)
        end if
       end do
 
@@ -419,7 +421,8 @@ subroutine sgs_scalars()
 
           fluxbtmp = fluxbtr(:,:,k)
           fluxttmp = fluxttr(:,:,k)
-          call diffuse_scalar(tracer(:,:,:,k),fluxbtmp,fluxttmp,sgs_field_sumM(:,:,:,5+nmicro_fields+k), &
+          dummy3b = sgs_field_sumM(1:nx,1:ny,1:nz,5+nmicro_fields+k)
+          call diffuse_scalar(tracer(:,:,:,k),fluxbtmp,fluxttmp,dummy3b, &
                trdiff(:,k),trwsb(:,k),dummy3, &
                dummy,dummy,dummy,.false.,.false.)
 !!$          call diffuse_scalar(tracer(:,:,:,k),fluxbtr(:,:,k),fluxttr(:,:,k),trdiff(:,k),trwsb(:,k), &
