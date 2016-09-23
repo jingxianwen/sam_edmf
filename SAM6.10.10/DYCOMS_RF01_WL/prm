@@ -7,7 +7,7 @@ pblhfluxmin = .false.
 
 &PARAMETERS
 
-caseid ='1DCPBL',
+caseid ='1DDYCOMS',
 doconstdz=.true.,
 dz=20.
 docolumn=.true.
@@ -27,26 +27,29 @@ doupperbound    = .false.,
 docloud         = .true.,
 dosgscloud      = .true.,
 doprecip        = .false.,
-dolongwave      = .false.,
+dolongwave      = .true.,
+doradsimple=.true.,
 doshortwave     = .false.,
 dosurface       = .true.,
-tabs_s=300.,
+tabs_s=292.5,
 dolargescale    = .false.,
 doradforcing    = .false.,
 dosfcforcing    = .false.,
-docoriolis      = .false.,
+docoriolis      = .true.,
+dofplane        = .true.,
+fcor            = 7.620245e-05, ! lat=31.5 deg
 donudging_uv    = .false.,
 donudging_tq    = .false.,
 tauls = 7200.,
 SFC_FLX_FXD    = .true.,
 SFC_TAU_FXD    = .true.,
 
-dokinunits=.true.,
-fluxt0 = 0.06,
-fluxq0 = 2.5e-05,
-tau0 = 0.,
+dokinunits=.false.,
+fluxt0 = 15.,
+fluxq0 = 115.,
+tau0 = 0.0625,
 
-nrad = 30,
+nrad = 1,
 
 dx =    4000.,
 dy =    4000.,
@@ -63,7 +66,7 @@ doisccp = .false.,
 domodis = .false.,
 domisr = .false.,
 
- nstop   = 2880,
+ nstop   = 2160,
  nprint  = 1,
  nstat = 10,
  nstatfrq = 1,

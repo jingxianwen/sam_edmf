@@ -10,6 +10,7 @@ use params
 use grid
 use micro_params
 use microphysics
+use sgs
 
 
 implicit none
@@ -33,9 +34,8 @@ do k=1,nzm
  
   totheta=(pres(k)/pres0)**(rgas/cp)
 
-  if (dosgscloud) then
   !thetali
-  thetali = (t(i,j,k)+fac_cond*qpl(i,j,k)+fac_sub*qpi(i,j,k)-ggr*z(k))  /  totheta 
+  thetali = (t(i,j,k)+fac_cond*qpl(i,j,k)+fac_sub*qpi(i,j,k)-gamaz(k))  /  totheta 
   ! get liquid/ice water temperature Tl
   tl     = totheta * thetali
 
@@ -55,21 +55,12 @@ do k=1,nzm
     (fac_cond/totheta + (1.+epsv) * tabs(i,j,k)/totheta) * lambdaf) &
       + (1.-cfrac_pdf(i,j,k)) * epsv*thetali
 
-  else
-
-  cthl(i,j,k) = (1.+epsv*qv(i,j,k))
-  cqt(i,j,k)  = epsv*tabs(i,j,k) / totheta
-    
-  end if
-
- 
 end do
+
 
 end do ! j
 end do ! i
 
-
-
-
+ 
 end subroutine get_c0c1
 

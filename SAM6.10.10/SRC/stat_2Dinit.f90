@@ -29,6 +29,7 @@ integer :: ResetStorage
      lwnsc_xy(:,:) = 0.
      swnsc_xy(:,:) = 0.
      qocean_xy(:,:) = 0.
+     pblh_xy(:,:) = 0.
 !===================================
 ! UW ADDITIONS: MOSTLY 2D STATISTICS
 

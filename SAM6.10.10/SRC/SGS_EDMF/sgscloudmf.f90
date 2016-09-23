@@ -50,14 +50,14 @@ do k=1,nzm
   !total water
   qte(k) = q(i,j,k)
   !thetali
-  thetali(k) = (t(i,j,k)+fac_cond*qpl(i,j,k)+fac_sub*qpi(i,j,k)-ggr*z(k))  /  totheta 
+  thetali(k) = (t(i,j,k)+fac_cond*qpl(i,j,k)+fac_sub*qpi(i,j,k)-gamaz(k))  /  totheta 
 end do
 
 do k=1,nzm
 
   ! only compute sgs clouds if tke > 0
 
-IF (tke(i,j,k).gt.0.0) then
+IF (tke(i,j,k).gt.0.0.and.dosgscloud) then
   
 ! compute vertical gradients of qt and thetali
   kb=k-1
@@ -173,8 +173,16 @@ IF (tke(i,j,k).gt.0.0) then
  qn(i,j,k) = max(qcl(i,j,k) + qci(i,j,k),0.)
  qv(i,j,k) = max(0.,q(i,j,k) - qn(i,j,k))
  qp(i,j,k) = max(0.,qp(i,j,k))
+
+else
+
+ if (qcl(i,j,k)+qci(i,j,k).gt.0.0) then 
+     cfrac_pdf(i,j,k) = 1.
+ else
+     cfrac_pdf(i,j,k) = 0.
+ end if
  
-end if ! tke > 0
+end if ! tke > 0 & dosgscloud
 
 end do ! k
 

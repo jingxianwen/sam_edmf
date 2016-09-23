@@ -196,5 +196,7 @@ real :: pblh
 
     END IF  
 
+    pblh_xy(i,j) = pblh_xy(i,j) + pblh * dtfactor
+
 
 end subroutine get_pblh

@@ -220,8 +220,8 @@ select case (ptype)
 
   case(-1)
 
-    if (masterproc) print*, 'Initial TKE=0'
-    tke =0.00
+    if (masterproc) print*, 'Initial TKE=0.001'
+    tke =0.001
 
   case(0)
 

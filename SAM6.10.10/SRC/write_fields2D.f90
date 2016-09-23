@@ -19,7 +19,7 @@ character*7 filestatus
 real coef
 logical, save :: notopend2D=.true.
 
-nfields= 30
+nfields= 31
 if(.not.dolongwave) nfields = nfields-4
 if(.not.doshortwave) nfields = nfields-5
 if(.not.dodynamicocean) nfields=nfields-1
@@ -27,6 +27,7 @@ if(.not.((ocean_type.ne.0.or.dodynamicocean).and..not.dossthomo)) &
                  nfields=nfields-1
 if(.not.doprecip) nfields = nfields-1
 if(.not.docloud) nfields = nfields-3
+if(.not.dosgs) nfields = nfields-1
 if(SFC_FLX_FXD) nfields = nfields-2
 nfields1=0
 
@@ -126,6 +127,22 @@ end if
 
 
 ! 2D fields:
+
+if (dosgs) then
+   nfields1=nfields1+1
+   do j=1,ny
+    do i=1,nx
+      tmp(i,j,1)=pblh_xy(i,j)*coef
+      pblh_xy(i,j) = 0.
+    end do
+   end do
+  name='PBLH'
+  long_name='Boundary layer height'
+  units='m'
+  call compress3D(tmp,nx,ny,1,name,long_name,units, &
+                               save2Dbin,dompi,rank,nsubdomains)
+end if
+
 
 if(doprecip) then
    nfields1=nfields1+1

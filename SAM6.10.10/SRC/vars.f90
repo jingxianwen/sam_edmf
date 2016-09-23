@@ -137,6 +137,7 @@ real v200_xy(nx,ny) ! v-wind at 200 mb
 real vsfc_xy(nx,ny) ! v-wind at the surface
 real w500_xy(nx,ny) ! w at 500 mb
 real qocean_xy(nx,ny) ! ocean cooling in W/m2
+real pblh_xy(nx,ny) ! boundary layer depth
 
 real, parameter :: t00 = 300.   ! constant offset for sstxy 
 

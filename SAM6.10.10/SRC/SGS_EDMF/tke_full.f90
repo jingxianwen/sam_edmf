@@ -55,11 +55,16 @@ do k=1,nzm
 
   thvflx(i,j,k) = cthl(i,j,k) * wthl + cqt(i,j,k) * wqt
   thetav(k) = (1.+epsv*qv(i,j,k))*tabs(i,j,k)*(pres0/pres(k))**(rgas/cp)
-  thvflx(i,j,k) = 1. * wthl + epsv * thetav(k) * wqt
+  !thvflx(i,j,k) = 1. * wthl + epsv * thetav(k) * wqt
 end do 
 
 ! compute PBL height
 call get_pblh(i,j,thetav,thvflx(i,j,1:nzm),pblh(i,j))
+!if (i.eq.1.and.j.eq.1) then 
+!do k=1,nzm
+!  write(*,*) thetav(k) , '  ',twsb3(i,j,k), '  ',thvflx(i,j,k),'  ',mkwsb3(i,j,k,1)
+!end do
+!end if
 
 end do
 end do
