@@ -26,6 +26,7 @@ dxz=dx/dz
 
 j=1
 
+
 if(.not.docolumn) then
 
 if(dowallx) then
@@ -65,7 +66,8 @@ do i=1,nx
                            (betap* (d(2:nzm)- d(1:nzm-1))+betam*(u(i,j,2:nzm)-u(i,j,1:nzm-1)) ) &
                            +(0.5*(sgs_field_sumM(i,j,2:nzm,2)+sgs_field_sumM(ib,j,2:nzm,2)) - (betap*d(2:nzm) + betam*u(i,j,2:nzm)) * sgs_field_sumM(i,j,2:nzm,1) )
     uwsb(2:nzm) = uwsb(2:nzm) + rhow(2:nzm) * uwsb3(i,j,2:nzm)
-    dudt(i,j,:,na) = dudt(i,j,:,na) + (d-u(i,j,:))/dtn
+    dudtdiff(i,j,:,na) = (d-u(i,j,:))/dtn
+    dudt(i,j,:,na) = dudt(i,j,:,na) + dudtdiff(i,j,:,na)
 end do
 
 vwsb3 = 0.
@@ -85,7 +87,8 @@ do i=1,nx
                            (betap* (d(2:nzm)- d(1:nzm-1))+betam*(v(i,j,2:nzm)-v(i,j,1:nzm-1)) ) &
                            +(sgs_field_sumM(i,j,2:nzm,3) - (betap*d(2:nzm) + betam*v(i,j,2:nzm)) * sgs_field_sumM(i,j,2:nzm,1) )
     vwsb(2:nzm) = vwsb(2:nzm) + rhow(2:nzm) * vwsb3(i,j,2:nzm)
-    dvdt(i,j,:,na) = dvdt(i,j,:,na) + (d-v(i,j,:))/dtn
+    dvdtdiff(i,j,:,na) = (d-v(i,j,:))/dtn
+    dvdt(i,j,:,na) = dvdt(i,j,:,na) + dvdtdiff(i,j,:,na)
 end do
 
 

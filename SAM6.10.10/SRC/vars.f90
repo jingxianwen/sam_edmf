@@ -30,6 +30,9 @@ real dudt   (nxp1, ny, nzm, 3)
 real dvdt   (nx, nyp1, nzm, 3)
 real dwdt   (nx, ny, nz,  3)
 
+real dudtdiff   (nxp1, ny, nzm, 3)
+real dvdtdiff   (nx, nyp1, nzm, 3)
+
 !----------------------------------------------------------------
 ! Temporary storage array:
 

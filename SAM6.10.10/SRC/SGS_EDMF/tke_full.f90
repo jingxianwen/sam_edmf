@@ -97,7 +97,7 @@ wstar=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
 if (dofixedtau) then
   tketau = 600.
 else
-  tketau= max(1.0 * pblh(i,j) /  wstar,0.0)
+  tketau= max(0.5 * pblh(i,j) /  wstar,0.0)
 end if
 
   tke(i,j,k)=max(0.,tke(i,j,k))
@@ -108,7 +108,7 @@ end if
   buoy_sgs=ggr/thetav_k * (thetav_c-thetav_b)/ (z(kc)-z(kb))
 
   l23 = (tketau*sqrt(tke(i,j,k)))**(-1)
-  !if (buoy_sgs.gt.0.0) l23 = l23 + (max(0.7*sqrt(tke(i,j,k))/sqrt(buoy_sgs),adz(k)*dz/2.))**(-1)
+  if (buoy_sgs.gt.0.0) l23 = l23 + (max(0.7*sqrt(tke(i,j,k))/sqrt(buoy_sgs),adz(k)*dz/2.))**(-1)
   l23 = l23**(-1)
   smix=  l23 + (xkar*z(k)-l23)*exp(-z(k)/100.)
   tk(i,j,k) = Ck*smix*sqrt(tke(i,j,k))

@@ -7,6 +7,10 @@ nzm=dimsizes(z)
 p=z
 theta=z
 qv=z
+u=theta
+v=theta
+u=7.
+v=-5.5
 
 zinvbottom  = 840.
 theta0      = 289.
@@ -29,10 +33,6 @@ qv = where(qv.lt.0.0,0.0,qv)
 rv=(qv/(1.-qv))*1000.
 delete(qv)
 
-u=theta
-v=theta
-u=7.
-v=-5.5
 p=-999.
 
 day0=0.0

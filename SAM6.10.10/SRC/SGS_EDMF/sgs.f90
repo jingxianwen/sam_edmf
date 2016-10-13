@@ -221,7 +221,7 @@ select case (ptype)
   case(-1)
 
     if (masterproc) print*, 'Initial TKE=0.001'
-    tke =0.001
+    tke =0.00
 
   case(0)
 
@@ -335,7 +335,7 @@ do k=1,nzm
      !0.5*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2, &
      !0.5*tkhmax(k)*grdf_x(k)*dt/dx**2, &
      !YES3D*0.5*tkhmax(k)*grdf_y(k)*dt/dy**2)
-     0.5*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2) 
+     2.0*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2) 
 end do
 end if
 

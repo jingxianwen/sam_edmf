@@ -15,6 +15,9 @@ dvdt(:,:,:,na) = 0.
 dwdt(:,:,:,na) = 0.
 misc(:,:,:) = 0.
 
+dudtdiff(:,:,:,na) = 0.
+dvdtdiff(:,:,:,na) = 0.
+
 call t_stopf ('zero')
 
 end

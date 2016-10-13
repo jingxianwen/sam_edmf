@@ -24,10 +24,14 @@ do k=1,nzm
    do i=1,nx
   
      dudt(i,j,k,nc) = u(i,j,k) + dt3(na) & 
-              *(at*dudt(i,j,k,na)+bt*dudt(i,j,k,nb)+ct*dudt(i,j,k,nc))
+              *(at*(dudt(i,j,k,na)-dudtdiff(i,j,k,na))&
+              +bt*(dudt(i,j,k,nb)-dudtdiff(i,j,k,nb))+ct*(dudt(i,j,k,nc)-dudtdiff(i,j,k,nc))+ &
+              dudtdiff(i,j,k,na))
 	   
      dvdt(i,j,k,nc) = v(i,j,k) + dt3(na) &
-              *(at*dvdt(i,j,k,na)+bt*dvdt(i,j,k,nb)+ct*dvdt(i,j,k,nc))
+              *(at*(dvdt(i,j,k,na)-dvdtdiff(i,j,k,na))&
+            +bt*(dvdt(i,j,k,nb)-dvdtdiff(i,j,k,nb))+ct*(dvdt(i,j,k,nc)-dvdtdiff(i,j,k,nc))+ &
+            dvdtdiff(i,j,k,na))
 	   
      dwdt(i,j,k,nc) = w(i,j,k) + dt3(na) &
               *(at*dwdt(i,j,k,na)+bt*dwdt(i,j,k,nb)+ct*dwdt(i,j,k,nc))

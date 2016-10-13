@@ -28,6 +28,7 @@ integer i,j,k,kb,kc,jb,jc
 
 call t_startf ('diffuse_scalars')
 
+
 if(dostatis) then
 	
   do k=1,nzm
