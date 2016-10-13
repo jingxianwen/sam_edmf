@@ -441,12 +441,41 @@ end subroutine sgs_scalars
 !
 subroutine sgs_proc()
 
-   use grid, only: nstep,dt,icycle
-   use params, only: dosmoke
+   use grid, only: nstep,dt,icycle,dompi
+   use params, only: dosmoke, dotracers, dosgs
+   use vars
+   use microphysics
+   use sgs
+   use tracers
+
+
+
+   integer :: i
 
 !    SGS TKE equation:
 
      if(dosgs) call tke_full()
+
+! add exchange of sumM fields which isn't done in task_boundaries 
+
+ if (dompi) then
+
+   do i = 1,5+nmicro_fields+ntracers
+       call task_exchange(sgs_field_sumM(:,:,:,i),dimx1_d,dimx2_d,dimy1_d,dimy2_d,nz, &
+                                                             1+dimx1_d,dimx2_d-nx,YES3D+dimy1_d,1-YES3D+dimy2_d-ny,&
+                                                             4+nsgs_fields+nsgs_fields_diag+nmicro_fields+ntracers+i)
+   end do
+ else
+
+   do i = 1,5+ntracers+nmicro_fields
+    if(dosgs.and.do_sgsdiag_bound) &
+     call bound_exchange(sgs_field_sumM(:,:,:,i),dimx1_d,dimx2_d,dimy1_d,dimy2_d,nz, &
+                                                           1+dimx1_d,dimx2_d-nx,YES3D+dimy1_d,1-YES3D+dimy2_d-ny,&
+                                                           4+nsgs_fields+nsgs_fields_diag+nmicro_fields+ntracers+i)
+   end do
+
+ end if
+
 
 end subroutine sgs_proc
 
