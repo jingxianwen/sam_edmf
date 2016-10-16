@@ -220,7 +220,7 @@ select case (ptype)
 
   case(-1)
 
-    if (masterproc) print*, 'Initial TKE=0.001'
+    if (masterproc) print*, 'Initial TKE=0.000'
     tke =0.00
 
   case(0)
@@ -445,7 +445,6 @@ subroutine sgs_proc()
    use params, only: dosmoke, dotracers, dosgs
    use vars
    use microphysics
-   use sgs
    use tracers
 
 

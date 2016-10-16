@@ -353,10 +353,12 @@ contains
           !
           ! Compute cloud IWP/LWP and particle sizes - convert from kg to g
           !
-          LWP(:, 1:nzm) = qcl(:, lat, 1:nzm) * 1.e3 * layerMass(:, 1:nzm) 
+          LWP(:, 1:nzm) = qcl(:, lat, 1:nzm) * 1.e3 * layerMass(:, 1:nzm) / &
+                          (cfrac_pdf(:,lat,1:nzm)+1.d-10)
           LWP(:, nzm+1) = 0. ! zero out extra layer
 
-          IWP(:, 1:nzm) = qci(:, lat, 1:nzm) * 1.e3 * layerMass(:, 1:nzm) 
+          IWP(:, 1:nzm) = qci(:, lat, 1:nzm) * 1.e3 * layerMass(:, 1:nzm) / &
+                          (cfrac_pdf(:,lat,1:nzm)+1.d-10)
           IWP(:, nzm+1) = 0. ! zero out extra layer
           cloudFrac(:,1:nzm) =cfrac_pdf(:,lat,1:nzm) ! MERGE(1., 0., LWP(:,:)>0. .or. IWP(:,:)>0.)
           cloudFrac(:,nzm+1) = 0.0

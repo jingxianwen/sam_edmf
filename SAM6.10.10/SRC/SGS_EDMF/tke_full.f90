@@ -107,8 +107,8 @@ end if
   thetav_b = (1.+epsv*qv(i,j,kb))*tabs(i,j,kb)*(pres0/pres(kb))**(rgas/cp)
   buoy_sgs=ggr/thetav_k * (thetav_c-thetav_b)/ (z(kc)-z(kb))
 
-  l23 = (tketau*sqrt(tke(i,j,k)))**(-1)
-  if (buoy_sgs.gt.0.0) l23 = l23 + (max(0.7*sqrt(tke(i,j,k))/sqrt(buoy_sgs),adz(k)*dz/2.))**(-1)
+  l23 = (tketau*sqrt(tke(i,j,k)+1.d-10))**(-1)
+  if (buoy_sgs.gt.0.0) l23 = l23 + (max(0.7*sqrt(tke(i,j,k)+1.d-10)/sqrt(buoy_sgs),adz(k)*dz/2.))**(-1)
   l23 = l23**(-1)
   smix=  l23 + (xkar*z(k)-l23)*exp(-z(k)/100.)
   tk(i,j,k) = Ck*smix*sqrt(tke(i,j,k))
