@@ -2,7 +2,7 @@ subroutine diffuse_scalar3D (field,fluxb,fluxt,tkh,rho,rhow,flux)
 
 use grid
 use params, only: docolumn,dowallx,dowally,dosgs
-use sgs, only: grdf_x,grdf_y,grdf_z
+use sgs, only: grdf_x,grdf_y,grdf_z, ck_fact, tk_back, dotkhpbl
 implicit none
 ! input	
 real field(dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm)	! scalar
@@ -16,7 +16,7 @@ real flux(nz)
 real flx(0:nx,0:ny,0:nzm)
 real dfdt(nx,ny,nz)
 real rdx2,rdy2,rdz2,rdz,rdx5,rdy5,rdz5,tmp
-real dxy,dxz,dyx,dyz,dzx,dzy,tkx,tky,tkz,rhoi
+real dxy,dxz,dyx,dyz,dzx,dzy,tkx,tky,tkz,rhoi,fck, fckb
 integer i,j,k,ib,ic,jb,jc,kc,kb
 
 
@@ -82,13 +82,21 @@ end if
 
 do k=1,nzm
 	
+ if (dotkhpbl) then
+ fck  = 1. + ck_fact*0.5*(1.+tanh(0.01*(600.-z(k))))
+ fckb = 0.5*(1.+tanh(0.01*(600.-z(k))))
+ else
+ fck = 1. + ck_fact
+ fckb= 1.
+ end if
+
  rdx5=0.5*rdx2  * grdf_x(k)
  rdy5=0.5*rdy2  * grdf_y(k)
 
  do j=1,ny
   do i=0,nx
     ic=i+1
-    tkx=rdx5*(tkh(i,j,k)+tkh(ic,j,k)) 	
+    tkx=rdx5*((tkh(i,j,k)+tkh(ic,j,k))) * fck + fckb *rdx5*2.*tk_back
     flx(i,j,k)=-tkx*(field(ic,j,k)-field(i,j,k))
   end do 
   do i=1,nx
@@ -100,7 +108,7 @@ do k=1,nzm
  do j=0,ny
   jc=j+1
   do i=1,nx
-   tky=rdy5*(tkh(i,j,k)+tkh(i,jc,k)) 	
+   tky=rdy5*((tkh(i,j,k)+tkh(i,jc,k))) * fck + fckb* rdy5*2.*tk_back
    flx(i,j,k)=-tky*(field(i,jc,k)-field(i,j,k))
   end do 
  end do

@@ -22,6 +22,10 @@ call setperturb_sgs(ptype)  ! set sgs fields
 
 select case (ptype)
 
+  case(-1)
+ 
+    print*,'no perturbation added'
+
   case(0)
 
      do k=1,nzm

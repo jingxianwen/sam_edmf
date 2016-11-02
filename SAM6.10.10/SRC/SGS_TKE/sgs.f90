@@ -64,6 +64,9 @@ real grdf_y(nzm)! grid factor for eddy diffusion in y
 real grdf_z(nzm)! grid factor for eddy diffusion in z
 
 logical:: dosmagor   ! if true, then use Smagorinsky closure
+logical :: dotkhpbl
+real   :: ck_fact
+real   :: tk_back
 
 ! Local diagnostics:
 
@@ -84,11 +87,14 @@ subroutine sgs_setparm()
 
   !======================================================================
   NAMELIST /SGS_TKE/ &
-       dosmagor ! Diagnostic Smagorinsky closure
+       dosmagor, ck_fact, tk_back, dotkhpbl ! Diagnostic Smagorinsky closure
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
   dosmagor = .true. ! default 
+  ck_fact  = 0.0
+  tk_back  = 0.0
+  dotkhpbl = .true.
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
@@ -149,6 +155,7 @@ subroutine sgs_init()
      else
         write(*,*) 'Prognostic TKE 1.5-order SGS Closure'
      end if
+     write(*,*) 'ck_fact=',ck_fact, ' tk_back=',tk_back
   end if
 
   if(LES) then
@@ -184,6 +191,9 @@ integer, intent(in) :: ptype
 integer i,j,k
 
 select case (ptype)
+
+  case(-1)
+    print*,'no perturbation added on tke'
 
   case(0)
 
@@ -275,13 +285,13 @@ end subroutine setperturb_sgs
 
 subroutine kurant_sgs(cfl)
 
-use grid, only: dt, dx, dy, dz, adz, adzw
+use grid, only: dt, dx, dy, dz, adz, adzw, z
 implicit none
 
 real, intent(out) :: cfl
 
 integer k
-real tkhmax(nz)
+real tkhmax(nz), fck
 
 do k = 1,nzm
  tkhmax(k) = maxval(tkh(1:nx,1:ny,k))
@@ -289,10 +299,11 @@ end do
 
 cfl = 0.
 do k=1,nzm
+  fck  = 1. + ck_fact*0.5*(1.+tanh(0.01*(600.-z(k))))
   cfl = max(cfl,        &
      0.5*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2, &
-     0.5*tkhmax(k)*grdf_x(k)*dt/dx**2, &
-     YES3D*0.5*tkhmax(k)*grdf_y(k)*dt/dy**2)
+     0.5*fck*(tkhmax(k)+tk_back)*grdf_x(k)*dt/dx**2, &
+     YES3D*0.5*fck*(tkhmax(k)+tk_back)*grdf_y(k)*dt/dy**2)
 end do
 
 end subroutine kurant_sgs

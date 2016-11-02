@@ -4,7 +4,7 @@ dosmagor = .true.
 
  &PARAMETERS
 
- caseid ='32x28sp',
+ caseid ='1DDYCOMS',
 
  nrestart = 0,
 
@@ -17,8 +17,8 @@ dosmagor = .true.
  docloud 	= .true.,
  doprecip 	= .false.,
  dolongwave	= .true.,
- doradsimple    = .false., 
- doshortwave	= .true.,
+ doradsimple    = .true., 
+ doshortwave	= .false.,
  dosurface 	= .true.,
  dolargescale 	= .true.,
  doradforcing   = .false.,
@@ -35,7 +35,7 @@ dosmagor = .true.
  dx = 	4000.,
  dy = 	4000.,
 
- dt = 	20.,
+ dt = 	1.,
 
  day0=0.5,
  nrad = 45,
@@ -43,24 +43,28 @@ dosmagor = .true.
  domodis = .true., 
  domisr = .true., 
 
-nstop 	= 180,
+nstop 	= 20,
 !nelapse = 1,
-nprint  = 180,
-nstat 	= 45,
+nprint  = 2,
+nstat 	= 10,
 nstatfrq= 1,
 
-doSAMconditionals = .fasle.
+doSAMconditionals = .false.
 dosatupdnconditionals = .false.
 
- nsave2D	= 1,
- nsave2Dstart	= 999991,
- nsave2Dend	= 14400,
- save2Dbin      = .true.
+nsave2D = 180,
+save2Davg=.false.,
+nsave2Dstart    = 0,
+nsave2Dend      = 9999999,
+save2Dsep = .false.,
+save2Dbin      = .false.,
 
- nsave3D	= 600,
- nsave3Dstart	= 99918000,
- nsave3Dend	= 999999999,
- save3Dbin      = .true.
+nsave3D = 180,
+nsave3Dstart    = 0,
+nsave3Dend      = 999999999,
+save3Dbin      = .false.,
+rad3Dout  = .true.,
+
 
 / 
 

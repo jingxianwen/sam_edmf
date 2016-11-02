@@ -4,8 +4,9 @@ subroutine diffuse_mom3D
 !        momentum tendency due to SGS diffusion
 
 use vars
-use sgs, only: tk, grdf_x, grdf_y, grdf_z
+use sgs, only: tk, grdf_x, grdf_y, grdf_z, ck_fact, tk_back, dotkhpbl
 use params, only: docolumn, dowallx, dowally
+use grid
 implicit none
 
 real rdx2,rdy2,rdz2,rdz,rdx25,rdy25
@@ -13,7 +14,7 @@ real rdx21,rdy21,rdx251,rdy251,rdz25
 real dxy,dxz,dyx,dyz,dzx,dzy
 
 integer i,j,k,ic,ib,jb,jc,kc,kcu
-real tkx, tky, tkz, rhoi, iadzw, iadz
+real tkx, tky, tkz, rhoi, iadzw, iadz, fck, fcki, fckb, fckbi
 real fu(0:nx,0:ny,nz),fv(0:nx,0:ny,nz),fw(0:nx,0:ny,nz)
 
 rdx2=1./(dx*dx)
@@ -76,6 +77,19 @@ do k=1,nzm
  kcu=min(kc,nzm)
  dxz=dx/(dz*adzw(kc))
  dyz=dy/(dz*adzw(kc))
+
+ if (dotkhpbl) then
+ fck  = 1. + ck_fact*0.5*(1.+tanh(0.01*(600.-z(k))))
+ fckb = 0.5*(1.+tanh(0.01*(600.-z(k))))
+ fcki = 1. + ck_fact*0.5*(1.+tanh(0.01*(600.-zi(kc))))
+ fckbi= 0.5*(1.+tanh(0.01*(600.-zi(kc))))
+ else
+ fck  = 1. + ck_fact
+ fckb = 1.
+ fcki = fck
+ fckbi=1.
+ end if
+
   rdx21=rdx2    * grdf_x(k)
   rdy21=rdy2    * grdf_y(k)
   rdx251=rdx25  * grdf_x(k)
@@ -84,11 +98,11 @@ do k=1,nzm
    jb=j-1
    do i=0,nx
     ic=i+1
-    tkx=rdx21*tk(i,j,k)
+    tkx=rdx21*(tk(i,j,k)) * fck + rdx21 * fckb * tk_back
     fu(i,j,k)=-2.*tkx*(u(ic,j,k)-u(i,j,k))
-    tkx=rdx251*(tk(i,j,k)+tk(i,jb,k)+tk(ic,j,k)+tk(ic,jb,k))
+    tkx=( rdx251*(tk(i,j,k)+tk(i,jb,k)+tk(ic,j,k)+tk(ic,jb,k))) * fck + rdx21 * fckb * tk_back
     fv(i,j,k)=-tkx*(v(ic,j,k)-v(i,j,k)+(u(ic,j,k)-u(ic,jb,k))*dxy)
-    tkx=rdx251*(tk(i,j,k)+tk(ic,j,k)+tk(i,j,kcu)+tk(ic,j,kcu)) 	
+    tkx=(rdx251*(tk(i,j,k)+tk(ic,j,k)+tk(i,j,kcu)+tk(ic,j,kcu)) ) *fcki+rdx21*tk_back*fckbi 	
     fw(i,j,k)=-tkx*(w(ic,j,kc)-w(i,j,kc)+(u(ic,j,kcu)-u(ic,j,k))*dxz)
    end do 
    do i=1,nx
@@ -103,11 +117,11 @@ do k=1,nzm
    jc=j+1
    do i=1,nx
     ib=i-1
-    tky=rdy21*tk(i,j,k)
+    tky=rdy21*(tk(i,j,k)) * fck + rdy21 * fckb * tk_back
     fv(i,j,k)=-2.*tky*(v(i,jc,k)-v(i,j,k))
-    tky=rdy251*(tk(i,j,k)+tk(ib,j,k)+tk(i,jc,k)+tk(ib,jc,k))
+    tky=(rdy251*(tk(i,j,k)+tk(ib,j,k)+tk(i,jc,k)+tk(ib,jc,k)))* fck + fckb * rdy21*tk_back
     fu(i,j,k)=-tky*(u(i,jc,k)-u(i,j,k)+(v(i,jc,k)-v(ib,jc,k))*dyx)
-    tky=rdy251*(tk(i,j,k)+tk(i,jc,k)+tk(i,j,kcu)+tk(i,jc,kcu)) 	
+    tky=(rdy251*(tk(i,j,k)+tk(i,jc,k)+tk(i,j,kcu)+tk(i,jc,kcu)) )* fcki + fckbi * rdy21*tk_back	
     fw(i,j,k)=-tky*(w(i,jc,kc)-w(i,j,kc)+(v(i,jc,kcu)-v(i,jc,k))*dyz)
    end do 
   end do 
