@@ -57,6 +57,9 @@ do k=1,nzm
      
            qcc = qn(i,j,k) * omn
            qii = qn(i,j,k) * (1.-omn)
+           ! convert to in-cloud values assuming top-hat
+           qcc = qcc / cfrac_pdf(i,j,k)
+           qii = qii / cfrac_pdf(i,j,k)
 
            if(qcc .gt. qcw0) then
             autor = alphaelq
@@ -93,15 +96,19 @@ do k=1,nzm
            endif
            qcc = (qcc+dtn*autor*qcw0)/(1.+dtn*(accrr+accrcs+accrcg+autor))
            qii = (qii+dtn*autos*qci0)/(1.+dtn*(accris+accrig+autos))
+           ! cell-wide precipitation source
            dq = dtn *(accrr*qcc + autor*(qcc-qcw0)+ &
-             (accris+accrig)*qii + (accrcs+accrcg)*qcc + autos*(qii-qci0))
+             (accris+accrig)*qii + (accrcs+accrcg)*qcc + autos*(qii-qci0)) * cfrac_pdf(i,j,k)
            dq = min(dq,qn(i,j,k))
            qp(i,j,k) = qp(i,j,k) + dq
            q(i,j,k) = q(i,j,k) - dq
            qn(i,j,k) = qn(i,j,k) - dq
 	   qpsrc(k) = qpsrc(k) + dq
+   
+         end if
 
-         elseif(qp(i,j,k).gt.qp_threshold.and.qn(i,j,k).eq.0.) then
+         ! new always compute evaporation, even if cloud condensate is present 
+         if(qp(i,j,k).gt.qp_threshold) then
 
            qsatt = 0.
            if(omn.gt.0.001) qsatt = qsatt + omn*qsatw(tabs(i,j,k),pres(k))
@@ -119,7 +126,8 @@ do k=1,nzm
              qgg = qp(i,j,k) * (1.-omp)*omg
              dq = dq + evapg1(k)*sqrt(qgg) + evapg2(k)*qgg**powg2
            end if
-           dq = dq * dtn * (q(i,j,k) /qsatt-1.) 
+           !use qv/qstat instead of q/qstat; multiply by 1-cfrac_pdf
+           dq = dq * dtn * ((q(i,j,k)-qn(i,j,k)) /qsatt-1.) * (1.-cfrac_pdf(i,j,k))
            dq = max(-0.5*qp(i,j,k),dq) 
            qp(i,j,k) = qp(i,j,k) + dq
            q(i,j,k) = q(i,j,k) - dq

@@ -7,7 +7,7 @@ pblhfluxmin = .false.
 
 &PARAMETERS
 
-caseid ='1DCPBL',
+caseid ='1DCPBL_003_a1',
 doconstdz=.true.,
 dz=20.
 docolumn=.true.
@@ -42,7 +42,7 @@ SFC_FLX_FXD    = .true.,
 SFC_TAU_FXD    = .true.,
 
 dokinunits=.true.,
-fluxt0 = 0.06,
+fluxt0 = 0.03,
 fluxq0 = 2.5e-05,
 tau0 = 0.,
 
@@ -64,22 +64,22 @@ domodis = .false.,
 domisr = .false.,
 
  nstop   = 2880,
- nprint  = 1,
- nstat = 10,
- nstatfrq = 1,
+ nprint  = 200,
+ nstat = 24,
+ nstatfrq = 10,
 
 
 doSAMconditionals = .false.,
 dosatupdnconditionals = .false.,
 
-nsave2D = 180,
+nsave2D = 90,
 save2Davg=.false.,
 nsave2Dstart    = 0,
 nsave2Dend      = 9999999,
 save2Dsep = .false.,
 save2Dbin      = .false.,
 
-nsave3D = 180,
+nsave3D = 90,
 nsave3Dstart    = 0,
 nsave3Dend      = 999999999,
 save3Dbin      = .false.,

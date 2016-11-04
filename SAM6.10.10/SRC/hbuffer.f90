@@ -140,6 +140,7 @@ lhobs=0.
 shobs=0.
 s_sst = 0.
 z_inv=0.
+z_pbl=0.
 z2_inv=0.
 z_ct=0.
 z_cb=z(nzm)
@@ -458,8 +459,9 @@ if(dompi) then
    end if
    hbuf(k+59)=nrmn*coef
    hbuf(k+60)=s_arthr
+   hbuf(k+61)=z_pbl
 
-   nbuf = k+60
+   nbuf = k+61
    call task_sum_real8(hbuf,hbuf1,nbuf)
    coef = 1./dble(nsubdomains)
    hbuf(1:nbuf) = hbuf1(1:nbuf)*coef
@@ -532,6 +534,7 @@ if(dompi) then
    end if
    nrmn=hbuf(k+59)*coef
    s_arthr=hbuf(k+60)
+   z_pbl=hbuf(k+61)
 
    z2_inv=z2_inv*factor*aver-(z_inv*factor*aver)**2
    z2_cb=z2_cb*factor-(z_cbmn*factor)**2
@@ -602,7 +605,7 @@ if(masterproc) then
         real(z_cbmn*factor,4), real(z2_cb,4), real(z_cb,4), &
         real(cwpmean*aver*factor,4), real(cwp2,4), &
         real(precmean*aver*factor,4), real(prec2,4), real(precmax,4), &
-        ncmn, nrmn, real(s_arthr*aver*factor,4) 
+        ncmn, nrmn, real(s_arthr*aver*factor,4), real(z_pbl*aver*factor,4) 
   write(ntape) length
   hbuf_real4(1:hbuf_length*nzm) = hbuf(1:hbuf_length*nzm)
   do l = 1,hbuf_length

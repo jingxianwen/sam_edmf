@@ -1,4 +1,4 @@
-subroutine get_pblh(i,j,thetav,thvflux,pblh)
+subroutine get_pblh(i,j,thetav,flux,pblhout)
 
 use vars
 use params
@@ -9,9 +9,9 @@ implicit none
 
 !input
 integer, intent(in) :: i,j
-real, dimension(nzm),intent(in) :: thetav, thvflux
+real, dimension(nzm),intent(in) :: thetav, flux
 !output
-real :: pblh
+real :: pblhout
 
 
     !---------------------------------------------------------------
@@ -37,25 +37,31 @@ real :: pblh
     REAL, PARAMETER :: sbl_lim  = 200. !typical scale of stable BL (m).
     REAL, PARAMETER :: sbl_damp = 400. !transition length for blending (m).
     INTEGER :: K,kthv,ktke
+    LOGICAL :: pblhalter
+
+    pblhalter=.false.
 
     IF (pblhfluxmin) then ! compute cpbl top as level with flux minimum
 
 
-    pblh = zi(2)
+    pblhout = zi(2)
     !FIND MIN Flux
     k = 1
     kthv = 1
     minthv = 9.E9
     DO WHILE (k.le.nzm)
        ! use flux from previous step
-       qtke  = thvflux(k) ! 
+       qtke  = flux(k) ! 
        IF (minthv > qtke) then
            minthv = qtke
            kthv = k
        ENDIF
        k = k+1
     ENDDO 
-    pblh=z(kthv)
+    pblhout=z(kthv)
+ 
+    if (pblhout.gt.4000.) pblhalter=.true.
+
 
     ELSEIF (pblhthvgrad) THEN
 
@@ -80,13 +86,13 @@ real :: pblh
     ENDDO
     if (kthv.eq.nzm-2) kthv=nzm-3
  
-
     !compute quadratic fit to thetav/dz using three points
     !then let height of vertex be the PBL height to allow for PBL height to fall in between levels
     if (kthv .eq. 1) then
-       pblh = z(1)
+       pblhout = z(1)
+    elseif (dthvdz(kthv).lt.dthvdz(kthv+1).or.z(kthv).gt.4000.) then
+       pblhalter=.true.
     else
-
        Y1 = dthvdz(kthv-1)
        Y2 = dthvdz(kthv)
        Y3 = dthvdz(kthv+1)
@@ -100,21 +106,25 @@ real :: pblh
       if (aa.eq.0.) then
         ! linear profile of gradient with bb.ne.0.0
         if (bb.gt.0.0) then
-          pblh = z(kthv+1)
+          pblhout = z(kthv+1)
         elseif(bb.lt.0.0) then
-          pblh = z(kthv-1)
+          pblhout = z(kthv-1)
         else
           !constant gradient
-          pblh = z(kthv)
+          pblhout = z(kthv)
         end if
       else
-        pblh =  - bb/(2.*aa)
+        pblhout =  - bb/(2.*aa)
       end if
 
     end if
 
+    END IF
 
-    ELSE 
+
+    ! call alternative scheme if needed for rescue or if chosen on purpose
+    IF (pblhalter .OR. &
+        .not.(pblhfluxmin.or.pblhthvgrad)) THEN
 
 
     !FIND MAX TKE AND MIN THETAV IN THE LOWEST 500 M
@@ -148,16 +158,16 @@ real :: pblh
         delt_thv = 1.5  
     ENDIF
 
-    pblh=0.
+    pblhout=0.
     k = kthv+1
-    DO WHILE (pblh .EQ. 0.) 
+    DO WHILE (pblhout .EQ. 0.) 
        IF (thetav(k) .GE. (minthv + delt_thv))THEN
-          pblh = z(k) - adzw(k)*dz* &
+          pblhout = z(k) - adzw(k)*dz* &
              & MIN(1.,(thetav(k)-(minthv + delt_thv))/ &
              & MAX(thetav(k)-thetav(k-1),1.E-6))
        ENDIF
        k = k+1
-       IF (k .EQ. nzm-1) pblh = zi(2) !EXIT SAFEGUARD
+       IF (k .EQ. nzm-1) pblhout = zi(2) !EXIT SAFEGUARD
     ENDDO
     !print*,"IN GET_PBLH:",thsfc,zi
 
@@ -191,12 +201,13 @@ real :: pblh
     PBLH_TKE = MIN(PBLH_TKE,4000.)
 
     !BLEND THE TWO PBLH TYPES HERE: 
-    wt=.5*TANH((pblh - sbl_lim)/sbl_damp) + .5
-    pblh=PBLH_TKE*(1.-wt) + pblh*wt
+    wt=.5*TANH((pblhout - sbl_lim)/sbl_damp) + .5
+    pblhout=PBLH_TKE*(1.-wt) + pblhout*wt
+
 
     END IF  
 
-    pblh_xy(i,j) = pblh_xy(i,j) + pblh * dtfactor
+    pblh_xy(i,j) = pblh_xy(i,j) + pblhout * dtfactor
 
 
 end subroutine get_pblh

@@ -141,6 +141,7 @@ real vsfc_xy(nx,ny) ! v-wind at the surface
 real w500_xy(nx,ny) ! w at 500 mb
 real qocean_xy(nx,ny) ! ocean cooling in W/m2
 real pblh_xy(nx,ny) ! boundary layer depth
+real pblh(nx,ny)
 
 real, parameter :: t00 = 300.   ! constant offset for sstxy 
 
@@ -152,7 +153,7 @@ real &
     uwle(nz), uwsb(nz), vwle(nz), vwsb(nz), &
     radlwup(nz), radlwdn(nz), radswup(nz), radswdn(nz), &
     radqrlw(nz), radqrsw(nz), w_max, u_max, s_acld, s_acldcold, s_ar, s_arthr, s_sst, &
-    s_acldl, s_acldm, s_acldh,  ncmn, nrmn, z_inv, z_cb, z_ct, z_cbmn, z_ctmn, &
+    s_acldl, s_acldm, s_acldh,  ncmn, nrmn, z_pbl, z_inv, z_cb, z_ct, z_cbmn, z_ctmn, &
     z2_inv, z2_cb, z2_ct, cwpmean, cwp2, precmean, prec2, precmax, nrainy, ncloudy, &
     s_acldisccp, s_acldlisccp, s_acldmisccp, s_acldhisccp, s_ptopisccp, &
     s_acldmodis, s_acldlmodis, s_acldmmodis, s_acldhmodis, s_ptopmodis, &

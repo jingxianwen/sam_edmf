@@ -175,5 +175,6 @@
 1  0 'VRESID'	'Meridional velocity budget residual','m/s/day'
 1  0 'HLSTOR'	'Liquid-ice static energy storage','K/day'
 1  0 'QTSTOR'	'Total water storage','K/day'
+1  0 'CLDSGS'	'Subgrid cloud cover','  '
 
 

@@ -15,7 +15,7 @@ setenv SGS_DIR SGS_EDMF
 
 # specify radiation directory in SRC
 #setenv RAD_DIR RAD_CAM
-setenv RAD_DIR RAD_RRTM
+setenv RAD_DIR RAD_CAM
 
 # specify microphysics directory in SRC
 setenv MICRO_DIR MICRO_SAM1MOM

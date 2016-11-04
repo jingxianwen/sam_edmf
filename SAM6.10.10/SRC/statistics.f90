@@ -22,6 +22,7 @@ implicit none
 	real qrz(nzm)
 	real qsz(nzm)
 	real relhz(nzm)
+	real cldsgs(nzm)
 
 	real u2z(nzm)
 	real v2z(nzm)
@@ -152,6 +153,7 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
 	 qsz(k) = 0.
 	 qsatwz(k)=0.
 	 relhz(k)=0.
+	 cldsgs(k)=0.
 	 prof1(k)=0.
 	 prof2(k)=0.
 	 prof3(k)=0.
@@ -181,6 +183,7 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
 	   sse(k)=sse(k)+tabs(i,j,k)+gamaz(k)+fac_cond*qsatw(tabs(i,j,k),pres(k))
 	   qsatwz(k) = qsatwz(k)+qsatw(tabs(i,j,k),pres(k))
 	   relhz(k)=relhz(k)+qv(i,j,k)/qsatw(tabs(i,j,k),pres(k))
+           cldsgs(k)=cldsgs(k)+cfrac_pdf(i,j,k)
 	  end do
 	 end do
 	end do	
@@ -219,6 +222,7 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
 	call hbuf_put('QCOND',prof3,1.e3*factor_xy)
 	call hbuf_put('QSAT',qsatwz,1.e3*factor_xy)
 	call hbuf_put('RELH',relhz,100.*factor_xy)
+	call hbuf_put('CLDSGS',cldsgs,factor_xy)
 
 !-------------------------------------------------------------
 !	Fluxes:
@@ -1134,6 +1138,7 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
            zzz = z(z_inv_ind(i,j))*0.001
            z_inv = z_inv + zzz
            z2_inv = z2_inv + zzz**2
+           z_pbl  = z_pbl + pblh(i,j)
            cwpmean = cwpmean + cwp(i,j)
            cwp2 = cwp2 + cwp(i,j)**2
            if(z_base_ind(i,j).gt.0) then

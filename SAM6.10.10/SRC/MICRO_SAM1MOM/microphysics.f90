@@ -127,7 +127,8 @@ subroutine micro_init()
      fluxtmk = 0.
 
      if(docloud) then
-       call cloud()
+       !call cloud()
+       call sgscloudmf()
        call micro_diagnose()
      end if
      if(dosmoke) then
@@ -184,7 +185,8 @@ subroutine micro_proc()
    if(doprecip.and.icycle.eq.1) call precip_init() 
 
    if(docloud) then
-     call cloud()
+     !call cloud()
+     call sgscloudmf()
      if(doprecip) call precip_proc()
      call micro_diagnose()
    end if

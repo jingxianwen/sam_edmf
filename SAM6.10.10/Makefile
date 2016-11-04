@@ -74,7 +74,7 @@ CC = mpicc -c -DLINUX
 
 
 FFLAGS = -O3 
-#FFLAGS = -g -ftrapuv -check all
+#FFLAGS = -g -ftrapuv -fpe0 -O0
 
 FFLAGS += -I${INC_MPI} -I${INC_NETCDF}
 LD = ${OPENMPI_DIR}/bin/mpif90

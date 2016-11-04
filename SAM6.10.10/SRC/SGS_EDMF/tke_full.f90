@@ -3,6 +3,7 @@ subroutine tke_full
 
 !	this subroutine solves the TKE equation
 
+use grid
 use vars
 use sgs
 use params
@@ -11,7 +12,6 @@ implicit none
 
 real def2(nx,ny,nzm)
 real, dimension(nx,ny,nzm) :: cthl, cqt 
-real, dimension(nx,ny) :: pblh
 real, dimension(nzm) :: thetav
 real grd,betdz,Ck,smix,Pr,Cee,thetav_c,thetav_b,thetav_k
 real buoy_sgs,a_prod_sh,a_prod_bu,a_diss
@@ -22,6 +22,8 @@ real thetavs, sfc_thv_flux, tketau, l23, wstar
 real dtkedtsum, dtkedtmin
 real, parameter :: xkar=0.4
 real wthl, wqt
+
+real thvflux1D(nzm)
 
 real tabs_interface, qp_interface, qtot_interface, qsat_check, qctot
 
@@ -38,8 +40,10 @@ else
   call shear_prod1D_2Dgrid(def2)
 endif
 
+
 ! compute coefficients needed for buoyancy flux
 call get_c0c1(cthl,cqt)
+
 
 do i=1,nx
 do j=1,ny
@@ -59,7 +63,8 @@ do k=1,nzm
 end do 
 
 ! compute PBL height
-call get_pblh(i,j,thetav,thvflx(i,j,1:nzm),pblh(i,j))
+thvflux1D = thvflx(i,j,1:nzm)
+call get_pblh(i,j,thetav,thvflux1D,pblh(i,j))
 !if (i.eq.1.and.j.eq.1) then 
 !do k=1,nzm
 !  write(*,*) thetav(k) , '  ',twsb3(i,j,k), '  ',thvflx(i,j,k),'  ',mkwsb3(i,j,k,1)
@@ -97,7 +102,7 @@ wstar=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
 if (dofixedtau) then
   tketau = 600.
 else
-  tketau= max(0.5 * pblh(i,j) /  wstar,0.0)
+  tketau= max(.5 * pblh(i,j) /  wstar,0.0)
 end if
 
   tke(i,j,k)=max(0.,tke(i,j,k))
@@ -111,7 +116,7 @@ end if
   if (buoy_sgs.gt.0.0) l23 = l23 + (max(0.7*sqrt(tke(i,j,k)+1.d-10)/sqrt(buoy_sgs),adz(k)*dz/2.))**(-1)
   l23 = l23**(-1)
   smix=  l23 + (xkar*z(k)-l23)*exp(-z(k)/100.)
-  tk(i,j,k) = Ck*smix*sqrt(tke(i,j,k))
+  tk(i,j,k) = min(1000.0,Ck*smix*sqrt(tke(i,j,k)))
 
  
   a_prod_sh=(tk(i,j,k)+0.001)*def2(i,j,k)
@@ -141,7 +146,6 @@ end if
   tkelediss(k) = tkelediss(k)/float(nx*ny)
 
   end do ! k
-
 
 call t_stopf('tke_full')
 

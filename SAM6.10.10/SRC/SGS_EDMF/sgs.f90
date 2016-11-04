@@ -377,6 +377,7 @@ subroutine sgs_scalars()
          if (dotkedirichlet) then
             do i=1,nx
             do j=1,ny
+              ! compute a downward flux of tke assuming tke=0 at sfc and K_sfc=K_1
               tkewsb3(i,j,1) = - 2.*tk(i,j,1)/adz(1)/dz * tke(i,j,1)   
             end do
             end do

@@ -72,7 +72,7 @@ call tracers_init() ! initialize tracers
 call setforcing()
 
 ! compute liquid water content since eventually needed for buoyancy flux
-call sgscloudmf()
+!call sgscloudmf()
 
 if(masterproc) call printout()
 !------------------------------------------------------------------
@@ -261,7 +261,7 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
 
       if(docloud.or.dosmoke) call micro_proc()
  
-      call sgscloudmf()
+      !call sgscloudmf()
 
 !----------------------------------------------------------
 !  Tracers' physics:

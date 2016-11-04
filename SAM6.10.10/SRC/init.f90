@@ -48,6 +48,8 @@ subroutine init()
   gamt0 = 0.
   gamq0 = 0.
 
+  pblh  = 0.0
+
 end subroutine init
 
 
