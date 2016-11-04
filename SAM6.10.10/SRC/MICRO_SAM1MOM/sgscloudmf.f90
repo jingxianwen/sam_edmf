@@ -1,7 +1,6 @@
 
 subroutine sgscloudmf()
 
-! operates only for grid points with tke > 0
 
 !output:
 ! cfrac_pdf ... stratiform cloud cover 
@@ -18,7 +17,6 @@ use params
 use grid
 use micro_params
 use microphysics, only : q,qp,qn
-use sgs, only : tke
 
 
 implicit none
@@ -55,7 +53,6 @@ end do
 
 do k=1,nzm
 
-  ! only compute sgs clouds if tke > 0
 
 !IF (tke(i,j,k).gt.1.d-3.and.dosgscloud) then
 IF (dosgscloud) then
