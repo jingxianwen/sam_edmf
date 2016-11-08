@@ -11,7 +11,7 @@ setenv SAM_SCR /global/scratch/langhans
 setenv ADV_DIR ADV_MPDATA
 
 # specify SGS directory in SRC
-setenv SGS_DIR SGS_EDMF
+setenv SGS_DIR SGS_TKE
 
 # specify radiation directory in SRC
 #setenv RAD_DIR RAD_CAM

@@ -36,9 +36,11 @@ real, parameter :: lcld = 150.
 real :: cab,ckk,leps
 real,dimension(nzm) :: qtqt, thlthl, qtthl, thetali, thetaligrad, qtgrad, sigmas
 
-
-
 an = 1./(tbgmax-tbgmin) 
+
+!IF (tke(i,j,k).gt.1.d-3.and.dosgscloud) then
+IF (dosgscloud) then
+
 
 do i=1,nx
 do j=1,ny
@@ -54,8 +56,6 @@ end do
 do k=1,nzm
 
 
-!IF (tke(i,j,k).gt.1.d-3.and.dosgscloud) then
-IF (dosgscloud) then
   
 ! compute vertical gradients of qt and thetali
   kb=k-1
@@ -172,21 +172,15 @@ IF (dosgscloud) then
  qv(i,j,k) = max(0.,q(i,j,k) - qn(i,j,k))
  qp(i,j,k) = max(0.,qp(i,j,k))
 
-else
-
- if (qcl(i,j,k)+qci(i,j,k).gt.0.0) then 
-     cfrac_pdf(i,j,k) = 1.
- else
-     cfrac_pdf(i,j,k) = 0.
- end if
- 
-end if ! dosgscloud
-
 end do ! k
-
-
 end do ! j
 end do ! i
+
+else
+
+ call cloud()
+
+end if ! dosgscloud
 
 
 end subroutine sgscloudmf
