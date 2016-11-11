@@ -50,7 +50,7 @@ do j=1,ny
 do k=1,nzm
 
   ! buoyancy flux computation on mass levels (since TKE is on mass levels)
-  wthl = (0.5*(twsb3(i,j,k) + twsb3(i,j,k+1)))* (pres0/pres(k))**(rgas/cp) 
+  wthl = (0.5*(twsb3(i,j,k) + twsb3(i,j,k+1))) 
   if (qp(i,j,k).gt.0.0) then
     wthl = wthl +  ((fac_cond*qpl(i,j,k)+fac_sub*qpi(i,j,k))/qp(i,j,k) * 0.5*(mkwsb3(i,j,k,2) + mkwsb3(i,j,k+1,2)))  &
            * (pres0/pres(k))**(rgas/cp) 

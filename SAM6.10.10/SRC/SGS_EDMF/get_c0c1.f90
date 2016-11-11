@@ -49,11 +49,11 @@ do k=1,nzm
   lambdaf = (1. + alphaf * (omn*fac_cond + (1.-omn) * fac_sub) )**(-1.)
   alphaf =alphaf * totheta
 
-  cthl(i,j,k) = cfrac_pdf(i,j,k) * (1. - (fac_cond/totheta - (1.+epsv) * tabs(i,j,k)/totheta)*lambdaf * alphaf) & 
-      + (1.-cfrac_pdf(i,j,k)) * (1.+epsv*q(i,j,k))
-  cqt(i,j,k) =  cfrac_pdf(i,j,k) * (epsv*tabs(i,j,k)/totheta + &
-    (fac_cond/totheta + (1.+epsv) * tabs(i,j,k)/totheta) * lambdaf) &
-      + (1.-cfrac_pdf(i,j,k)) * epsv*thetali
+  ! Bechtold (1995) Eqn. (B5)
+  cthl(i,j,k) = cfrac_pdf(i,j,k) * (1.+epsv*q(i,j,k)-(fac_cond/totheta - (1.+epsv) * &
+         tabs(i,j,k)/totheta)*lambdaf*alphaf) + (1.-cfrac_pdf(i,j,k)) * (1.+epsv*q(i,j,k))
+  cqt(i,j,k)  = cfrac_pdf(i,j,k) * (epsv*tabs(i,j,k)/totheta+(fac_cond/totheta - (1.+epsv) *tabs(i,j,k)/totheta)*lambdaf ) &
+           + (1.-cfrac_pdf(i,j,k)) * epsv * tabs(i,j,k)/totheta
 
 end do
 
