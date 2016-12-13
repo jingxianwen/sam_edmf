@@ -107,6 +107,7 @@ do k=1,nzm
  ds=lambdaf *(qte(k)-qsl)
  ! and its std dev
  sigmas(k) = lambdaf * (max(0.0,qtqt(k) + alphaf**2 * thlthl(k)**2. - 2. * alphaf * qtthl(k)))**(0.5)
+ if (dozerosigma) sigmas(k) = 0.0
 
  ! The scheme is actually diagnostic, but we find that the initial guess can be slightly improved
  ! (ie the Taylor approximation to the mean sat. deficit can be improved)
