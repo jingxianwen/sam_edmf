@@ -85,7 +85,7 @@ logical :: dotkedirichlet ! if true, then downward tke surface fluxes are comput
 logical :: pblhfluxmin    ! use level with minimum buoyancy flux
 logical :: pblhthvgrad    ! use height with max dthv gradient (may lie between levels)
 
-real :: ctketau
+real :: ctketau, ustar(dimx1_s:dimx2_s, dimy1_s:dimy2_s), wstar(dimx1_s:dimx2_s, dimy1_s:dimy2_s)
 
 ! Local diagnostics:
 

@@ -5,7 +5,7 @@ subroutine tke_full
 
 use grid
 use vars
-use sgs
+use sgs, only : wstar
 use params
 use microphysics, only : qp
 implicit none
@@ -18,7 +18,7 @@ real buoy_sgs,a_prod_sh,a_prod_bu,a_diss
 real lstarn, lstarp, bbb, omn, omp
 real qsatt,dqsat
 integer i,j,k,kc,kb
-real thetavs, sfc_thv_flux, tketau, l23, wstar
+real thetavs, sfc_thv_flux, tketau, l23
 real dtkedtsum, dtkedtmin
 real, parameter :: xkar=0.4
 real wthl, wqt
@@ -98,11 +98,11 @@ do i=1,nx
 !thetavs
 thetavs = (1.+epsv*qv(i,j,1))*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)
 sfc_thv_flux = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)*fluxbq(i,j)
-wstar=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
+wstar(i,j)=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
 if (dofixedtau) then
   tketau = ctketau
 else
-  tketau= max(ctketau * pblh(i,j) /  wstar,0.0)
+  tketau= max(ctketau * pblh(i,j) /  wstar(i,j),0.0)
 end if
 
   tke(i,j,k)=max(0.,tke(i,j,k))
