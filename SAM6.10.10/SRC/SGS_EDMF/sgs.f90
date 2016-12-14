@@ -85,6 +85,8 @@ logical :: dotkedirichlet ! if true, then downward tke surface fluxes are comput
 logical :: pblhfluxmin    ! use level with minimum buoyancy flux
 logical :: pblhthvgrad    ! use height with max dthv gradient (may lie between levels)
 
+real :: ctketau
+
 ! Local diagnostics:
 
 real tkesbbuoy(nz), tkesbshear(nz),tkesbdiss(nz), tkesbdiff(nz)
@@ -104,7 +106,7 @@ subroutine sgs_setparm()
 
   !======================================================================
   NAMELIST /SGS_TKE/ &
-       dofixedtau,dotkedirichlet,pblhfluxmin,pblhthvgrad
+       dofixedtau,dotkedirichlet,pblhfluxmin,pblhthvgrad,ctketau
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
@@ -112,6 +114,11 @@ subroutine sgs_setparm()
   dotkedirichlet = .true.
   pblhfluxmin    = .false.
   pblhthvgrad    = .true.
+  if (dofixedtau) then
+    ctketau = 400.
+  else
+    ctketau = 0.5
+  end if
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
