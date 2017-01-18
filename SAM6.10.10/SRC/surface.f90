@@ -2,6 +2,7 @@ subroutine surface()
 	
 use vars
 use params
+use sgs, only : ustar
 use microphysics, only: micro_field, index_water_vapor
 implicit none
 	
@@ -36,6 +37,7 @@ if(.not.SFC_FLX_FXD) then
        else
          tau0=sqrt( taux0**2 +  tauy0**2)/rhow(1)
        end if
+       ustar(:,:) = sqrt(tau0)
 
        fluxbt(:,:) = fluxt0
        fluxbq(:,:) = fluxq0
@@ -57,6 +59,7 @@ if(.not.SFC_FLX_FXD) then
                        sstxy(i,j)+t00, fluxt0, fluxq0, taux0, tauy0, q_s)
            fluxbt(i,j) = fluxt0
            fluxbq(i,j) = fluxq0
+           ustar(i,j)  = (taux0**2  +  tauy0**2)**0.25
 
            call oceflx(pres(1),u(i,j,1)+ug, &
                        0.25*(v(i-1,j+YES3D,1)+v(i-1,j,1)+v(i,j+YES3D,1)+v(i,j,1))+vg, &
@@ -80,6 +83,7 @@ if(.not.SFC_FLX_FXD) then
                        (0.25*(u(i+1,j-YES3D,1)+u(i,j-YES3D,1)+u(i+1,j,1)+u(i,j,1))+ug)**2+ &
                        (v(i,j,1)+vg)**2))
              tauy0 = -(v(i,j,1)+vg)/u_h0*tau0*rhow(1)
+             ustar(i,j) = sqrt(tau0)
            end if
            fluxbv(i,j) = tauy0/rhow(1)
 
@@ -110,6 +114,7 @@ if(.not.SFC_FLX_FXD) then
                else
                  tau0=sqrt( taux0**2 +  tauy0**2)/rhow(1)
                end if
+               ustar(:,:) = sqrt(tau0)
 
                fluxbt(:,:) = fluxt0
                fluxbq(:,:) = fluxq0
@@ -135,6 +140,7 @@ if(.not.SFC_FLX_FXD) then
                       fluxt0, fluxq0, taux0, tauy0, xlmo)
                fluxbt(i,j) = fluxt0
                fluxbq(i,j) = fluxq0
+               ustar(i,j)  = (taux0**2  +  tauy0**2)**0.25
 
                t_s = (0.5*(sstxy(i-1,j)+sstxy(i,j))+t00)*coef
                q_s = soil_wetness*qsatw(0.5*(sstxy(i-1,j)+sstxy(i,j))+t00,pres(1))
@@ -161,6 +167,7 @@ if(.not.SFC_FLX_FXD) then
                        (0.25*(u(i+1,j-YES3D,1)+u(i,j-YES3D,1)+u(i+1,j,1)+u(i,j,1))+ug)**2+ &
                        (v(i,j,1)+vg)**2))
                   tauy0 = -(v(i,j,1)+vg)/u_h0*tau0*rhow(1)
+                  ustar(i,j) = sqrt(tau0)
                end if
                fluxbv(i,j) = tauy0/rhow(1)
 
@@ -184,8 +191,7 @@ if(SFC_FLX_FXD) then
     if(OCEAN) z0 = 0.0001  ! for LAND z0 should be set in namelist (default z0=0.035)
 
     tau0 = diag_ustar(z(1),  &
-                bet(1)*(fluxt0+epsv*(t0(1)-gamaz(1))*fluxq0),u_h0,z0)**2  
-
+                bet(1)*(fluxt0+epsv*(t0(1)-gamaz(1))*fluxq0),(t0(1)-gamaz(1))*(1.+epsv*q0(1)),u_h0,z0)**2
   end if ! .not.SFC_TAU_FXD
 
   if(LES) then
@@ -197,6 +203,8 @@ if(SFC_FLX_FXD) then
     fluxbu(:,:) = -(u(1:nx,1:ny,1)+ug)/u_h0*tau0
     fluxbv(:,:) = -(v(1:nx,1:ny,1)+vg)/u_h0*tau0
   end if
+
+  ustar(:,:) = (fluxbu(:,:)**2 + fluxbv(:,:)**2)**0.25
 
   fluxbt(:,:) = fluxt0
   fluxbq(:,:) = fluxq0
@@ -264,7 +272,7 @@ end
 ! Code corrected 8th June 1999 (obukhov length was wrong way up,
 ! so now used as reciprocal of obukhov length)
 
-      real function diag_ustar(z,bflx,wnd,z0)
+      real function diag_ustar(z,bflx,thv1,wnd,z0)
 
       implicit none
       real, parameter      :: vonk =  0.4   ! von Karmans constant
@@ -276,32 +284,33 @@ end
       real, intent (in)    :: z             ! height where u locates
       real, intent (in)    :: bflx          ! surface buoyancy flux (m^2/s^3)
       real, intent (in)    :: wnd           ! wind speed at z
+      real, intent (in)    :: thv1          ! virtual pot temperature 
       real, intent (in)    :: z0            ! momentum roughness height
 
       integer :: iterate
-      real    :: lnz, klnz, c1, x, psi1, zeta, rlmo, ustar
+      real    :: lnz, klnz, c1, x, psi1, zeta, rlmo, ustarl
 
       lnz   = log(z/z0) 
       klnz  = vonk/lnz              
       c1    = 3.14159/2. - 3.*log(2.)
 
-      ustar =  wnd*klnz
+      ustarl =  wnd*klnz
       if (bflx /= 0.0) then 
         do iterate=1,4
-          rlmo   = -bflx * vonk/(ustar**3 + eps)   !reciprocal of
+          rlmo   = -bflx *g/thv1* vonk/(ustarl**3 + eps)   !reciprocal of
                                                    !obukhov length
           zeta  = z*rlmo
           if (zeta > 0.) then
-            ustar =  vonk*wnd  /(lnz + am*zeta)
+            ustarl =  vonk*wnd  /(lnz + am*zeta)
           else
             x     = sqrt( sqrt( 1.0 - bm*zeta ) )
             psi1  = 2.*log(1.0+x) + log(1.0+x*x) - 2.*atan(x) + c1
-            ustar = wnd*vonk/(lnz - psi1)
+            ustarl = wnd*vonk/(lnz - psi1)
           end if
         end do
       end if
 
-      diag_ustar = ustar
+      diag_ustar = ustarl
 
       return
       end function diag_ustar

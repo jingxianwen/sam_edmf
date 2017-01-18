@@ -51,6 +51,10 @@ subroutine init()
   pblh  = 0.0
  
   cfrac_tot=0.0
+  cfrac_mf = 0.
+  frac_mf  = 0.
+  qcsgs_mf = 0.
+  qisgs_mf = 0.
 
 end subroutine init
 

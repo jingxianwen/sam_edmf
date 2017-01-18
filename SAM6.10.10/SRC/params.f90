@@ -83,6 +83,7 @@ logical:: doupperbound = .false.
 logical:: docloud = .false. 
 logical:: dosgscloud = .false. 
 logical:: doedmf = .false. 
+logical :: dozerosigma = .false.
 logical:: doprecip = .false.
 logical:: dolongwave = .false. 
 logical:: doshortwave = .false.

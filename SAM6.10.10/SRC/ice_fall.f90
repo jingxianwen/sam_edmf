@@ -65,7 +65,13 @@ do k = max(1,kmin-1),kmax
          ! 0.1 m/s low bound was suggested by Chris Bretherton 
 !          vt_ice = 0.0
 !         vt_ice = max(0.1,0.5*log10(qic+1.e-12)+3.) ! based on Heymsfield's figure
-         vt_ice = 8.66*(max(0.,qic)+1.e-10)**0.24   ! Heymsfield (JAS, 2003, p.2607)
+         !vt_ice = 8.66*(max(0.,qic)+1.e-10)**0.24   ! Heymsfield (JAS, 2003, p.2607)
+         if (cfrac_pdf(i,j,k).eq.0.0) then
+           vt_ice = 0.0
+         else
+           ! Langhans, use in-cloud value
+           vt_ice = 8.66*(max(0.,qic/cfrac_pdf(i,j,k))+1.e-10)**0.24   ! Heymsfield (JAS, 2003, p.2607)
+         end if
 
          ! Use MC flux limiter in computation of flux correction.
          ! (MC = monotonized centered difference).
