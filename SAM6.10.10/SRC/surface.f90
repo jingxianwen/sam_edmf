@@ -59,7 +59,7 @@ if(.not.SFC_FLX_FXD) then
                        sstxy(i,j)+t00, fluxt0, fluxq0, taux0, tauy0, q_s)
            fluxbt(i,j) = fluxt0
            fluxbq(i,j) = fluxq0
-           ustar(i,j)  = (taux0**2  +  tauy0**2)**0.25
+           ustar(i,j)  = (taux0**2  +  tauy0**2)**0.25/rhow(1)**0.5
 
            call oceflx(pres(1),u(i,j,1)+ug, &
                        0.25*(v(i-1,j+YES3D,1)+v(i-1,j,1)+v(i,j+YES3D,1)+v(i,j,1))+vg, &
@@ -140,7 +140,7 @@ if(.not.SFC_FLX_FXD) then
                       fluxt0, fluxq0, taux0, tauy0, xlmo)
                fluxbt(i,j) = fluxt0
                fluxbq(i,j) = fluxq0
-               ustar(i,j)  = (taux0**2  +  tauy0**2)**0.25
+               ustar(i,j)  = (taux0**2  +  tauy0**2)**0.25/rhow(1)**0.5
 
                t_s = (0.5*(sstxy(i-1,j)+sstxy(i,j))+t00)*coef
                q_s = soil_wetness*qsatw(0.5*(sstxy(i-1,j)+sstxy(i,j))+t00,pres(1))
