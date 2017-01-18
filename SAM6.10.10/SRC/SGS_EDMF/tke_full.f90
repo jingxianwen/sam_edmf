@@ -47,6 +47,7 @@ call get_c0c1(cthl,cqt)
 
 do i=1,nx
 do j=1,ny
+
 do k=1,nzm
 
   ! buoyancy flux computation on mass levels (since TKE is on mass levels)
