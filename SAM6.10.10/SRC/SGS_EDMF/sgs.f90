@@ -41,6 +41,12 @@ real vwsb3(nx,ny,nz)                          ! sgs vertical flux of v
 real tkewsb3(nx,ny,nz)                        ! sgs vertical flux of tke
 real thvflx(nx,ny,nzm)                        ! sgs buoyancy flux in TKE equation
 
+! MF things
+real qcsgs_mf(nx,ny,nz)
+real qisgs_mf(nx,ny,nz)
+real frac_mf(nx,ny,nz)
+real cfrac_mf(nx,ny,nz)
+
 logical:: advect_sgs = .true. ! advect prognostics
 logical, parameter:: do_sgsdiag_bound = .true.  ! exchange boundaries for diagnostics fields
 

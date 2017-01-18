@@ -33,7 +33,7 @@ real,dimension (2) :: tabs1, tabs2
 real, parameter :: q_crit=1.6
 real, parameter :: lcld = 150.
 
-real :: cab,ckk,leps
+real :: cab,ckk,leps, frac_mf2
 real,dimension(nzm) :: qtqt, thlthl, qtthl, thetali, thetaligrad, qtgrad, sigmas
 
 an = 1./(tbgmax-tbgmin) 
@@ -181,6 +181,32 @@ else
  call cloud()
 
 end if ! dosgscloud
+
+if (doedmf) then 
+
+do i=1,nx
+do j=1,ny
+do k=1,nzm
+
+ ! get final domain averages (convective and environment)
+ frac_mf2 = 0.5*(frac_mf(i,j,k)+frac_mf(i,j,k+1))
+ qcl(i,j,k) = (1.-frac_mf2) * qcl(i,j,k) + 0.5 * frac_mf2 * (qcsgs_mf(i,j,k)+qcsgs_mf(i,j,k+1))
+ qci(i,j,k) = (1.-frac_mf2) * qci(i,j,k) + 0.5 * frac_mf2 * (qisgs_mf(i,j,k)+qisgs_mf(i,j,k+1))
+ tabs(i,j,k)  = t(i,j,k)-gamaz(k) + fac_cond*(qpl(i,j,k)+qcl(i,j,k)) + fac_sub*(qpi(i,j,k)+qci(i,j,k))
+ cfrac_tot(i,j,k) = min(frac_mf2,0.5*(cfrac_mf(i,j,k+1)+cfrac_mf(i,j,k))) + (1.-frac_mf2) * cfrac_pdf(i,j,k)
+ qn(i,j,k) = max(qcl(i,j,k) + qci(i,j,k),0.)
+ qv(i,j,k) = max(0.,q(i,j,k) - qn(i,j,k))
+ qp(i,j,k) = max(0.,qp(i,j,k))
+ 
+end do ! k
+end do ! j
+end do ! i
+
+else
+
+cfrac_tot = cfrac_pdf
+
+end if
 
 
 end subroutine sgscloudmf

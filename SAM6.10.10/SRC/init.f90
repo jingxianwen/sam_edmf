@@ -49,6 +49,8 @@ subroutine init()
   gamq0 = 0.
 
   pblh  = 0.0
+ 
+  cfrac_tot=0.0
 
 end subroutine init
 

@@ -412,10 +412,10 @@ subroutine rad_full()
     do k=1,nzm
       do j=1,ny
         do i=1,nx
-          qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)/(cfrac_pdf(i,j,k)+1.d-8)
-          qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)/(cfrac_pdf(i,j,k)+1.d-8)
-          qs_rad(i,j,k)=qs_rad(i,j,k)+SnowMassMixingRatio(i,j,k)/(cfrac_pdf(i,j,k)+1.d-8)
-          cld_rad(i,j,k) = cld_rad(i,j,k)+ cfrac_pdf(i,j,k)
+          qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          qs_rad(i,j,k)=qs_rad(i,j,k)+SnowMassMixingRatio(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          cld_rad(i,j,k) = cld_rad(i,j,k)+ cfrac_tot(i,j,k)
         end do
       end do
     end do
@@ -424,22 +424,22 @@ subroutine rad_full()
     do k=1,nzm
       do j=1,ny
         do i=1,nx
-          qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)/(cfrac_pdf(i,j,k)+1.d-8)
-          qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)/(cfrac_pdf(i,j,k)+1.d-8)
-          cld_rad(i,j,k) = cld_rad(i,j,k)+cfrac_pdf(i,j,k)
+          qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          cld_rad(i,j,k) = cld_rad(i,j,k)+cfrac_tot(i,j,k)
         end do
       end do
     end do
   end if
   ! Accumulate effective radius by weighting it with mass
   if(compute_reffc) then
-    rel_rad(1:nx,1:ny,1:nzm) = rel_rad(1:nx,1:ny,1:nzm) + reffc(1:nx,1:ny,1:nzm) * qcl(1:nx,1:ny,1:nzm)/(cfrac_pdf(i,j,k)+1.d-8) 
+    rel_rad(1:nx,1:ny,1:nzm) = rel_rad(1:nx,1:ny,1:nzm) + reffc(1:nx,1:ny,1:nzm) * qcl(1:nx,1:ny,1:nzm)/(cfrac_tot(i,j,k)+1.d-8) 
   end if
   if(compute_reffi) then
-    rei_rad(1:nx,1:ny,1:nzm) = rei_rad(1:nx,1:ny,1:nzm) + reffi(1:nx,1:ny,1:nzm) * qci(1:nx,1:ny,1:nzm)/(cfrac_pdf(i,j,k)+1.d-8) 
+    rei_rad(1:nx,1:ny,1:nzm) = rei_rad(1:nx,1:ny,1:nzm) + reffi(1:nx,1:ny,1:nzm) * qci(1:nx,1:ny,1:nzm)/(cfrac_tot(i,j,k)+1.d-8) 
   end if
   if(dosnow_radiatively_active) then
-    res_rad(1:nx,1:ny,1:nzm) = res_rad(1:nx,1:ny,1:nzm) + reffs(1:nx,1:ny,1:nzm) * SnowMassMixingRatio(1:nx,1:ny,1:nzm)/(cfrac_pdf(i,j,k)+1.d-8) 
+    res_rad(1:nx,1:ny,1:nzm) = res_rad(1:nx,1:ny,1:nzm) + reffs(1:nx,1:ny,1:nzm) * SnowMassMixingRatio(1:nx,1:ny,1:nzm)/(cfrac_tot(i,j,k)+1.d-8) 
   end if
   nradsteps=nradsteps+1
 
