@@ -1,5 +1,5 @@
 subroutine diffuse_scalar (f,fluxb,fluxt,sumMs, &
-                          fdiff,flux,flux3,f2lediff,f2lediss,fwlediff,doit,massflux)
+                          fdiff,flux,flux3,f2lediff,f2lediss,fwlediff,doit,massflux,flux3_mf)
 
 use grid
 use vars, only: rho, rhow
@@ -13,6 +13,7 @@ real fluxt(nx,ny)		! top flux
 real sumMs(1:nx, 1:ny,nz)		! MF flux of scalar
 real flux(nz)
 real flux3(nx,ny,nz)
+real,optional :: flux3_mf(nx,ny,nz)
 real fdiff(nz)
 real f2lediff(nzm)
 real f2lediss(nzm)
@@ -43,6 +44,7 @@ endif
 
 flux = 0.
 flux3 = 0.
+if (present(flux3_mf)) flux3_mf = 0.
 do i=1,nx
   do j=1,ny
     var = f(i,j,1:nzm)
@@ -55,9 +57,14 @@ do i=1,nx
     flux3(i,j,nz) = 0.0
     flux(nz)= 0.
     flux3(i,j,2:nzm) =  (-1.) /adzw(2:nzm)/dz *         0.5*(tkh(i,j,1:nzm-1) + tkh(i,j,2:nzm)) *                  &
-                           (betap* (d(2:nzm)- d(1:nzm-1))+betam*(f(i,j,2:nzm)-f(i,j,1:nzm-1)) ) &
-                           +(sumMs(i,j,2:nzm) - (betap*d(2:nzm) + betam*f(i,j,2:nzm)) * sgs_field_sumM(i,j,2:nzm,1) )
+                           (betap* (d(2:nzm)- d(1:nzm-1))+betam*(f(i,j,2:nzm)-f(i,j,1:nzm-1)) ) 
+    if (present(flux3_mf).and.massflux) then
+                      flux3_mf(i,j,2:nzm) = (sumMs(i,j,2:nzm) - (betap*d(2:nzm) + betam*f(i,j,2:nzm)) * sgs_field_sumM(i,j,2:nzm,1) )
+    end if
     flux(2:nzm) = flux(2:nzm) + rhow(2:nzm) * flux3(i,j,2:nzm)/dz
+    if (present(flux3_mf).and.massflux) then
+       flux(2:nzm) = flux(2:nzm) + rhow(2:nzm) * flux3_mf(i,j,2:nzm)/dz
+    end if
     f(i,j,1:nzm) = d(1:nzm)
   end do
 end do

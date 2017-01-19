@@ -1,4 +1,4 @@
-subroutine get_pblh(i,j,thetav,flux,pblhout)
+subroutine get_pblh()
 
 use vars
 use params
@@ -8,10 +8,8 @@ use sgs, only : pblhfluxmin, pblhthvgrad, tke
 implicit none
 
 !input
-integer, intent(in) :: i,j
-real, dimension(nzm),intent(in) :: thetav, flux
-!output
-real :: pblhout
+integer :: i,j
+real, dimension(nzm) :: thetav, flux
 
 
     !---------------------------------------------------------------
@@ -41,10 +39,21 @@ real :: pblhout
 
     pblhalter=.false.
 
+
+    do i=1,nx
+    do j=1,ny
+
+    flux = thvflx(i,j,1:nzm)
+    
+    do k=1,nzm
+       thetav(k) = (1.+epsv*qv(i,j,k))*tabs(i,j,k)*(pres0/pres(k))**(rgas/cp)
+    end do
+
+
     IF (pblhfluxmin) then ! compute cpbl top as level with flux minimum
 
 
-    pblhout = zi(2)
+    pblh(i,j) = zi(2)
     !FIND MIN Flux
     k = 1
     kthv = 1
@@ -58,9 +67,9 @@ real :: pblhout
        ENDIF
        k = k+1
     ENDDO 
-    pblhout=z(kthv)
+    pblh(i,j)=z(kthv)
  
-    if (pblhout.gt.4000.) pblhalter=.true.
+    if (pblh(i,j).gt.4000.) pblhalter=.true.
 
 
     ELSEIF (pblhthvgrad) THEN
@@ -89,7 +98,7 @@ real :: pblhout
     !compute quadratic fit to thetav/dz using three points
     !then let height of vertex be the PBL height to allow for PBL height to fall in between levels
     if (kthv .eq. 1) then
-       pblhout = z(1)
+       pblh(i,j) = z(1)
     elseif (dthvdz(kthv).lt.dthvdz(kthv+1).or.z(kthv).gt.4000.) then
        pblhalter=.true.
     else
@@ -106,15 +115,15 @@ real :: pblhout
       if (aa.eq.0.) then
         ! linear profile of gradient with bb.ne.0.0
         if (bb.gt.0.0) then
-          pblhout = z(kthv+1)
+          pblh(i,j) = z(kthv+1)
         elseif(bb.lt.0.0) then
-          pblhout = z(kthv-1)
+          pblh(i,j) = z(kthv-1)
         else
           !constant gradient
-          pblhout = z(kthv)
+          pblh(i,j) = z(kthv)
         end if
       else
-        pblhout =  - bb/(2.*aa)
+        pblh(i,j) =  - bb/(2.*aa)
       end if
 
     end if
@@ -158,16 +167,16 @@ real :: pblhout
         delt_thv = 1.5  
     ENDIF
 
-    pblhout=0.
+    pblh(i,j)=0.
     k = kthv+1
-    DO WHILE (pblhout .EQ. 0.) 
+    DO WHILE (pblh(i,j) .EQ. 0.) 
        IF (thetav(k) .GE. (minthv + delt_thv))THEN
-          pblhout = z(k) - adzw(k)*dz* &
+          pblh(i,j) = z(k) - adzw(k)*dz* &
              & MIN(1.,(thetav(k)-(minthv + delt_thv))/ &
              & MAX(thetav(k)-thetav(k-1),1.E-6))
        ENDIF
        k = k+1
-       IF (k .EQ. nzm-1) pblhout = zi(2) !EXIT SAFEGUARD
+       IF (k .EQ. nzm-1) pblh(i,j) = zi(2) !EXIT SAFEGUARD
     ENDDO
     !print*,"IN GET_PBLH:",thsfc,zi
 
@@ -201,13 +210,16 @@ real :: pblhout
     PBLH_TKE = MIN(PBLH_TKE,4000.)
 
     !BLEND THE TWO PBLH TYPES HERE: 
-    wt=.5*TANH((pblhout - sbl_lim)/sbl_damp) + .5
-    pblhout=PBLH_TKE*(1.-wt) + pblhout*wt
+    wt=.5*TANH((pblh(i,j) - sbl_lim)/sbl_damp) + .5
+    pblh(i,j)=PBLH_TKE*(1.-wt) + pblh(i,j)*wt
 
 
     END IF  
 
-    pblh_xy(i,j) = pblh_xy(i,j) + pblhout * dtfactor
+    pblh_xy(i,j) = pblh_xy(i,j) + pblh(i,j) * dtfactor
+ 
+    end do
+    end do
 
 
 end subroutine get_pblh

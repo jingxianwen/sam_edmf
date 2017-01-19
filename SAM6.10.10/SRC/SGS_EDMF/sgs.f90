@@ -46,6 +46,8 @@ real qcsgs_mf(nx,ny,nz)
 real qisgs_mf(nx,ny,nz)
 real frac_mf(nx,ny,nz)
 real cfrac_mf(nx,ny,nz)
+real twsb3_mf (nx,ny,nz)                         ! sgs vertical flux of h/cp
+real mkwsb3_mf(nx,ny,nz)                         ! sgs vertical flux of qt
 
 logical:: advect_sgs = .true. ! advect prognostics
 logical, parameter:: do_sgsdiag_bound = .true.  ! exchange boundaries for diagnostics fields
@@ -86,12 +88,20 @@ real grdf_y(nzm)! grid factor for eddy diffusion in y
 real grdf_z(nzm)! grid factor for eddy diffusion in z
 
 logical :: dofixedtau   ! if true, tau=600 sec
-logical :: dotkedirichlet ! if true, then downward tke surface fluxes are computed based on tke on first model level 
                           ! and assuming tke(z=0) = 0
 logical :: pblhfluxmin    ! use level with minimum buoyancy flux
 logical :: pblhthvgrad    ! use height with max dthv gradient (may lie between levels)
+logical :: fixedeps
+logical :: donoplumesat
+logical :: dopblh
+real :: tauneggers
+real :: ctketau
+real :: beta
+real :: pwmin
+integer :: nup
+real ::eps0
 
-real :: ctketau, ustar(dimx1_s:dimx2_s, dimy1_s:dimy2_s), wstar(dimx1_s:dimx2_s, dimy1_s:dimy2_s)
+real :: ustar(dimx1_s:dimx2_s, dimy1_s:dimy2_s), wstar(dimx1_s:dimx2_s, dimy1_s:dimy2_s)
 
 ! Local diagnostics:
 
@@ -112,19 +122,28 @@ subroutine sgs_setparm()
 
   !======================================================================
   NAMELIST /SGS_TKE/ &
-       dofixedtau,dotkedirichlet,pblhfluxmin,pblhthvgrad,ctketau
+       dofixedtau,pblhfluxmin,pblhthvgrad,ctketau,fixedeps,tauneggers,&
+       dosingleplume,beta,donoplumesat,pwmin,nup,eps0,dopblh
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
   dofixedtau = .false.
-  dotkedirichlet = .true.
   pblhfluxmin    = .false.
   pblhthvgrad    = .true.
   if (dofixedtau) then
-    ctketau = 400.
+    ctketau = 700.
   else
     ctketau = 0.5
   end if
+  fixedeps=.false.
+  donoplumesat=.false.
+  tauneggers=500. 
+  dosingleplume=.false.
+  beta=0.3,
+  pwmin=1.4
+  nup = 40
+  eps0=1.0e-3
+  dopblh=.true.
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
@@ -147,6 +166,14 @@ subroutine sgs_setparm()
 
   if (pblhfluxmin.eq.pblhthvgrad) then
         if (masterproc) write(*,*) '****** ERROR: bad specification in SGS_TKE namelist for pblh diagnostic'
+        call task_abort()
+  end if
+  if (dopblh.and.pblhfluxmin .and..not.dosgs) then
+      if (masterproc) write(*,*) '****** ERROR: bad specification in SGS_TKE namelist for dopblh'
+        call task_abort()
+  end if
+  if (doedmf.and..not.dopblh) then
+      if (masterproc) write(*,*) '****** ERROR: bad specification in SGS_TKE namelist for dopblh&doedmf'
         call task_abort()
   end if
 
@@ -184,7 +211,9 @@ subroutine sgs_init()
      fluxtsgs = 0.
 
      twsb3 = 0.
+     twsb3_mf = 0.
      mkwsb3 = 0.
+     mkwsb3_mf = 0.
      uwsb3 = 0. 
      vwsb3 = 0. 
      tkewsb3 = 0.       
@@ -384,19 +413,15 @@ subroutine sgs_scalars()
       dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,5)
 
       call diffuse_scalar(t,fluxbt,fluxtt,dummy3,tdiff,twsb,twsb3, &
-                           t2lediff,t2lediss,twlediff,.true.,.false.)
+                           t2lediff,t2lediss,twlediff,.true.,doedmf,twsb3_mf)
     
       if(advect_sgs) then
-         if (dotkedirichlet) then
-            do i=1,nx
-            do j=1,ny
-              ! compute a downward flux of tke assuming tke=0 at sfc and K_sfc=K_1
-              tkewsb3(i,j,1) = - 2.*tk(i,j,1)/adz(1)/dz * tke(i,j,1)   
-            end do
-            end do
-         else
-            tkewsb3 = 0.
-         end if
+          do i=1,nx
+          do j=1,ny
+            ! compute a downward flux of tke assuming tke=0 at sfc and K_sfc=K_1
+            tkewsb3(i,j,1) = - 2.*tk(i,j,1)/adz(1)/dz * (tke(i,j,1) - 3.75*ustar**2 - 0.2*wstar**2)  
+          end do
+          end do
          fluxbtmp(1:nx,1:ny) = tkewsb3(1:nx,1:ny,1)
          dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,4)
          call diffuse_scalar(tke,fluxbtmp,fzero,dummy3,dummy,sgswsb,tkewsb3, &
@@ -418,8 +443,13 @@ subroutine sgs_scalars()
            fluxbtmp(1:nx,1:ny) = fluxbmk(1:nx,1:ny,k)
            fluxttmp(1:nx,1:ny) = fluxtmk(1:nx,1:ny,k)
            dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,5+k)
+           if (flag_precip(k).eq.0) then
            call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp,dummy3, &
-                mkdiff(:,k),mkwsb(:,k),mkwsb3(:,:,:,k), dummy,dummy,dummy,.false.,.false.)
+                mkdiff(:,k),mkwsb(:,k),mkwsb3(:,:,:,k), dummy,dummy,dummy,.false.,doedmf,mkwsb3_mf)
+           else
+           call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp,dummy3, &
+                mkdiff(:,k),mkwsb(:,k),mkwsb3(:,:,:,k),dummy,dummy,dummy,.false.,.false.)
+           end if
        end if
       end do
 
@@ -464,6 +494,11 @@ subroutine sgs_proc()
 
 
    integer :: i
+
+     if(dopblh) call get_pblh()
+
+     sgs_field_sumM = 0.
+     if (doedmf) call edmf()
 
 !    SGS TKE equation:
 
