@@ -114,7 +114,7 @@ do k = 1, nzm
 
       qsatt = qsatt + dqsat * dtabs
       qn(i,j,k) = max(0.,q(i,j,k)-qsatt)
-      if (qn(i,j,k).gt.0.0) else
+      if (qn(i,j,k).gt.0.0) then
           cfrac_pdf(i,j,k) = 1. 
       else
           cfrac_pdf(i,j,k) = 0.

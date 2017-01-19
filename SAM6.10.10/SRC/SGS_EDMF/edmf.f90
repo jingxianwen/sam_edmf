@@ -1,10 +1,12 @@
 ! WL this routine provides the fluxes sumM(nz), sumMrt(nz), sumMu(nz), sumMv(nz), sumMt(nz), and sumMtke(nz)
 ! WL that result from the multiplume model provided by Kay Suselj and adapted by WL
-subroutine edmf()
+subroutine edmf
 
 use vars
 use grid
 use params
+use microphysics, only : q, qn, qp
+use sgs
 implicit none
 
 ! ==============================================================================
@@ -34,9 +36,13 @@ implicit none
       REAl,DIMENSION(1:nzm,1:nup)    :: ENTf
       INTEGER,DIMENSION(1:nzm,1:nup) :: ENTi
 
+      REAL, DIMENSION(1:nz,1:nup) :: UPM, UPW, UPT, UPTABS, UPTHV, UPQT, UPQCL,&
+                                     UPQCI,UPA, UPU, UPV  
+      REAL, DIMENSION(1:nz,1:nup) :: ENT, UPCF, BUOY
+
       INTEGER :: K,N,i,j
       REAL :: wthv,wqt,wthl,qstar,thstar,sigmaW,sigmaQT,sigmaTH,sigmaTHV,zs, &
-           pwmax,wmin,wmax,wlv,wtv,thetav1
+           pwmax,wmin,wmax,wlv,wtv,thetav1,theta
       REAL :: QTn,Tn,THVn,QCLn,QCIn,Un,Vn,Wn2,EntEXP,EntW, hlp, acrit, Wa
 
 ! w parameters
@@ -79,7 +85,6 @@ implicit none
  UPU=0.
  UPV=0.
  ENT=0.
- DET=0.
  BUOY=0.
  qcsgs_mf=0.
  qisgs_mf=0.
@@ -96,7 +101,7 @@ implicit none
  
  ! surface fluxes
  ! sensible heat flux (K m s-1)
- wthl = fluxbt(i,j,)
+ wthl = fluxbt(i,j)
  ! latent heat flux (m s-1)
  wqt  = fluxbq(i,j) 
  ! virtual pot. temp flux
@@ -128,6 +133,7 @@ implicit none
 
 
     thetav1 = (1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)
+    theta   = thetav1/(1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))
 
 ! see Lenschow et al. (1980), JAS
     wstar(i,j)=max(0.,(ggr/thetav1*wthv*pblh(i,j))**(1./3.))
@@ -138,8 +144,8 @@ implicit none
     sigmaTH=1.34*thstar*(zs/pblh(i,j))**(-1./3.)
  
 ! now get sigmaTHV from linearization of pot. temp. and using a corr. coeff between qv and theta of 0.75 (see Sobjan 1991)
-    sigmaTHV=sqrt(sigmaTH**2+epsv**2*theta(1)**2*sigmaQT**2 &
-        + 2.*epsv*theta(1)*0.75*sigmaTH*sigmaQT)
+    sigmaTHV=sqrt(sigmaTH**2+epsv**2*theta**2*sigmaQT**2 &
+        + 2.*epsv*theta*0.75*sigmaTH*sigmaQT)
 
     wmin=sigmaW*pwmin
     wmax=sigmaW*pwmax
@@ -156,12 +162,12 @@ implicit none
        ! note that tke here is fully explicit only (at step n) if dosequential=.false., otherwise
        ! the tendency from buoyancy production, shear production, and dissipation have been added.
        ! This, if dosequential=.false., tke could be 0 and we simply add 0.01  to avoid division by zero
-       UPQT(1,1)=qt(i,j,1)+beta*wqt/(sqrt(0.2)*wstar(i,j)) !(sqrt(tke(1)) + 0.001 )
+       UPQT(1,1)=q(i,j,1)+beta*wqt/(sqrt(0.2)*wstar(i,j)) !(sqrt(tke(1)) + 0.001 )
        UPTHV(1,1)=thetav1+beta*wthv/ (sqrt(0.2)*wstar(i,j)) !(sqrt(tke(1)) + 0.001 )
-       UPTABS(1,1)=UPTHV(1,1)/(1.+epsv*UPQT(1,1)) * (pres(1)/p00)**(rgas/cp) 
+       UPTABS(1,1)=UPTHV(1,1)/(1.+epsv*UPQT(1,1)) * (pres(1)/1000.)**(rgas/cp) 
        UPQCL(1,1)=qcl(i,j,1) + qpl(i,j,1)
        UPQCI(1,1)=qci(i,j,1) + qpi(i,j,1)
-       UPT(1,1)= (p00/pres(1))**(rgas/cp) *&
+       UPT(1,1)= (1000./pres(1))**(rgas/cp) *&
        (UPTABS(1,1) - fac_cond*(qcl(i,j,1)+qpl(i,j,1)) - fac_sub*(qci(i,j,1)+qpi(i,j,1)))    
        UPCF(1,1) = 0.0
        frac_mf(i,j,1) = UPA(1,1)
@@ -186,13 +192,13 @@ implicit none
          UPV(1,N)=v(i,j,1)
 
          ! specific humidity needed (will be convert back in the end)
-         UPQT(1,N)=qt(1)+0.32*UPW(1,N)*sigmaQT/sigmaW
+         UPQT(1,N)=q(1)+0.32*UPW(1,N)*sigmaQT/sigmaW
          ! according to cheinet the 0.58 is for thetav, hence thetav is initialized (instead of theta)
          UPTHV(1,N)=thetav1+0.58*UPW(1,N)*sigmaTHV/sigmaW
-         UPTABS(1,N)=UPTHV(1,N)/(1.+epsv*UPQT(1,N)) * (pres(1)/p00)**(rgas/cp) 
+         UPTABS(1,N)=UPTHV(1,N)/(1.+epsv*UPQT(1,N)) * (pres(1)/1000.)**(rgas/cp) 
          UPQCL(1,N)=qcl(i,j,1) + qpl(i,j,1)
          UPQCI(1,N)=qci(i,j,1) + qpi(i,j,1)
-         UPT(1,N)= (p00/pres(1))**(rgas/cp) *&
+         UPT(1,N)= (1000./pres(1))**(rgas/cp) *&
          (UPTABS(1,N) - fac_cond*(qcl(i,j,1)+qpl(i,j,1)) - fac_sub*(qci(i,j,1)+qpi(i,j,1)))    
          UPCF(1,N) = 0.0
          frac_mf(i,j,1) = frac_mf(i,j,1)+UPA(1,N)
@@ -222,8 +228,8 @@ implicit none
 
           EntExp=exp(-ENT(k-1,N)*(zi(k)-zi(k-1)))
 
-          QTn=qt(i,j,k-1)*(1.-EntExp)+UPQT(k-1,N)*EntExp
-          Tn=(p00/pres(k-1))**(rgas/cp) * (t(i,j,k-1)-ggr/cp*z(k-1))*(1.-EntExp)+UPT(k-1,N)*EntExp
+          QTn=q(i,j,k-1)*(1.-EntExp)+UPQT(k-1,N)*EntExp
+          Tn=(1000./pres(k-1))**(rgas/cp) * (t(i,j,k-1)-ggr/cp*z(k-1))*(1.-EntExp)+UPT(k-1,N)*EntExp
           !Un=u(k)*(1.-EntExp)+UPU(k-1,i)*EntExp
           !Vn=v(k)*(1.-EntExp)+UPV(k-1,i)*EntExp
 
@@ -254,7 +260,7 @@ implicit none
              UPA(k,N) = UPA(k-1,N)
              UPM(k,N) = UPW(k,N) * UPA(k,N)  
              UPTHV(k,N)=THVn
-             UPTABS  (k,N)=THVn/(1.+epsv*(QTn-QCLn-QCIn)-QCLn-QCIn)*(presi(k)/p00)**(rgas/cp)
+             UPTABS  (k,N)=THVn/(1.+epsv*(QTn-QCLn-QCIn)-QCLn-QCIn)*(presi(k)/1000.)**(rgas/cp)
              UPT(k,N)=Tn
              UPQT(k,N)=QTn
              UPQCL(k,N)=QCLn
@@ -274,7 +280,7 @@ implicit none
     DO k=2,nzm
       DO N=1,nup
         sgs_field_sumM(i,j,k,1)=sgs_field_sumM(i,j,k,1) + UPA(K,N)*UPW(K,N)
-        sgs_field_sumM(i,j,k,5)=sgs_field_sumM(i,j,k,5) + UPA(K,N)*((presi(k)/p00)**(rgas/cp)*UPT(K,N)+ggr/cp*zi(k))*UPW(K,N)
+        sgs_field_sumM(i,j,k,5)=sgs_field_sumM(i,j,k,5) + UPA(K,N)*((presi(k)/1000.)**(rgas/cp)*UPT(K,N)+ggr/cp*zi(k))*UPW(K,N)
         sgs_field_sumM(i,j,k,6)=sgs_field_sumM(i,j,k,6) + UPA(K,N)*UPQT(K,N)*UPW(K,N)
         !sumMu(k)  =sumMu(k)+UPA(K,i)*UPW(K,I)*UPU(K,I)
         !sumMv(k)  =sumMv(k)+UPA(K,i)*UPW(K,I)*UPV(K,I)
@@ -327,7 +333,7 @@ QN=0.
 !print*, '+++++++++++++++++++++++++'
 do i=1,NITER
 ! get tabs
-T = THLI* (P/p00)**(rgas/cp) +fac_cond*QC+fac_sub*QI
+T = THLI* (P/1000.)**(rgas/cp) +fac_cond*QC+fac_sub*QI
 ! WL get saturation mixing ratio
 if (T.ge.tbgmax) then
   QS=qsatw(T,P)
@@ -349,7 +355,7 @@ if (abs(QN-QNOLD)<Diff) exit
 !print*, '+++++++++++++++++++++++++'
 enddo
 
-T = THLI* (P/p00)**(rgas/cp) +fac_cond*QC+fac_sub*QI
+T = THLI* (P/1000.)**(rgas/cp) +fac_cond*QC+fac_sub*QI
 if (T.ge.tbgmax) then
   QS=qsatw(T,P)
 elseif (T.le.tbgmin) then
@@ -362,7 +368,7 @@ QN=max(QT-QS,0.)
 QC= om * QN
 QI= (1.-om) * QN
 
-THV = (THLI +(fac_cond*QC+fac_sub*QI)*(p00/P)**(rgas/cp)) * (1.+epsv*(QT-QN)-QN)
+THV = (THLI +(fac_cond*QC+fac_sub*QI)*(1000./P)**(rgas/cp)) * (1.+epsv*(QT-QN)-QN)
 
 end subroutine condensation_edmf
 

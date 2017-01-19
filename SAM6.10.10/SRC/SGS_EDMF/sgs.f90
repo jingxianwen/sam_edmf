@@ -4,7 +4,7 @@ module sgs
 ! Marat Khairoutdinov, 2012
 
 use grid, only: nx,nxp1,ny,nyp1,YES3D,nzm,nz,dimx1_s,dimx2_s,dimy1_s,dimy2_s 
-use params, only: dosgs
+use params, only: dosgs,doedmf
 use microphysics, only : nmicro_fields
 use tracers, only : ntracers
 implicit none
@@ -94,6 +94,7 @@ logical :: pblhthvgrad    ! use height with max dthv gradient (may lie between l
 logical :: fixedeps
 logical :: donoplumesat
 logical :: dopblh
+logical :: dosingleplume
 real :: tauneggers
 real :: ctketau
 real :: beta
@@ -101,7 +102,7 @@ real :: pwmin
 integer :: nup
 real ::eps0
 
-real :: ustar(dimx1_s:dimx2_s, dimy1_s:dimy2_s), wstar(dimx1_s:dimx2_s, dimy1_s:dimy2_s)
+real :: ustar(nx,ny), wstar(nx,ny)
 
 ! Local diagnostics:
 
@@ -139,7 +140,7 @@ subroutine sgs_setparm()
   donoplumesat=.false.
   tauneggers=500. 
   dosingleplume=.false.
-  beta=0.3,
+  beta=0.3
   pwmin=1.4
   nup = 40
   eps0=1.0e-3
@@ -419,7 +420,7 @@ subroutine sgs_scalars()
           do i=1,nx
           do j=1,ny
             ! compute a downward flux of tke assuming tke=0 at sfc and K_sfc=K_1
-            tkewsb3(i,j,1) = - 2.*tk(i,j,1)/adz(1)/dz * (tke(i,j,1) - 3.75*ustar**2 - 0.2*wstar**2)  
+            tkewsb3(i,j,1) = - 2.*tk(i,j,1)/adz(1)/dz * (tke(i,j,1) - 3.75*ustar(i,j)**2 - 0.2*wstar(i,j)**2)  
           end do
           end do
          fluxbtmp(1:nx,1:ny) = tkewsb3(1:nx,1:ny,1)

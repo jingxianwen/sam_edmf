@@ -3,7 +3,7 @@ subroutine get_pblh()
 use vars
 use params
 use grid
-use sgs, only : pblhfluxmin, pblhthvgrad, tke
+use sgs, only : pblhfluxmin, pblhthvgrad, tke,thvflx
 
 implicit none
 

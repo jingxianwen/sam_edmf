@@ -33,7 +33,7 @@ real,dimension (2) :: tabs1, tabs2
 real, parameter :: q_crit=1.6
 real, parameter :: lcld = 150.
 
-real :: cab,ckk,leps, frac_mf2
+real :: cab,ckk,leps
 real,dimension(nzm) :: qtqt, thlthl, qtthl, thetali, thetaligrad, qtgrad, sigmas
 
 an = 1./(tbgmax-tbgmin) 
@@ -135,13 +135,8 @@ do k=1,nzm
 
  IF (sigmas(k).le.0.0) then
    ! homogeneous grid box
-   if (donoenvcloud) then
-   cfrac_pdf(i,j,k) = 0.
-   qne = 0.
-   else
    cfrac_pdf(i,j,k) =   ABS ( (SIGN(1.0,ds)+1.0)*0.5 )
    qne = cfrac_pdf(i,j,k) * ds
-   end if
    q1=-999.
    dqndt =  - (omn  * dtqsatw(tabse,pres(k)) + (1.-omn) * dtqsati(tabse,pres(k)))
  ELSE
@@ -172,7 +167,7 @@ do k=1,nzm
  frac_mf2 = 0.5*(frac_mf(i,j,k)+frac_mf(i,j,k+1))
  qcl(i,j,k) = (1.-frac_mf2) * omn * qne + 0.5 * frac_mf2 * (qcsgs_mf(i,j,k)+qcsgs_mf(i,j,k+1))
  qci(i,j,k) = (1.-frac_mf2) * (1.-omn) * qne + 0.5 * frac_mf2 * (qisgs_mf(i,j,k)+qisgs_mf(i,j,k+1)) 
- cfrac_pdf(k) = min(frac_mf2,0.5*(cfrac_mf(i,j,k+1)+cfrac_mf(i,j,k))) + (1.-frac_mf2) * cfrac_pdf(i,j,k)
+ cfrac_pdf(i,j,k) = min(frac_mf2,0.5*(cfrac_mf(i,j,k+1)+cfrac_mf(i,j,k))) + (1.-frac_mf2) * cfrac_pdf(i,j,k)
 
  tabs(i,j,k)  = t(i,j,k)-gamaz(k) + fac_cond*(qpl(i,j,k)+qcl(i,j,k)) + fac_sub*(qpi(i,j,k)+qci(i,j,k)) 
 

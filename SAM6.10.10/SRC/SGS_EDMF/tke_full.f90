@@ -5,7 +5,7 @@ subroutine tke_full
 
 use grid
 use vars
-use sgs, only : wstar
+use sgs
 use params
 use microphysics, only : qp
 implicit none
