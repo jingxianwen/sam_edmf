@@ -43,7 +43,7 @@ implicit none
       INTEGER :: K,N,i,j
       REAL :: wthv,wqt,wthl,qstar,thstar,sigmaW,sigmaQT,sigmaTH,sigmaTHV,zs, &
            pwmax,wmin,wmax,wlv,wtv,thetav1,theta
-      REAL :: QTn,Tn,THVn,QCLn,QCIn,Un,Vn,Wn2,EntEXP,EntW, hlp, acrit, Wa
+      REAL :: QTn,Tn,THVn,QCLn,QCIn,Un,Vn,Wn2,EntEXP,EntW, hlp, acrit, Wa, thetavenv
 
 ! w parameters
       REAL,PARAMETER :: &
@@ -192,7 +192,7 @@ implicit none
          UPV(1,N)=v(i,j,1)
 
          ! specific humidity needed (will be convert back in the end)
-         UPQT(1,N)=q(1)+0.32*UPW(1,N)*sigmaQT/sigmaW
+         UPQT(1,N)=q(i,j,1)+0.32*UPW(1,N)*sigmaQT/sigmaW
          ! according to cheinet the 0.58 is for thetav, hence thetav is initialized (instead of theta)
          UPTHV(1,N)=thetav1+0.58*UPW(1,N)*sigmaTHV/sigmaW
          UPTABS(1,N)=UPTHV(1,N)/(1.+epsv*UPQT(1,N)) * (pres(1)/1000.)**(rgas/cp) 
@@ -210,7 +210,6 @@ implicit none
 
     qcsgs_mf(i,j,1)=qcsgs_mf(i,j,1)/frac_mf(i,j,1)
     qisgs_mf(i,j,1)=qisgs_mf(i,j,1)/frac_mf(i,j,1)
-    qtsgs_mf(i,j,1)=qtsgs_mf(i,j,1)/frac_mf(i,j,1)
 
     
 

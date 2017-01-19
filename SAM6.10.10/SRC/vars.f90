@@ -24,11 +24,6 @@ real qpi     (nx, ny, nzm)                ! ice water  (precipitation)
 real cfrac_pdf(nx, ny, nzm)               ! sgs cloud cover  
 real cfrac_tot(nx, ny, nzm)               ! sgs cloud cover  
 
-real cfrac_mf (nx, ny, nz)                ! sgs plume cloud cover
-real frac_mf (nx,ny,nz)                   ! sgs plume fractional area (>= cfrac_mf)
-real qcsgs_mf (nx,ny,nz)                  ! sgs qc in plumes
-real qisgs_mf (nx,ny,nz)                  ! sgs qi in plumes
-        
 !--------------------------------------------------------------------
 ! time-tendencies for prognostic variables
 

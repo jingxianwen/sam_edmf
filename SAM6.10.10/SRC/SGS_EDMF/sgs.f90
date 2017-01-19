@@ -219,6 +219,11 @@ subroutine sgs_init()
      vwsb3 = 0. 
      tkewsb3 = 0.       
 
+     qcsgs_mf=0.
+     qisgs_mf=0.
+     cfrac_mf=0.
+     frac_mf=0.
+
   end if
 
   if(masterproc) then

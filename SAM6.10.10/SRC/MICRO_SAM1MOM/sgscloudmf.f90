@@ -17,6 +17,7 @@ use params
 use grid
 use micro_params
 use microphysics, only : q,qp,qn
+use sgs
 
 
 implicit none
