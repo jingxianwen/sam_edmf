@@ -407,7 +407,7 @@ subroutine sgs_scalars()
   use vars
   use microphysics
   use tracers
-  use params, only: dotracers
+  use params, only: dotracers,dosurface,doedmf
   use grid, only: nx, ny, nz, adz, dz 
   implicit none
 
@@ -418,9 +418,10 @@ subroutine sgs_scalars()
 
       dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,5)
 
-      call diffuse_scalar(t,fluxbt,fluxtt,dummy3,tdiff,twsb,twsb3, &
+      call diffuse_scalar_edmf(t,fluxbt,fluxtt,dummy3,tdiff,twsb,twsb3, &
                            t2lediff,t2lediss,twlediff,.true.,doedmf,twsb3_mf)
     
+      if (.not.dosurface) ustar=0.
       if(advect_sgs) then
           do i=1,nx
           do j=1,ny
@@ -450,7 +451,7 @@ subroutine sgs_scalars()
            fluxttmp(1:nx,1:ny) = fluxtmk(1:nx,1:ny,k)
            dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,5+k)
            if (flag_precip(k).eq.0) then
-           call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp,dummy3, &
+           call diffuse_scalar_edmf(micro_field(:,:,:,k),fluxbtmp,fluxttmp,dummy3, &
                 mkdiff(:,k),mkwsb(:,k),mkwsb3(:,:,:,k), dummy,dummy,dummy,.false.,doedmf,mkwsb3_mf)
            else
            call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp,dummy3, &

@@ -1,0 +1,99 @@
+&SGS_TKE
+dofixedtau = .true.,
+ctketau=700.,
+pblhthvgrad = .true.,
+pblhfluxmin = .false.,
+dopblh= .false.,
+fixedeps=.false.,
+donoplumesat=.false.,
+dosingleplume=.false.,
+tauneggers=500.,
+pwmin=1.4,
+nup=40
+/
+
+&PARAMETERS
+
+ caseid ='BOMEX_ED',
+ nrestart = 0,
+ perturb_type = 5, 
+ day0 = 0.,
+
+ LES = .true.,
+ OCEAN = .true.,
+ doconstdz=.true.,
+ dz=20.
+ doseawater=.false.
+ dodynamicocean=.false.
+
+ docolumn       = .true.,
+ dosgs		= .true.,
+ doedmf=.false.,
+ dodamping 	= .false.,
+ doupperbound  	= .false.,
+ docloud 	= .true.,
+ dosgscloud     = .true.,
+ dozerosigma    = .true.,
+ donoenvcloud   = .true.,
+ doprecip 	= .false., 
+ dolongwave	= .false.,
+ doshortwave	= .false.,
+ dosurface 	= .true.,
+ dolargescale 	= .true.,
+ doradforcing   = .false.,
+ dosfcforcing   = .false.,
+ docoriolis 	= .true.,
+ donudging_uv   = .false.,
+ donudging_tq   = .false.,
+
+ tauls = 43200.,
+
+ SFC_FLX_FXD    = .true.,
+ SFC_TAU_FXD    = .true.,
+
+ fcor = 0.376e-4,
+ dofplane=.true.
+
+ dx = 	1000.,
+ dy = 	1000.,
+
+ dt = 	10.,
+ 
+ nrad = 15,
+ longitude0 = 0.,
+ latitude0 = 18.,
+ doseasons = .false.,
+ doisccp = .true.,
+ domodis = .true.,
+ domisr = .true.,
+
+ dokinunits=.true.,
+ fluxt0   = 8.e-03    
+ fluxq0   = 5.2e-05 
+ tau0     = 0.0784
+
+
+nstop 	= 1080,
+nprint 	= 10,
+nstat 	= 24,
+nstatfrq= 10,
+
+doSAMconditionals = .false.
+dosatupdnconditionals = .false.
+
+
+ nsave2D	= 90,
+ nsave2Dstart	= 9936000,
+ nsave2Dend	= 999164000,
+ save2Dbin      = .false.
+
+ nsave3D	= 90,
+ nsave3Dstart	= 9936000,
+ nsave3Dend	= 999999999,
+ save3Dbin      = .false.
+
+
+/ 
+
+
+

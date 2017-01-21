@@ -136,10 +136,17 @@ do k=1,nzm
 
  IF (sigmas(k).le.0.0) then
    ! homogeneous grid box
+   if (donoenvcloud) then
+   cfrac_pdf(i,j,k) = 0.0
+   qne = 0.0
+   q1=-999.
+   dqndt = - (omn  * dtqsatw(tabse,pres(k)) + (1.-omn) * dtqsati(tabse,pres(k)))
+   else
    cfrac_pdf(i,j,k) =   ABS ( (SIGN(1.0,ds)+1.0)*0.5 )
    qne = cfrac_pdf(i,j,k) * ds
    q1=-999.
    dqndt =  - (omn  * dtqsatw(tabse,pres(k)) + (1.-omn) * dtqsati(tabse,pres(k)))
+   end if
  ELSE
    q1= ds/sigmas(k)
    cfrac_pdf(i,j,k) = MIN ( 1.0, MAX ( 0.0, &

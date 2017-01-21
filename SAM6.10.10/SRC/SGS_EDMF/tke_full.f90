@@ -87,7 +87,9 @@ do i=1,nx
 !thetavs
 thetavs = (1.+epsv*qv(i,j,1))*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)
 sfc_thv_flux = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)*fluxbq(i,j)
-wstar(i,j)=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
+if (.not.doedmf) then
+  wstar(i,j)=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
+end if
 if (dofixedtau) then
   tketau = ctketau
 else
