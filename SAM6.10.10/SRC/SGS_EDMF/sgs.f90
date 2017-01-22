@@ -67,6 +67,9 @@ real sgsadv(nz,1:nsgs_fields)  ! tendency due to vertical advection
 real sgslsadv(nz,1:nsgs_fields)  ! tendency due to large-scale vertical advection
 real sgsdiff(nz,1:nsgs_fields)  ! tendency due to vertical diffusion
 
+!for edmf mf fluxes should be written
+real twsbmf(nz)       !h/cp
+
 !------------------------------------------------------------------
 ! internal (optional) definitions:
 
@@ -418,7 +421,7 @@ subroutine sgs_scalars()
 
       dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,5)
 
-      call diffuse_scalar_edmf(t,fluxbt,fluxtt,dummy3,tdiff,twsb,twsb3, &
+      call diffuse_scalar_edmf(t,fluxbt,fluxtt,dummy3,tdiff,twsb,twsbmf,twsb3, &
                            t2lediff,t2lediss,twlediff,.true.,doedmf,twsb3_mf)
     
       if (.not.dosurface) ustar=0.
@@ -452,7 +455,7 @@ subroutine sgs_scalars()
            dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,5+k)
            if (flag_precip(k).eq.0) then
            call diffuse_scalar_edmf(micro_field(:,:,:,k),fluxbtmp,fluxttmp,dummy3, &
-                mkdiff(:,k),mkwsb(:,k),mkwsb3(:,:,:,k), dummy,dummy,dummy,.false.,doedmf,mkwsb3_mf)
+                mkdiff(:,k),mkwsb(:,k),mkwsbmf,mkwsb3(:,:,:,k), dummy,dummy,dummy,.false.,doedmf,mkwsb3_mf)
            else
            call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp,dummy3, &
                 mkdiff(:,k),mkwsb(:,k),mkwsb3(:,:,:,k),dummy,dummy,dummy,.false.,.false.)

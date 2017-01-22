@@ -39,6 +39,8 @@ real mkadv(nz,1:nmicro_fields)  ! tendency due to vertical advection
 real mklsadv(nz,1:nmicro_fields)  ! tendency due to large-scale vertical advection
 real mkdiff(nz,1:nmicro_fields)  ! tendency due to vertical diffusion
 
+real mkwsbmf(nz)
+
 !======================================================================
 ! UW ADDITIONS
 
@@ -139,6 +141,7 @@ subroutine micro_init()
 
   mkwle = 0.
   mkwsb = 0.
+  mkwsbmf = 0.
   mkadv = 0.
   mkdiff = 0.
   mklsadv = 0.
@@ -351,7 +354,8 @@ subroutine micro_statistics()
       tmp(1) = dz/rhow(k)
       tmp(2) = tmp(1) / dtn
       mkwsb(k,1) = mkwsb(k,1) * tmp(1) * rhow(k) * lcond
-      mkwle(k,1) = mkwle(k,1)*tmp(2)*rhow(k)*lcond + mkwsb(k,1)
+      mkwsbmf(k) = mkwsbmf(k) * tmp(1) * rhow(k) * lcond
+      mkwle(k,1) = mkwle(k,1)*tmp(2)*rhow(k)*lcond + mkwsb(k,1) + mkwsbmf(k)
       if(docloud.and.doprecip) then
         mkwsb(k,2) = mkwsb(k,2) * tmp(1) * rhow(k) * lcond
         mkwle(k,2) = mkwle(k,2)*tmp(2)*rhow(k)*lcond + mkwsb(k,2)
@@ -360,6 +364,7 @@ subroutine micro_statistics()
 
   call hbuf_put('QTFLUX',mkwle(:,1),factor_xy)
   call hbuf_put('QTFLUXS',mkwsb(:,1),factor_xy)
+  call hbuf_put('QTFLUXSM',mkwsbmf(:),factor_xy)
   call hbuf_put('QPFLUX',mkwle(:,2),factor_xy)
   call hbuf_put('QPFLUXS',mkwsb(:,2),factor_xy)
 
@@ -468,7 +473,15 @@ subroutine micro_hbuf_init(namelist,deflist,unitlist,status,average_type,count,t
    count = count + 1
    trcount = trcount + 1
    namelist(count) = 'QTFLUXS'
-   deflist(count) = 'Nonprecipitating-water flux (SGS)'
+   deflist(count) = 'Nonprecipitating-water flux (SGS ED)'
+   unitlist(count) = 'W/m2'
+   status(count) = 1    
+   average_type(count) = 0
+
+   count = count + 1
+   trcount = trcount + 1
+   namelist(count) = 'QTFLUXSM'
+   deflist(count) = 'Nonprecipitating-water flux (SGS MF)'
    unitlist(count) = 'W/m2'
    status(count) = 1    
    average_type(count) = 0

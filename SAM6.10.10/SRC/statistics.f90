@@ -7,6 +7,7 @@ use tracers
 use params
 use hbuffer
 use instrument_diagnostics, only: compute_instr_diags
+use sgs, only : twsbmf
 implicit none	
 	
 	real mse(nzm)
@@ -234,9 +235,10 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
 	  uwsb(k) = uwsb(k) * tmp(1)
 	  vwsb(k) = vwsb(k) * tmp(1)
 	  twsb(k) = twsb(k) * tmp(1) * rhow(k) * cp
+	  twsbmf(k) = twsbmf(k) * tmp(1) * rhow(k) * cp
 	  uwle(k) = uwle(k)*tmp(1) + uwsb(k)
 	  vwle(k) = vwle(k)*tmp(1) + vwsb(k)
-	  twle(k) = twle(k)*tmp(2)*rhow(k)*cp + twsb(k)
+	  twle(k) = twle(k)*tmp(2)*rhow(k)*cp + twsb(k) + twsbmf(k)
 	  if(dotracers) then
            do ntr=1,ntracers
 	    trwsb(k,ntr) = trwsb(k,ntr) * tmp(1)*rhow(k)
@@ -255,6 +257,7 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
 	call hbuf_put('VWSB',vwsb,factor_xy)
 	call hbuf_put('TLFLUX',twle,factor_xy)
 	call hbuf_put('TLFLUXS',twsb,factor_xy)
+	call hbuf_put('TLFLUXSM',twsbmf,factor_xy)
 	call hbuf_put('PRECIP',precflux,factor_xy/dt*dz*86400./(nstatis+1.e-5))
 	
 	do j=1,ny
