@@ -81,6 +81,11 @@ do k=1,nzm
   end if
 
 
+tkelediss(k) = 0.
+tkesbdiss(k) = 0.
+tkesbshear(k)= 0.
+tkesbbuoy(k) = 0.
+
 do j=1,ny
 do i=1,nx
 

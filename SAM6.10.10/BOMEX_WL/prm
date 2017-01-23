@@ -16,7 +16,7 @@ nup=40
 
  caseid ='BOMEX_ED',
  nrestart = 0,
- perturb_type = 5, 
+ perturb_type = -1, 
  day0 = 0.,
 
  LES = .true.,
@@ -28,7 +28,7 @@ nup=40
 
  docolumn       = .true.,
  dosgs		= .true.,
- doedmf         = .true.,
+ doedmf         = .false.,
  dodamping 	= .false.,
  doupperbound  	= .false.,
  docloud 	= .true.,
@@ -75,8 +75,8 @@ nup=40
 
 nstop 	= 1080,
 nprint 	= 10,
-nstat 	= 24,
-nstatfrq= 10,
+nstat 	= 10,
+nstatfrq= 1,
 
 doSAMconditionals = .false.
 dosatupdnconditionals = .false.

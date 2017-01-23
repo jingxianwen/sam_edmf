@@ -70,6 +70,7 @@ real sgsdiff(nz,1:nsgs_fields)  ! tendency due to vertical diffusion
 !for edmf mf fluxes should be written
 real twsbmf(nz)       !h/cp
 
+
 !------------------------------------------------------------------
 ! internal (optional) definitions:
 
@@ -272,7 +273,7 @@ select case (ptype)
   case(-1)
 
     if (masterproc) print*, 'Initial TKE=0.000'
-    tke =0.00
+    tke =0.001
 
   case(0)
 
@@ -434,7 +435,7 @@ subroutine sgs_scalars()
           end do
          fluxbtmp(1:nx,1:ny) = tkewsb3(1:nx,1:ny,1)
          dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,4)
-         call diffuse_scalar(tke,fluxbtmp,fzero,dummy3,dummy,sgswsb,tkewsb3, &
+         call diffuse_scalar(tke,fluxbtmp,fzero,dummy3,sgsdiff(1:nz,1),sgswsb,tkewsb3, &
                                     dummy,dummy,dummy,.false.,.false.)
       end if
 
@@ -583,7 +584,7 @@ subroutine sgs_statistics()
 !---------------------------------------------------------
 ! SGS TKE Budget:
 
-         call hbuf_put('ADVTRS',sgswle(:,1),factor_xy)
+         call hbuf_put('ADVTRS',sgsdiff(:,1),factor_xy)
          call hbuf_put('BUOYAS',tkesbbuoy,factor_xy)
          call hbuf_put('SHEARS',tkesbshear,factor_xy)
          call hbuf_put('DISSIPS',tkesbdiss,factor_xy)
