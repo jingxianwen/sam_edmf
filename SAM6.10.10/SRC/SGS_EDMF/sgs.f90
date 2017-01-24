@@ -584,7 +584,7 @@ subroutine sgs_statistics()
 !---------------------------------------------------------
 ! SGS TKE Budget:
 
-         call hbuf_put('ADVTRS',sgsdiff(:,1),factor_xy)
+         call hbuf_put('ADVTRS',sgsdiff(:,1),factor_xy/dtn)
          call hbuf_put('BUOYAS',tkesbbuoy,factor_xy)
          call hbuf_put('SHEARS',tkesbshear,factor_xy)
          call hbuf_put('DISSIPS',tkesbdiss,factor_xy)

@@ -2,14 +2,24 @@
 subroutine shear_prod1D_3Dgrid(def2)
 	
 use vars
+use params, only : docolumn
 implicit none
 	
-real def2(nx,ny,nzm)
+real def2(nx,ny,nzm), tmpu(nzm), tmpv(nzm)
 	
 real rdx0,rdx,rdx_up,rdx_dn
 real rdy0,rdy,rdy_up,rdy_dn
 real rdz,rdzw_up,rdzw_dn
 integer i,j,k,ib,ic,jb,jc,kb,kc
+
+if (docolumn) then
+  tmpu=0.
+  tmpv=0.
+else
+  tmpu=u0
+  tmpv=v0
+end if
+
 
 rdx0=1./dx 
 rdy0=1./dy
@@ -37,16 +47,16 @@ do k=2,nzm-1
 	 
       def2(i,j,k)= &
         + 0.25 * ( &
-          ( (u(ic,j,kc)-u0(kc)-u(ic,j, k)+u0(k))*rdzw_up)**2+ &
-          ( (u(i ,j,kc)-u0(kc)-u(i ,j, k)+u0(k))*rdzw_up)**2+ &
-          ( (u(ic,j,k )-u0(k)-u(ic,j,kb)+u0(kb))*rdzw_dn)**2+ &
-          ( (u(i ,j,k )-u0(k)-u(i ,j,kb)+u0(kb))*rdzw_dn)**2 )
+          ( (u(ic,j,kc)-tmpu(kc)-u(ic,j, k)+tmpu(k))*rdzw_up)**2+ &
+          ( (u(i ,j,kc)-tmpu(kc)-u(i ,j, k)+tmpu(k))*rdzw_up)**2+ &
+          ( (u(ic,j,k )-tmpu(k)-u(ic,j,kb)+tmpu(kb))*rdzw_dn)**2+ &
+          ( (u(i ,j,k )-tmpu(k)-u(i ,j,kb)+tmpu(kb))*rdzw_dn)**2 )
       def2(i,j,k)=def2(i,j,k) &	
         + 0.25 * ( & 
-          ( (v(i,jc,kc)-v0(kc)-v(i,jc, k)+v0(k))*rdzw_up)**2+ &
-          ( (v(i,j ,kc)-v0(kc)-v(i,j , k)+v0(k))*rdzw_up)**2+ &
-          ( (v(i,jc,k )-v0(k)-v(i,jc,kb)+v0(kb))*rdzw_dn)**2+ &
-          ( (v(i,j ,k )-v0(k)-v(i,j ,kb)+v0(kb))*rdzw_dn)**2 ) 
+          ( (v(i,jc,kc)-tmpv(kc)-v(i,jc, k)+tmpv(k))*rdzw_up)**2+ &
+          ( (v(i,j ,kc)-tmpv(kc)-v(i,j , k)+tmpv(k))*rdzw_up)**2+ &
+          ( (v(i,jc,k )-tmpv(k)-v(i,jc,kb)+tmpv(kb))*rdzw_dn)**2+ &
+          ( (v(i,j ,k )-tmpv(k)-v(i,j ,kb)+tmpv(kb))*rdzw_dn)**2 ) 
     end do
  end do
 end do ! k
@@ -71,11 +81,11 @@ do j=1,ny
 	 	
       def2(i,j,k)= &
 	 + 0.5 * ( &
-          ( (v(i,jc,kc)-v0(kc)-v(i,jc, k)+v0(k))*rdzw_up)**2+ &
-          ( (v(i,j ,kc)-v0(kc)-v(i,j , k)+v0(k))*rdzw_up)**2) &
+          ( (v(i,jc,kc)-tmpv(kc)-v(i,jc, k)+tmpv(k))*rdzw_up)**2+ &
+          ( (v(i,j ,kc)-tmpv(kc)-v(i,j , k)+tmpv(k))*rdzw_up)**2) &
 	 + 0.5 * ( &
-          ( (u(ic,j,kc)-u0(kc)-u(ic,j, k)+u0(k))*rdzw_up)**2+ &
-          ( (u(i ,j,kc)-u0(kc)-u(i ,j, k)+u0(k))*rdzw_up)**2)
+          ( (u(ic,j,kc)-tmpu(kc)-u(ic,j, k)+tmpu(k))*rdzw_up)**2+ &
+          ( (u(i ,j,kc)-tmpu(kc)-u(i ,j, k)+tmpu(k))*rdzw_up)**2)
 
    end do 
 end do
@@ -100,11 +110,11 @@ do j=1,ny
       ic=i+1
       def2(i,j,k)= & 
        + 0.5 * ( &
-           ( (v(i,jc,k )-v0(k)-v(i,jc,kb)+v0(kb))*rdzw_dn)**2+ &
-           ( (v(i,j ,k )-v0(k)-v(i,j ,kb)+v0(kb))*rdzw_dn)**2) &
+           ( (v(i,jc,k )-tmpv(k)-v(i,jc,kb)+tmpv(kb))*rdzw_dn)**2+ &
+           ( (v(i,j ,k )-tmpv(k)-v(i,j ,kb)+tmpv(kb))*rdzw_dn)**2) &
  	+ 0.5 * ( &
-           ( (u(ic,j,k )-u0(k)-u(ic,j,kb)+u0(kb))*rdzw_dn)**2+ &
-           ( (u(i ,j,k )-u0(k)-u(i ,j,kb)+u0(kb))*rdzw_dn)**2)
+           ( (u(ic,j,k )-tmpu(k)-u(ic,j,kb)+tmpu(kb))*rdzw_dn)**2+ &
+           ( (u(i ,j,k )-tmpu(k)-u(i ,j,kb)+tmpu(kb))*rdzw_dn)**2)
   end do 
 end do
 	
