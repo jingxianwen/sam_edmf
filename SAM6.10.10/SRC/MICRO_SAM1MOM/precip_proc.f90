@@ -58,8 +58,8 @@ do k=1,nzm
            qcc = qn(i,j,k) * omn
            qii = qn(i,j,k) * (1.-omn)
            ! convert to in-cloud values assuming top-hat
-           qcc = qcc / cfrac_tot(i,j,k)
-           qii = qii / cfrac_tot(i,j,k)
+           qcc = qcc / (cfrac_tot(i,j,k)+1.0d-20)
+           qii = qii / (cfrac_tot(i,j,k)+1.0d-20)
 
            if(qcc .gt. qcw0) then
             autor = alphaelq
