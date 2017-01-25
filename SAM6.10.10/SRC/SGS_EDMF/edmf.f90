@@ -158,8 +158,14 @@ implicit none
        UPA(1,1) = 0.1
        UPW(1,1) = 0.0
        UPM(1,1) = 0.0
-       UPU(1,1)=u(i,j,1)
-       UPV(1,1)=v(i,j,1)
+       ic=i+1
+       UPU(1,1)=0.5*(u(i,j,1)+u(ic,j,1))
+       if (RUN3D) then
+         jc=j+YES3D
+         UPV(1,1)=0.5*(v(i,j,1)+v(i,jc,1))
+       else
+         UPV(1,1)=v(i,j,1)
+       end if
        ! beta=0.3
        ! note that tke here is fully explicit only (at step n) if dosequential=.false., otherwise
        ! the tendency from buoyancy production, shear production, and dissipation have been added.
@@ -190,8 +196,14 @@ implicit none
  
          UPM(1,N) = UPA(1,N) * UPW(1,N)
 
-         UPU(1,N)=u(i,j,1)
-         UPV(1,N)=v(i,j,1)
+         ic=i+1
+         UPU(1,N)=0.5*(u(i,j,1)+u(ic,j,1))
+         if (RUN3D) then
+           jc=j+YES3D
+           UPV(1,N)=0.5*(v(i,j,1)+v(i,jc,1))
+         else
+           UPV(1,N)=v(i,j,1)
+         end if
 
          ! specific humidity needed (will be convert back in the end)
          UPQT(1,N)=q(i,j,1)+0.32*UPW(1,N)*sigmaQT/sigmaW
@@ -233,8 +245,13 @@ implicit none
 
           QTn=q(i,j,k-1)*(1.-EntExp)+UPQT(k-1,N)*EntExp
           Tn=(1000./pres(k-1))**(rgas/cp) * (t(i,j,k-1)-ggr/cp*z(k-1))*(1.-EntExp)+UPT(k-1,N)*EntExp
-          !Un=u(k)*(1.-EntExp)+UPU(k-1,i)*EntExp
-          !Vn=v(k)*(1.-EntExp)+UPV(k-1,i)*EntExp
+          !Un=0.5*(u(i,j,k-1)+u(i+1,j,k-1))*(1.-EntExp)+UPU(k-1,i)*EntExp
+          !if (RUN3D) then
+          !Vn=0.5*(v(i,j,k-1)+v(i,j+YES3D,k-1))*(1.-EntExp)+UPV(k-1,i)*EntExp
+          !else
+          !Vn=v(i,j,k-1)*(1.-EntExp)+UPV(k-1,i)*EntExp
+          !end if
+          
 
 
           ! all-or-nothing condensation scheme
@@ -319,7 +336,7 @@ implicit none
 real,intent(in) :: QT,THLI,P, zlev
 real,intent(out):: THV,QC,QI
 
-integer :: niter,i
+integer :: niter,i, ic, jc
 real :: diff,t,qs,qnold, an, bn, qn, om
 
 an = 1./(tbgmax-tbgmin)
