@@ -58,8 +58,8 @@ do k=1,nzm
            qcc = qn(i,j,k) * omn
            qii = qn(i,j,k) * (1.-omn)
            ! convert to in-cloud values assuming top-hat
-           qcc = qcc / cfrac_pdf(i,j,k)
-           qii = qii / cfrac_pdf(i,j,k)
+           qcc = qcc / cfrac_tot(i,j,k)
+           qii = qii / cfrac_tot(i,j,k)
 
            if(qcc .gt. qcw0) then
             autor = alphaelq
@@ -98,7 +98,7 @@ do k=1,nzm
            qii = (qii+dtn*autos*qci0)/(1.+dtn*(accris+accrig+autos))
            ! cell-wide precipitation source
            dq = dtn *(accrr*qcc + autor*(qcc-qcw0)+ &
-             (accris+accrig)*qii + (accrcs+accrcg)*qcc + autos*(qii-qci0)) * cfrac_pdf(i,j,k)
+             (accris+accrig)*qii + (accrcs+accrcg)*qcc + autos*(qii-qci0)) * cfrac_tot(i,j,k)
            dq = min(dq,qn(i,j,k))
            qp(i,j,k) = qp(i,j,k) + dq
            q(i,j,k) = q(i,j,k) - dq
@@ -126,8 +126,8 @@ do k=1,nzm
              qgg = qp(i,j,k) * (1.-omp)*omg
              dq = dq + evapg1(k)*sqrt(qgg) + evapg2(k)*qgg**powg2
            end if
-           !use qv/qstat instead of q/qstat; multiply by 1-cfrac_pdf
-           dq = dq * dtn * ((q(i,j,k)-qn(i,j,k)) /qsatt-1.) * (1.-cfrac_pdf(i,j,k))
+           !use qv/qstat instead of q/qstat; multiply by 1-cfrac_tot
+           dq = dq * dtn * ((q(i,j,k)-qn(i,j,k)) /qsatt-1.) * (1.-cfrac_tot(i,j,k))
            dq = max(-0.5*qp(i,j,k),dq) 
            qp(i,j,k) = qp(i,j,k) + dq
            q(i,j,k) = q(i,j,k) - dq

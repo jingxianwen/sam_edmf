@@ -48,6 +48,8 @@ real frac_mf(nx,ny,nz)
 real cfrac_mf(nx,ny,nz)
 real twsb3_mf (nx,ny,nz)                         ! sgs vertical flux of h/cp
 real mkwsb3_mf(nx,ny,nz)                         ! sgs vertical flux of qt
+real cfrac_mf1D(nz)
+real frac_mf1D(nz)
 
 logical:: advect_sgs = .true. ! advect prognostics
 logical, parameter:: do_sgsdiag_bound = .true.  ! exchange boundaries for diagnostics fields
@@ -227,6 +229,8 @@ subroutine sgs_init()
      qisgs_mf=0.
      cfrac_mf=0.
      frac_mf=0.
+     cfrac_mf1D=0.
+     frac_mf1D=0.
 
   end if
 
@@ -453,7 +457,7 @@ subroutine sgs_scalars()
          .or. doprecip.and.flag_precip(k).eq.1 ) then
            fluxbtmp(1:nx,1:ny) = fluxbmk(1:nx,1:ny,k)
            fluxttmp(1:nx,1:ny) = fluxtmk(1:nx,1:ny,k)
-           dummy3 = sgs_field_sumM(1:nx,1:ny,1:nz,5+k)
+           dummy3 =  sgs_field_sumM(1:nx,1:ny,1:nz,5+k)
            if (flag_precip(k).eq.0) then
            call diffuse_scalar_edmf(micro_field(:,:,:,k),fluxbtmp,fluxttmp,dummy3, &
                 mkdiff(:,k),mkwsb(:,k),mkwsbmf,mkwsb3(:,:,:,k), dummy,dummy,dummy,.false.,doedmf,mkwsb3_mf)
@@ -589,6 +593,13 @@ subroutine sgs_statistics()
          call hbuf_put('SHEARS',tkesbshear,factor_xy)
          call hbuf_put('DISSIPS',tkesbdiss,factor_xy)
 
+!---------------------------------------------------------
+! MF Massflux properties:
+
+  call hbuf_put('FRAC_MF',frac_mf1D,factor_xy)
+  call hbuf_put('CFRAC_MF',cfrac_mf1D,factor_xy)
+
+
   call t_stopf ('sgs_statistics')
 
 end subroutine sgs_statistics
@@ -608,8 +619,27 @@ end subroutine sgs_print
 !!! Initialize the list of sgs statistics 
 !
 subroutine sgs_hbuf_init(namelist,deflist,unitlist,status,average_type,count,sgscount)
+use vars
 character(*) namelist(*), deflist(*), unitlist(*)
 integer status(*),average_type(*),count,sgscount
+
+
+   count = count + 1
+   sgscount = sgscount + 1
+   namelist(count) = 'CFRAC_MF'
+   deflist(count) = 'Cloud fraction from plumes'
+   unitlist(count) = '1'
+   status(count) = 1
+   average_type(count) = 0
+
+   count = count + 1
+   sgscount = sgscount + 1
+   namelist(count) = 'FRAC_MF'
+   deflist(count) = 'Plume fractional area'
+   unitlist(count) = '1'
+   status(count) = 1
+   average_type(count) = 0
+
 
 end subroutine sgs_hbuf_init
 

@@ -90,6 +90,8 @@ implicit none
  qisgs_mf=0.
  cfrac_mf=0.
  frac_mf=0.
+ cfrac_mf1D=0.
+ frac_mf1D=0.
 
  Wa = 0.4* Wc + 0.3
 ! set initial conditions for updrafts
@@ -105,7 +107,7 @@ implicit none
  ! latent heat flux (m s-1)
  wqt  = fluxbq(i,j) 
  ! virtual pot. temp flux
- wthv = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)*fluxbq(i,j)
+ wthv = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)*fluxbq(i,j)
 
  ! quit in case of a non-positive buoyancy flux
  if (wthv.le.0.0) exit
@@ -132,7 +134,7 @@ implicit none
   !  enddo
 
 
-    thetav1 = (1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)
+    thetav1 = (1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)
     theta   = thetav1/(1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))
 
 ! see Lenschow et al. (1980), JAS
@@ -210,6 +212,8 @@ implicit none
 
     qcsgs_mf(i,j,1)=qcsgs_mf(i,j,1)/frac_mf(i,j,1)
     qisgs_mf(i,j,1)=qisgs_mf(i,j,1)/frac_mf(i,j,1)
+    frac_mf1D(1)  = frac_mf1D(1) + frac_mf(i,j,1)
+    cfrac_mf1D(1) = cfrac_mf1D(1) + cfrac_mf(i,j,1)
 
     
 
@@ -243,7 +247,7 @@ implicit none
 !          end if
        
           ! based on density potential temperature (without qp effect since homogeneous across cell)
-          thetavenv = (1.+epsv*qv(i,j,k-1)-(qn(i,j,k-1)+qp(i,j,k-1)))*tabs(i,j,k-1)*(pres0/pres(k-1))**(rgas/cp)
+          thetavenv = (1.+epsv*qv(i,j,k-1)-(qn(i,j,k-1)+qp(i,j,k-1)))*tabs(i,j,k-1)*(1000./pres(k-1))**(rgas/cp)
           BUOY(k-1,N)=ggr*(0.5*(THVn+UPTHV(k-1,N))/thetavenv-1.)
 
           !EntW=exp(-2.*(Wb+Wc*ENT(k-1,i))*(zi(k)-zi(k-1)))
@@ -292,7 +296,10 @@ implicit none
          qcsgs_mf(i,j,k) = qcsgs_mf(i,j,k) / frac_mf(i,j,k)
          qisgs_mf(i,j,k) = qisgs_mf(i,j,k) / frac_mf(i,j,k)
       end if
+      frac_mf1D(k)  = frac_mf1D(k) + frac_mf(i,j,k)
+      cfrac_mf1D(k) = cfrac_mf1D(k) + cfrac_mf(i,j,k)
     ENDDO
+
 
   end do
   end do

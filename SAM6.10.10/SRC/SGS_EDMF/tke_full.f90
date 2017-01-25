@@ -53,7 +53,7 @@ do k=1,nzm
   wthl = (0.5*(twsb3(i,j,k) + twsb3(i,j,k+1))) 
   if (qp(i,j,k).gt.0.0) then
     wthl = wthl +  ((fac_cond*qpl(i,j,k)+fac_sub*qpi(i,j,k))/qp(i,j,k) * 0.5*(mkwsb3(i,j,k,2) + mkwsb3(i,j,k+1,2)))  &
-           * (pres0/pres(k))**(rgas/cp) 
+           * (1000./pres(k))**(rgas/cp) 
   end if
   wqt  = 0.5*(mkwsb3(i,j,k,1) + mkwsb3(i,j,k+1,1))
 
@@ -90,8 +90,8 @@ do j=1,ny
 do i=1,nx
 
 !thetavs
-thetavs = (1.+epsv*qv(i,j,1))*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)
-sfc_thv_flux = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(pres0/pres(1))**(rgas/cp)*fluxbq(i,j)
+thetavs = (1.+epsv*qv(i,j,1))*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)
+sfc_thv_flux = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)*fluxbq(i,j)
 if (.not.doedmf) then
   wstar(i,j)=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
 end if
@@ -103,9 +103,9 @@ end if
 
   tke(i,j,k)=max(0.,tke(i,j,k))
   !N**2 based on virtual potential temperature
-  thetav_c = (1.+epsv*qv(i,j,kc))*tabs(i,j,kc)*(pres0/pres(kc))**(rgas/cp)
-  thetav_k = (1.+epsv*qv(i,j,k))*tabs(i,j,k)*(pres0/pres(k))**(rgas/cp)
-  thetav_b = (1.+epsv*qv(i,j,kb))*tabs(i,j,kb)*(pres0/pres(kb))**(rgas/cp)
+  thetav_c = (1.+epsv*qv(i,j,kc))*tabs(i,j,kc)*(1000./pres(kc))**(rgas/cp)
+  thetav_k = (1.+epsv*qv(i,j,k))*tabs(i,j,k)*(1000./pres(k))**(rgas/cp)
+  thetav_b = (1.+epsv*qv(i,j,kb))*tabs(i,j,kb)*(1000./pres(kb))**(rgas/cp)
   buoy_sgs=ggr/thetav_k * (thetav_c-thetav_b)/ (z(kc)-z(kb))
 
   l23 = (tketau*sqrt(tke(i,j,k)+1.d-10))**(-1)

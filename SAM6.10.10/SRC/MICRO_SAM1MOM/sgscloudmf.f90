@@ -47,7 +47,7 @@ do i=1,nx
 do j=1,ny
 
 do k=1,nzm
-  totheta=(pres(k)/pres0)**(rgas/cp)
+  totheta=(pres(k)/1000.)**(rgas/cp)
   !total water
   qte(k) = q(i,j,k)
   !thetali
@@ -89,7 +89,7 @@ do k=1,nzm
   qtthl(k)=max(min(qtthl(k),0.02d-3),-4.d-3)
 
  ! get liquid/ice water temperature Tl
- totheta=(pres(k)/pres0)**(rgas/cp)
+ totheta=(pres(k)/1000.)**(rgas/cp)
  tl     = totheta * thetali(k)
  tabsnoql = tl ! save tabs assuming no condensate (which equals Tl in that case)
  tabse=tabsnoql! set initial guess for temperature to temp without condensate
@@ -172,15 +172,24 @@ do k=1,nzm
 
  end do ! end of iterative loop
 
+ if (doedmf) then
+
  frac_mf2 = 0.5*(frac_mf(i,j,k)+frac_mf(i,j,k+1))
  qcl(i,j,k) = (1.-frac_mf2) * omn * qne + 0.5 * frac_mf2 * (qcsgs_mf(i,j,k)+qcsgs_mf(i,j,k+1))
- qci(i,j,k) = (1.-frac_mf2) * (1.-omn) * qne + 0.5 * frac_mf2 * (qisgs_mf(i,j,k)+qisgs_mf(i,j,k+1)) 
- cfrac_pdf(i,j,k) = min(frac_mf2,0.5*(cfrac_mf(i,j,k+1)+cfrac_mf(i,j,k))) + (1.-frac_mf2) * cfrac_pdf(i,j,k)
+ qci(i,j,k) = (1.-frac_mf2) * (1.-omn)*qne + 0.5 * frac_mf2 * (qisgs_mf(i,j,k)+qisgs_mf(i,j,k+1))
+ qn(i,j,k) = max(0.,qcl(i,j,k)+qci(i,j,k))
+ cfrac_tot(i,j,k) = min(frac_mf2,0.5*(cfrac_mf(i,j,k+1)+cfrac_mf(i,j,k))) + (1.-frac_mf2) * cfrac_pdf(i,j,k)
+
+ else
+
+ qcl(i,j,k) = omn * qne
+ qci(i,j,k) = (1.-omn)*qne
+ qn(i,j,k) = qne
+ cfrac_tot(i,j,k) = cfrac_pdf(i,j,k)
+
+ end if
 
  tabs(i,j,k)  = t(i,j,k)-gamaz(k) + fac_cond*(qpl(i,j,k)+qcl(i,j,k)) + fac_sub*(qpi(i,j,k)+qci(i,j,k)) 
-
- qn(i,j,k) = max(qcl(i,j,k) + qci(i,j,k),0.)
- qv(i,j,k) = max(0.,q(i,j,k) - qn(i,j,k))
  qp(i,j,k) = max(0.,qp(i,j,k))
 
 
@@ -192,34 +201,9 @@ else
 
  call cloud()
 
+ cfrac_tot = cfrac_pdf
+
 end if ! dosgscloud
-
-if (doedmf) then 
-
-do i=1,nx
-do j=1,ny
-do k=1,nzm
-
- ! get final domain averages (convective and environment)
- frac_mf2 = 0.5*(frac_mf(i,j,k)+frac_mf(i,j,k+1))
- qcl(i,j,k) = (1.-frac_mf2) * qcl(i,j,k) + 0.5 * frac_mf2 * (qcsgs_mf(i,j,k)+qcsgs_mf(i,j,k+1))
- qci(i,j,k) = (1.-frac_mf2) * qci(i,j,k) + 0.5 * frac_mf2 * (qisgs_mf(i,j,k)+qisgs_mf(i,j,k+1))
- tabs(i,j,k)  = t(i,j,k)-gamaz(k) + fac_cond*(qpl(i,j,k)+qcl(i,j,k)) + fac_sub*(qpi(i,j,k)+qci(i,j,k))
- cfrac_tot(i,j,k) = min(frac_mf2,0.5*(cfrac_mf(i,j,k+1)+cfrac_mf(i,j,k))) + (1.-frac_mf2) * cfrac_pdf(i,j,k)
- qn(i,j,k) = max(qcl(i,j,k) + qci(i,j,k),0.)
- qv(i,j,k) = max(0.,q(i,j,k) - qn(i,j,k))
- qp(i,j,k) = max(0.,qp(i,j,k))
- 
-end do ! k
-end do ! j
-end do ! i
-
-else
-
-cfrac_tot = cfrac_pdf
-
-end if
-
 
 end subroutine sgscloudmf
 

@@ -66,7 +66,7 @@ INC_NETCDF  := $(NETCDF_DIR)/include
 #LIB_NETCDF   := /gpfs/home2/marat/netcdf-vis-3.6.2/lib
 
 #FF = xlf90 -qsuffix=f=f -qfixed=132 -I$(INC_NETCDF)
-FF = gfortran  -O3 -ffixed-form -ffixed-line-length-0 -I$(INC_NETCDF)
+FF = gfortran-4.6  -O3 -ffixed-form -ffixed-line-length-0 -I$(INC_NETCDF)
 DFLAGS = -L${LIB_NETCDF} -lnetcdf
 LDFLAGS = -L${LIB_NETCDF} -L/usr/lib -lnetcdf -lnetcdff -lpthread
 

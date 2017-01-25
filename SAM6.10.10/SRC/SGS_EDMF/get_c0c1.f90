@@ -32,7 +32,7 @@ do j=1,ny
 do k=1,nzm
  
  
-  totheta=(pres(k)/pres0)**(rgas/cp)
+  totheta=(pres(k)/1000.)**(rgas/cp)
 
   !thetali
   thetali = (t(i,j,k)+fac_cond*qpl(i,j,k)+fac_sub*qpi(i,j,k)-gamaz(k))  /  totheta 

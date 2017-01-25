@@ -46,7 +46,7 @@ real, dimension(nzm) :: thetav, flux
     flux = thvflx(i,j,1:nzm)
     
     do k=1,nzm
-       thetav(k) = (1.+epsv*qv(i,j,k))*tabs(i,j,k)*(pres0/pres(k))**(rgas/cp)
+       thetav(k) = (1.+epsv*qv(i,j,k))*tabs(i,j,k)*(1000./pres(k))**(rgas/cp)
     end do
 
 

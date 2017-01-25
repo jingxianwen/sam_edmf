@@ -59,17 +59,43 @@ endif
 #----------------------------------------------------------------------
 # Linux, Intel Compiler, Lawrencium
 #
+#
+#ifeq ($(PLATFORM),Linux)
+#
+#LIB_MPI = ${OPENMPI_DIR}/lib
+#INC_MPI = ${OPENMPI_DIR}/include
+#INC_NETCDF = ${NETCDF_DIR}/include
+#LIB_NETCDF = ${NETCDF_DIR}/lib
+#
+#
+#FF77 = ${OPENMPI_DIR}/bin/mpif90 -c -fixed -extend_source
+#FF90 = ${OPENMPI_DIR}/bin/mpif90 -c
+#CC = mpicc -c -DLINUX
+#
+#
+#FFLAGS = -O3 
+##FFLAGS = -g -ftrapuv -fpe0 -O0
+#
+#FFLAGS += -I${INC_MPI} -I${INC_NETCDF}
+#LD = ${OPENMPI_DIR}/bin/mpif90
+#LDFLAGS = -L${LIB_NETCDF} -lnetcdf -lnetcdff
+#
+#
+#endif
+#----------------------------------------------------------------------
+# Linux, Intel Compiler, Edison
+#
 
 ifeq ($(PLATFORM),Linux)
 
-LIB_MPI = ${OPENMPI_DIR}/lib
-INC_MPI = ${OPENMPI_DIR}/include
+LIB_MPI = ${OMPI_DIR}/lib
+INC_MPI = ${OMPI_DIR}/include
 INC_NETCDF = ${NETCDF_DIR}/include
 LIB_NETCDF = ${NETCDF_DIR}/lib
 
 
-FF77 = ${OPENMPI_DIR}/bin/mpif90 -c -fixed -extend_source
-FF90 = ${OPENMPI_DIR}/bin/mpif90 -c
+FF77 = ${OMPI_DIR}/bin/mpif90 -c -fixed -extend_source
+FF90 = ${OMPI_DIR}/bin/mpif90 -c
 CC = mpicc -c -DLINUX
 
 
@@ -77,7 +103,7 @@ FFLAGS = -O3
 #FFLAGS = -g -ftrapuv -fpe0 -O0
 
 FFLAGS += -I${INC_MPI} -I${INC_NETCDF}
-LD = ${OPENMPI_DIR}/bin/mpif90
+LD = ${OMPI_DIR}/bin/mpif90
 LDFLAGS = -L${LIB_NETCDF} -lnetcdf -lnetcdff
 
 
@@ -85,6 +111,7 @@ endif
 #----------------------------------------------------------------------
 # Linux, Intel Compiler
 #
+
 
 #ifeq ($(PLATFORM),Linux)
 
