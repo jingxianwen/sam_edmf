@@ -40,7 +40,7 @@ implicit none
                                      UPQCI,UPA, UPU, UPV  
       REAL, DIMENSION(1:nz,1:nup) :: ENT, UPCF, BUOY
 
-      INTEGER :: K,N,i,j
+      INTEGER :: K,N,i,j, ic, jc
       REAL :: wthv,wqt,wthl,qstar,thstar,sigmaW,sigmaQT,sigmaTH,sigmaTHV,zs, &
            pwmax,wmin,wmax,wlv,wtv,thetav1,theta
       REAL :: QTn,Tn,THVn,QCLn,QCIn,Un,Vn,Wn2,EntEXP,EntW, hlp, acrit, Wa, thetavenv
@@ -336,7 +336,7 @@ implicit none
 real,intent(in) :: QT,THLI,P, zlev
 real,intent(out):: THV,QC,QI
 
-integer :: niter,i, ic, jc
+integer :: niter,i
 real :: diff,t,qs,qnold, an, bn, qn, om
 
 an = 1./(tbgmax-tbgmin)
