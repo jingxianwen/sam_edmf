@@ -71,8 +71,6 @@ call stat_2Dinit(1) ! argument of 1 means storage terms in stats are reset
 call tracers_init() ! initialize tracers
 call setforcing()
 
-! compute liquid water content since eventually needed for buoyancy flux
-!call sgscloudmf()
 
 if(masterproc) call printout()
 !------------------------------------------------------------------
@@ -261,7 +259,6 @@ do while(nstep.lt.nstop.and.nelapse.gt.0)
 
       if(docloud.or.dosmoke) call micro_proc()
  
-      !call sgscloudmf()
 
 !----------------------------------------------------------
 !  Tracers' physics:
