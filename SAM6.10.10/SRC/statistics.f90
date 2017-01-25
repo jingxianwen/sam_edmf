@@ -184,7 +184,7 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
 	   sse(k)=sse(k)+tabs(i,j,k)+gamaz(k)+fac_cond*qsatw(tabs(i,j,k),pres(k))
 	   qsatwz(k) = qsatwz(k)+qsatw(tabs(i,j,k),pres(k))
 	   relhz(k)=relhz(k)+qv(i,j,k)/qsatw(tabs(i,j,k),pres(k))
-           cldsgs(k)=cldsgs(k)+cfrac_pdf(i,j,k)
+           cldsgs(k)=cldsgs(k)+cfrac_tot(i,j,k)
 	  end do
 	 end do
 	end do	
