@@ -59,7 +59,7 @@ do i=1,nx
     flux3(i,j,2:nzm) =  (-1.) /adzw(2:nzm)/dz *         0.5*(tkh(i,j,1:nzm-1) + tkh(i,j,2:nzm)) *                  &
                            (betap* (d(2:nzm)- d(1:nzm-1))+betam*(f(i,j,2:nzm)-f(i,j,1:nzm-1)) ) 
     if (massflux) then
-      flux3mf(i,j,2:nzm) = 0.
+      flux3mf(i,j,2:nzm) = (sumMs(i,j,2:nzm) - (betap*d(2:nzm) + betam*f(i,j,2:nzm)) * sgs_field_sumM(i,j,2:nzm,1) )
       fluxmf(2:nzm) = fluxmf(2:nzm) + rhow(2:nzm) * flux3mf(i,j,2:nzm)/dz
     end if
     flux(2:nzm) = flux(2:nzm) + rhow(2:nzm) * flux3(i,j,2:nzm)/dz

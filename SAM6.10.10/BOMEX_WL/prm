@@ -28,7 +28,7 @@ nup=40
 
  docolumn       = .true.,
  dosgs		= .true.,
- doedmf         = .false.,
+ doedmf         = .true.,
  dodamping 	= .false.,
  doupperbound  	= .false.,
  docloud 	= .true.,
