@@ -1,15 +1,16 @@
 &SGS_TKE
-dofixedtau = .true.,
-ctketau=700.,
-pblhthvgrad = .true.,
-pblhfluxmin = .false.,
-dopblh= .true.,
-fixedeps=.false.,
-donoplumesat=.false.,
-dosingleplume=.false.,
-tauneggers=500.,
-pwmin=1.4,
-nup=40
+dosmagor=.true.
+!dofixedtau = .true.,
+!ctketau=700.,
+!pblhthvgrad = .true.,
+!pblhfluxmin = .false.,
+!dopblh= .true.,
+!fixedeps=.false.,
+!donoplumesat=.false.,
+!dosingleplume=.false.,
+!tauneggers=500.,
+!pwmin=1.4,
+!nup=40
 /
 
 &PARAMETERS

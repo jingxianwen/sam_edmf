@@ -1,10 +1,20 @@
 &SGS_TKE
-dosmagor=.true.
+dofixedtau = .true.,
+ctketau=700.,
+pblhthvgrad = .true.,
+pblhfluxmin = .false.,
+dopblh= .true.,
+fixedeps=.false.,
+donoplumesat=.false.,
+dosingleplume=.false.,
+tauneggers=500.,
+pwmin=1.4,
+nup=40
 /
 
 &PARAMETERS
 
-caseid ='4096x1x106_3km_10s_300K_SGSTKE',
+caseid ='4096x1x96_3km_10s_300K_SGSEDMF',
 doconstdz=.false.,
 
 nrestart = 0,
@@ -18,6 +28,7 @@ dodynamicocean=.false.,
 perturb_type  = 0,
 day0 = 0.,
 dosgs           = .true.,
+doedmf          = .true.,
 dodamping       = .true.,
 doupperbound    = .true.,
 docloud         = .true.,
@@ -39,7 +50,7 @@ tauls = 7200.,
 SFC_FLX_FXD    = .false.,
 SFC_TAU_FXD    = .false.,
 
-nrad = 15,
+nrad = 90,
 
 dx =    3000.,
 dy =    3000.,
