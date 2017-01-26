@@ -1,5 +1,5 @@
 
-f=addfile("./RCE_300/initialsounding_300K.nc","r")
+f=addfile("./initialsounding_300K.nc","r")
 
 rd=287.
 cp=1004.

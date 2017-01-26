@@ -339,7 +339,7 @@ subroutine micro_statistics()
   
   use vars
   use hbuffer, only: hbuf_put
-  use params, only : lcond
+  use params, only : lcond, doedmf
 
   real tmp(2), factor_xy 
   real qcz(nzm), qiz(nzm), qrz(nzm), qsz(nzm), qgz(nzm), omg
@@ -354,7 +354,11 @@ subroutine micro_statistics()
       tmp(1) = dz/rhow(k)
       tmp(2) = tmp(1) / dtn
       mkwsb(k,1) = mkwsb(k,1) * tmp(1) * rhow(k) * lcond
-      mkwsbmf(k) = mkwsbmf(k) * tmp(1) * rhow(k) * lcond
+      if (doedmf) then
+        mkwsbmf(k) = mkwsbmf(k) * tmp(1) * rhow(k) * lcond
+      else
+        mkwsbmf(k) = 0.0
+      end if
       mkwle(k,1) = mkwle(k,1)*tmp(2)*rhow(k)*lcond + mkwsb(k,1) + mkwsbmf(k)
       if(docloud.and.doprecip) then
         mkwsb(k,2) = mkwsb(k,2) * tmp(1) * rhow(k) * lcond

@@ -24,6 +24,13 @@ real qpi     (nx, ny, nzm)                ! ice water  (precipitation)
 real cfrac_pdf(nx, ny, nzm)               ! sgs cloud cover  
 real cfrac_tot(nx, ny, nzm)               ! sgs cloud cover  
 
+! needed for EDMF (but also for MP thus located here)
+real qcsgs_mf(nx,ny,nz)
+real qisgs_mf(nx,ny,nz)
+real frac_mf(nx,ny,nz)
+real cfrac_mf(nx,ny,nz)
+real ustar(nx,ny)
+
 !--------------------------------------------------------------------
 ! time-tendencies for prognostic variables
 
@@ -150,7 +157,7 @@ real, parameter :: t00 = 300.   ! constant offset for sstxy
 !	Vertical profiles of quantities sampled for statitistics purposes:
 
 real &
-    twle(nz), twsb(nz), precflux(nz), &
+    twle(nz), twsb(nz), precflux(nz), twsbmf(nz), &
     uwle(nz), uwsb(nz), vwle(nz), vwsb(nz), &
     radlwup(nz), radlwdn(nz), radswup(nz), radswdn(nz), &
     radqrlw(nz), radqrsw(nz), w_max, u_max, s_acld, s_acldcold, s_ar, s_arthr, s_sst, &

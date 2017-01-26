@@ -2,7 +2,6 @@ subroutine surface()
 	
 use vars
 use params
-use sgs, only : ustar
 use microphysics, only: micro_field, index_water_vapor
 implicit none
 	

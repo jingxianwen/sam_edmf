@@ -42,10 +42,6 @@ real tkewsb3(nx,ny,nz)                        ! sgs vertical flux of tke
 real thvflx(nx,ny,nzm)                        ! sgs buoyancy flux in TKE equation
 
 ! MF things
-real qcsgs_mf(nx,ny,nz)
-real qisgs_mf(nx,ny,nz)
-real frac_mf(nx,ny,nz)
-real cfrac_mf(nx,ny,nz)
 real twsb3_mf (nx,ny,nz)                         ! sgs vertical flux of h/cp
 real mkwsb3_mf(nx,ny,nz)                         ! sgs vertical flux of qt
 real cfrac_mf1D(nz)
@@ -68,9 +64,6 @@ real sgswsb(nz,1:nsgs_fields)  ! SGS vertical flux
 real sgsadv(nz,1:nsgs_fields)  ! tendency due to vertical advection
 real sgslsadv(nz,1:nsgs_fields)  ! tendency due to large-scale vertical advection
 real sgsdiff(nz,1:nsgs_fields)  ! tendency due to vertical diffusion
-
-!for edmf mf fluxes should be written
-real twsbmf(nz)       !h/cp
 
 
 !------------------------------------------------------------------
@@ -108,7 +101,7 @@ real :: pwmin
 integer :: nup
 real ::eps0
 
-real :: ustar(nx,ny), wstar(nx,ny)
+real :: wstar(nx,ny)
 
 ! Local diagnostics:
 
@@ -206,6 +199,7 @@ subroutine sgs_init()
 
   use grid, only: nrestart, dx, dy, dz, adz, masterproc
   use params, only: LES
+  use vars, only : qcsgs_mf, qisgs_mf, cfrac_mf, frac_mf, twsbmf
   integer k
 
   if(nrestart.eq.0) then
@@ -220,6 +214,7 @@ subroutine sgs_init()
      twsb3 = 0.
      twsb3_mf = 0.
      mkwsb3 = 0.
+     twsbmf = 0.
      mkwsb3_mf = 0.
      uwsb3 = 0. 
      vwsb3 = 0. 

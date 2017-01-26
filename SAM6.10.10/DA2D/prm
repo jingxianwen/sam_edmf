@@ -1,0 +1,85 @@
+&SGS_TKE
+dosmagor=.true.
+/
+
+&PARAMETERS
+
+caseid ='4096x1x106_3km_10s_300K_SGSTKE',
+doconstdz=.false.,
+
+nrestart = 0,
+
+CEM = .true.,
+LES = .false.,
+OCEAN = .true.,
+ocean_type=0,
+doseawater = .false.,
+dodynamicocean=.false.,
+perturb_type  = 0,
+day0 = 0.,
+dosgs           = .true.,
+dodamping       = .true.,
+doupperbound    = .true.,
+docloud         = .true.,
+dosgscloud      = .true.,
+dozerosigma     = .true.,
+donoenvcloud    = .false,
+doprecip        = .true.,
+dolongwave      = .true.,
+doshortwave     = .true.,
+dosurface       = .true.,
+tabs_s=300.,
+dolargescale    = .false.,
+doradforcing    = .false.,
+dosfcforcing    = .false.,
+docoriolis      = .false.,
+donudging_uv    = .true.,
+donudging_tq    = .false.,
+tauls = 7200.,
+SFC_FLX_FXD    = .false.,
+SFC_TAU_FXD    = .false.,
+
+nrad = 15,
+
+dx =    3000.,
+dy =    3000.,
+
+dt =    10.,
+
+doseasons = .false.,
+doradhomo=.false.,
+doperpetual=.true.,
+dosolarconstant=.true.,
+solar_constant = 650.83,
+zenith_angle = 50.5,
+doisccp = .false.,
+domodis = .false.,
+domisr = .false.,
+
+nstop   = 1036800,
+nprint  = 17280,
+nstat = 720,
+nstatfrq = 60,
+
+doSAMconditionals = .false.,
+dosatupdnconditionals = .false.,
+
+nsave2D = 17280,
+save2Davg=.false.,
+nsave2Dstart    = 0,
+nsave2Dend      = 9999999,
+save2Dsep = .false.,
+save2Dbin      = .false.,
+
+nsave3D = 17280,
+nsave3Dstart    = 0,
+nsave3Dend      = 999999999,
+save3Dbin      = .false.,
+rad3Dout  = .true.,
+
+nmovie       = 2,
+nmoviestart  = 99999990,
+nmovieend    = 99960480
+/
+
+

@@ -7,7 +7,6 @@ use tracers
 use params
 use hbuffer
 use instrument_diagnostics, only: compute_instr_diags
-use sgs, only : twsbmf
 implicit none	
 	
 	real mse(nzm)
@@ -235,7 +234,11 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
 	  uwsb(k) = uwsb(k) * tmp(1)
 	  vwsb(k) = vwsb(k) * tmp(1)
 	  twsb(k) = twsb(k) * tmp(1) * rhow(k) * cp
-	  twsbmf(k) = twsbmf(k) * tmp(1) * rhow(k) * cp
+	  if (doedmf) then 
+             twsbmf(k) = twsbmf(k) * tmp(1) * rhow(k) * cp
+          else
+             twsbmf(k) = 0.
+          end if
 	  uwle(k) = uwle(k)*tmp(1) + uwsb(k)
 	  vwle(k) = vwle(k)*tmp(1) + vwsb(k)
 	  twle(k) = twle(k)*tmp(2)*rhow(k)*cp + twsb(k) + twsbmf(k)
