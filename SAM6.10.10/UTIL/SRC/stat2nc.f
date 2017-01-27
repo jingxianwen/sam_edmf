@@ -3,7 +3,7 @@ c-------------------------------------------------------
 	include 'netcdf.inc'
 	include 'hbuf.inc'	
 	
-        integer, parameter :: nparms = 69  
+        integer, parameter :: nparms = 70  
 	integer flag(HBUF_MAX_LENGTH)
 c-------------------------------------------------------	
 	character caseid*40, version*20, filename*148, filename2*148
@@ -1501,6 +1501,23 @@ c--------------------------------------------------------
         abbr_name = 'PBLH'
         units = 'm'
         npar = 69
+        err = NF_REDEF(ncid)
+        err = NF_DEF_VAR(ncid,trim(abbr_name),NF_FLOAT,
+     &                                  1, timeid,varid)
+        err = NF_PUT_ATT_TEXT(ncid,varid,'long_name',
+     &                  len_trim(long_name),trim(long_name))
+        err = NF_PUT_ATT_TEXT(ncid,varid,'units',
+     &                       len_trim(units),trim(units))
+        err = NF_ENDDEF(ncid)
+        tmp(1:ntime) = parms(npar:npar+nparms*(ntime-1):nparms)
+        err = NF_PUT_VAR_REAL(ncid, varid, tmp)
+        print*,long_name
+        print*,tmp(1:ntime)
+c--------------------------------------------------------
+        long_name = 'Maximum precipitable water'
+        abbr_name = 'PWMAX'
+        units = 'mm'
+        npar = 70
         err = NF_REDEF(ncid)
         err = NF_DEF_VAR(ncid,trim(abbr_name),NF_FLOAT,
      &                                  1, timeid,varid)

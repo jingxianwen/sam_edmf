@@ -382,9 +382,11 @@ end subroutine sgs_scalars
 subroutine sgs_proc()
 
    use grid, only: nstep,dt,icycle
-   use params, only: dosmoke
+   use params, only: dosmoke, dopblh
 
 !    SGS TKE equation:
+
+     if(dopblh) call get_pblh()
 
      if(dosgs) call tke_full()
 

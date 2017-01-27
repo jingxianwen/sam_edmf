@@ -44,7 +44,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 bubble_radius_ver,bubble_dtemp,bubble_dq, dosmoke, dossthomo, &
                 rad3Dout, nxco2, dosimfilesout, notracegases, &
                 doradlat, doradlon, ncycle_max, doseawater, dosgscloud, doedmf,&
-                dozerosigma,donoenvcloud
+                dozerosigma,donoenvcloud,dopblh,pblhfluxmin,pblhthvgrad   
 	
 !----------------------------------
 !  Read namelist variables from the standard input:
@@ -89,6 +89,11 @@ end if
 	endif
 
         if(docoriolis.and..not.dofplane.or.doradlat) dowally=.true.
+
+        if (dopblh .and.pblhfluxmin.and.pblhthvgrad) then
+          write(*,*) 'WARNING: Only one method for the PBLH diagnostic may be chosen. '
+          write(*,*) 'Setting pblhfluxmin=.false.'
+        end if
 
 	if(ny.eq.1) dy=dx
 	dtn = dt

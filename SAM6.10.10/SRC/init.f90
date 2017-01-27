@@ -51,6 +51,7 @@ subroutine init()
   pblh  = 0.0
  
   cfrac_tot=0.0
+  pw_globalmax=0.0
 
 end subroutine init
 

@@ -1133,6 +1133,7 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
          ncloudy = ncloudy+1
         end if
 
+        z_pwmax = z_pwmax + pw_globalmax
 	do j=1,ny
 	 do i=1,nx
 	   if(cwp(i,j).gt.cwpmax) s_acld=s_acld+1.

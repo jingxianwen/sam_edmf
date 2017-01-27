@@ -15,10 +15,30 @@ implicit none
 	
 integer i,j,k,ic,jc,nstatsteps
 real div, divmax, divmin
-real rdx, rdy, rdz, coef
+real rdx, rdy, rdz, coef, coef1
 integer im,jm,km
-real wmax, qnmax(1), qnmax1(1)
+real wmax, qnmax(1), qnmax1(1), pwmax
 real(8) buffer(5), buffer1(5)
+
+
+
+pw_xyinst=0.
+do k=1,nzm
+coef1 = rho(k)*dz*adz(k)
+do i=1,nx
+do j=1,ny
+   pw_xyinst(i,j) = pw_xyinst(i,j)+qv(i,j,k)*coef1 ! not weighted by dtn/dt since used in edmf each cycle
+end do
+end do
+end do
+
+! get maximum of instantaneous PW distribution
+pwmax=maxval(pw_xyinst)
+if (dompi) then
+  call task_max_real(pwmax,pw_globalmax,1)
+else
+  pw_globalmax=pwmax
+end if
 
 if(mod(nstep,nstatis).eq.0) then
       call statistics()
@@ -286,3 +306,4 @@ end if ! (mod(nstep,nprint).eq.0)
 call t_stopf ('print_out')
 
 end
+

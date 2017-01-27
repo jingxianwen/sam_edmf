@@ -88,11 +88,8 @@ real grdf_z(nzm)! grid factor for eddy diffusion in z
 
 logical :: dofixedtau   ! if true, tau=600 sec
                           ! and assuming tke(z=0) = 0
-logical :: pblhfluxmin    ! use level with minimum buoyancy flux
-logical :: pblhthvgrad    ! use height with max dthv gradient (may lie between levels)
 logical :: fixedeps
 logical :: donoplumesat
-logical :: dopblh
 logical :: dosingleplume
 real :: tauneggers
 real :: ctketau
@@ -116,20 +113,19 @@ CONTAINS
 subroutine sgs_setparm()
 
   use grid, only: case, caseid, masterproc
+  use params, only: pblhfluxmin,dopblh
   implicit none
 
   integer ierr, ios, ios_missing_namelist, place_holder
 
   !======================================================================
   NAMELIST /SGS_TKE/ &
-       dofixedtau,pblhfluxmin,pblhthvgrad,ctketau,fixedeps,tauneggers,&
-       dosingleplume,beta,donoplumesat,pwmin,nup,eps0,dopblh
+       dofixedtau,ctketau,fixedeps,tauneggers,&
+       dosingleplume,beta,donoplumesat,pwmin,nup,eps0
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
   dofixedtau = .false.
-  pblhfluxmin    = .false.
-  pblhthvgrad    = .true.
   if (dofixedtau) then
     ctketau = 700.
   else
@@ -143,7 +139,6 @@ subroutine sgs_setparm()
   pwmin=1.4
   nup = 40
   eps0=1.0e-3
-  dopblh=.true.
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
@@ -164,10 +159,6 @@ subroutine sgs_setparm()
      end if
   end if
 
-  if (pblhfluxmin.eq.pblhthvgrad) then
-        if (masterproc) write(*,*) '****** ERROR: bad specification in SGS_TKE namelist for pblh diagnostic'
-        call task_abort()
-  end if
   if (dopblh.and.pblhfluxmin .and..not.dosgs) then
       if (masterproc) write(*,*) '****** ERROR: bad specification in SGS_TKE namelist for dopblh'
         call task_abort()
@@ -496,7 +487,7 @@ end subroutine sgs_scalars
 subroutine sgs_proc()
 
    use grid, only: nstep,dt,icycle,dompi
-   use params, only: dosmoke, dotracers, dosgs
+   use params, only: dosmoke, dotracers, dosgs, dopblh
    use vars
    use microphysics
    use tracers

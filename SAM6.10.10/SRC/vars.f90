@@ -139,6 +139,8 @@ real lwntc_xy(nx,ny) ! clear-sky mean net lw at TOA
 real swntc_xy(nx,ny) ! clear-sky mean net sw at TOA
 real solin_xy(nx,ny) ! solar TOA insolation
 real pw_xy(nx,ny)   ! precipitable water
+real pw_xyinst(nx,ny)   ! instantaneous precipitable water
+real pw_globalmax       ! domain-wide maximum in PW
 real cw_xy(nx,ny)   ! cloud water path
 real iw_xy(nx,ny)   ! ice water path
 real cld_xy(nx,ny)   ! cloud frequency
@@ -161,7 +163,7 @@ real &
     uwle(nz), uwsb(nz), vwle(nz), vwsb(nz), &
     radlwup(nz), radlwdn(nz), radswup(nz), radswdn(nz), &
     radqrlw(nz), radqrsw(nz), w_max, u_max, s_acld, s_acldcold, s_ar, s_arthr, s_sst, &
-    s_acldl, s_acldm, s_acldh,  ncmn, nrmn, z_pbl, z_inv, z_cb, z_ct, z_cbmn, z_ctmn, &
+    s_acldl, s_acldm, s_acldh,  ncmn, nrmn, z_pbl, z_pwmax, z_inv, z_cb, z_ct, z_cbmn, z_ctmn, &
     z2_inv, z2_cb, z2_ct, cwpmean, cwp2, precmean, prec2, precmax, nrainy, ncloudy, &
     s_acldisccp, s_acldlisccp, s_acldmisccp, s_acldhisccp, s_ptopisccp, &
     s_acldmodis, s_acldlmodis, s_acldmmodis, s_acldhmodis, s_ptopmodis, &

@@ -141,6 +141,7 @@ shobs=0.
 s_sst = 0.
 z_inv=0.
 z_pbl=0.
+z_pwmax=0.
 z2_inv=0.
 z_ct=0.
 z_cb=z(nzm)
@@ -605,7 +606,7 @@ if(masterproc) then
         real(z_cbmn*factor,4), real(z2_cb,4), real(z_cb,4), &
         real(cwpmean*aver*factor,4), real(cwp2,4), &
         real(precmean*aver*factor,4), real(prec2,4), real(precmax,4), &
-        ncmn, nrmn, real(s_arthr*aver*factor,4), real(z_pbl*aver*factor,4) 
+        ncmn, nrmn, real(s_arthr*aver*factor,4), real(z_pbl*aver*factor,4), real(z_pwmax*aver,4) 
   write(ntape) length
   hbuf_real4(1:hbuf_length*nzm) = hbuf(1:hbuf_length*nzm)
   do l = 1,hbuf_length
