@@ -169,7 +169,11 @@ do j = 1,ny
          if (tmp_lwp.gt.0.01) then
             cloudtopheight(i,j) = z(k)
             cloudtoptemp(i,j) = tabs(i,j,k)
-            cld_xy(i,j) = cld_xy(i,j) + dtfactor
+            if (k.gt.1) then
+              cld_xy(i,j) = cld_xy(i,j) + dtfactor*maxval(cfrac_tot(i,j,1:k))
+            else
+              cld_xy(i,j) = cld_xy(i,j) + dtfactor*cfrac_tot(i,j,k)
+            end if
             EXIT
          end if
       end do
