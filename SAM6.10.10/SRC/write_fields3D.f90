@@ -282,7 +282,7 @@ end if
 
 if (dosgs.and.sgs3Dout) then
 
-  call write_sgsfields3D(nfields)
+  call write_sgsfields3D(nfields1)
 
 end if
 
