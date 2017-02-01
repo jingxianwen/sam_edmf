@@ -48,7 +48,7 @@ nf=nf+1
   do k=1,nzm
    do j=1,ny
     do i=1,nx
-      tmp(i,j,k)=mkwsb3(i,j,k,0) 
+      tmp(i,j,k)=mkwsb3(i,j,k,1) 
     end do
    end do
   end do
