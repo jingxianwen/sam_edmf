@@ -1,9 +1,6 @@
 &SGS_TKE
 dofixedtau = .true.,
 ctketau=700.,
-pblhthvgrad = .true.,
-pblhfluxmin = .false.,
-dopblh= .true.,
 fixedeps=.false.,
 donoplumesat=.false.,
 dosingleplume=.false.,
@@ -11,6 +8,7 @@ tauneggers=500.,
 pwmin=1.4,
 nup=6
 /
+
 
 &PARAMETERS
 
@@ -29,6 +27,9 @@ perturb_type  = 0,
 day0 = 0.,
 dosgs           = .true.,
 doedmf          = .false.,
+pblhthvgrad = .true.,
+pblhfluxmin = .false.,
+dopblh= .true.,
 dosgscloud      = .true.,
 dozerosigma     = .true.,
 donoenvcloud    = .false.,
@@ -76,14 +77,16 @@ nstatfrq = 40,
 doSAMconditionals = .false.,
 dosatupdnconditionals = .false.,
 
-nsave2D = 4320,
+!nsave2D = 4320,
+nsave2D = 180,
 save2Davg=.false.,
 nsave2Dstart    = 0,
 nsave2Dend      = 9999999,
 save2Dsep = .false.,
 save2Dbin      = .false.,
 
-nsave3D = 8640,
+!nsave3D = 8640,
+nsave3D = 360,
 nsave3Dstart    = 0,
 nsave3Dend      = 999999999,
 save3Dbin      = .false.,
