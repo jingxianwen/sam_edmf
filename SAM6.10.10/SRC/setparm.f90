@@ -29,7 +29,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
 		CEM,LES,OCEAN,LAND,SFC_FLX_FXD,SFC_TAU_FXD, soil_wetness, &
                 doensemble, nensemble, dowallx, dowally, &
                 nsave2D, nsave2Dstart, nsave2Dend, qnsave3D, & 
-                docolumn, save2Dbin, save2Davg, save3Dbin, &
+                docolumn, save2Dbin, save2Davg, save3Dbin, sgs3Dout, &
                 save2Dsep, save3Dsep, dogzip2D, dogzip3D, restart_sep, &
 	        doseasons, doperpetual, doradhomo, dosfchomo, doisccp, &
                 domodis, domisr, dodynamicocean, ocean_type, delta_sst, &

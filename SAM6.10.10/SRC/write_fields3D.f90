@@ -280,6 +280,12 @@ if(doprecip) then
                                  save3Dbin,dompi,rank,nsubdomains)
 end if
 
+if (dosgs.and.sgs3Dout) then
+
+  call write_sgsfields3D(nfields)
+
+end if
+
 
 do n = 1,nmicro_fields
    if(docloud.AND.flag_micro3Dout(n).gt.0.AND.n.ne.index_water_vapor) then

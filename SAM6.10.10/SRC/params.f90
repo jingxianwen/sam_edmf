@@ -92,6 +92,7 @@ logical:: doprecip = .false.
 logical:: dolongwave = .false. 
 logical:: doshortwave = .false.
 logical:: dosgs = .false.
+logical:: sgs3Dout = .false.
 logical:: docoriolis = .false. 
 logical:: docoriolisz = .false. 
 logical:: dofplane = .true.
