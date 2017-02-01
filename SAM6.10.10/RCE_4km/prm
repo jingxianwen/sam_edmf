@@ -50,7 +50,7 @@ tauls = 7200.,
 SFC_FLX_FXD    = .false.,
 SFC_TAU_FXD    = .false.,
 
-nrad = 60,
+nrad = 120,
 
 dx =    4000.,
 dy =    4000.,
@@ -87,6 +87,7 @@ nsave3Dstart    = 0,
 nsave3Dend      = 999999999,
 save3Dbin      = .false.,
 rad3Dout  = .true.,
+sgs3Dout  = .true.,
 
 nmovie       = 2,
 nmoviestart  = 99999990,
