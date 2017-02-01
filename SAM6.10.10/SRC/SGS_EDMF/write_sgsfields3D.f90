@@ -6,7 +6,7 @@ use params
 
 implicit none
 
-real,intent(inout) :: nf
+integer,intent(inout) :: nf
 integer :: k,j,i
 character *80 long_name
 character *8 name
