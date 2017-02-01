@@ -1,10 +1,20 @@
 &SGS_TKE
-dosmagor =.true.
+dofixedtau = .true.,
+ctketau=700.,
+pblhthvgrad = .true.,
+pblhfluxmin = .false.,
+dopblh= .true.,
+fixedeps=.false.,
+donoplumesat=.false.,
+dosingleplume=.false.,
+tauneggers=500.,
+pwmin=1.4,
+nup=6
 /
 
 &PARAMETERS
 
-caseid ='128x128x96_4km_10s_305K_smag',
+caseid ='128x128x96_4km_10s_305K_ED',
 doconstdz=.false.,
 
 nrestart = 0,
