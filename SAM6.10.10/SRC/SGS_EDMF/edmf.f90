@@ -109,8 +109,13 @@ implicit none
  ! virtual pot. temp flux
  wthv = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)*fluxbq(i,j)
 
+ thetav1 = (1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)
+ theta   = thetav1/(1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))
+
+ wstar(i,j)=max(0.,(ggr/thetav1*wthv*pblh(i,j))**(1./3.))
+
  ! quit in case of a non-positive buoyancy flux
- if (wthv.le.0.0) exit
+ if (wthv.le.0.0) cycle
  
  ! get entrainment rate
   !do i=1,nup
@@ -134,11 +139,7 @@ implicit none
   !  enddo
 
 
-    thetav1 = (1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)
-    theta   = thetav1/(1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))
-
 ! see Lenschow et al. (1980), JAS
-    wstar(i,j)=max(0.,(ggr/thetav1*wthv*pblh(i,j))**(1./3.))
     qstar=wqt/wstar(i,j)
     thstar=wthl/wstar(i,j) 
     sigmaW=1.34*wstar(i,j)*(zs/pblh(i,j))**(1./3.)*(1.-0.8*zs/pblh(i,j))

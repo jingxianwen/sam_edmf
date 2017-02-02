@@ -12,7 +12,7 @@ nup=6
 
 &PARAMETERS
 
-caseid ='128x128x96_4km_10s_305K_ED',
+caseid ='128x128x96_4km_10s_305K_EDMF',
 doconstdz=.false.,
 
 nrestart = 0,
@@ -26,7 +26,7 @@ dodynamicocean=.false.,
 perturb_type  = 0,
 day0 = 0.,
 dosgs           = .true.,
-doedmf          = .false.,
+doedmf          = .true.,
 pblhthvgrad = .true.,
 pblhfluxmin = .false.,
 dopblh= .true.,

@@ -499,7 +499,7 @@ subroutine sgs_proc()
      if(dopblh) call get_pblh()
 
      sgs_field_sumM = 0.
-     if (doedmf) call edmf()
+     if (dosgs.and.doedmf) call edmf()
 
 !    SGS TKE equation:
 
@@ -507,23 +507,23 @@ subroutine sgs_proc()
 
 ! add exchange of sumM fields which isn't done in task_boundaries 
 
- if (dompi) then
-
-   do i = 1,5+nmicro_fields+ntracers
-       call task_exchange(sgs_field_sumM(:,:,:,i),dimx1_d,dimx2_d,dimy1_d,dimy2_d,nz, &
-                                                             1+dimx1_d,dimx2_d-nx,YES3D+dimy1_d,1-YES3D+dimy2_d-ny,&
-                                                             4+nsgs_fields+nsgs_fields_diag+nmicro_fields+ntracers+i)
-   end do
- else
-
-   do i = 1,5+ntracers+nmicro_fields
-    if(dosgs.and.do_sgsdiag_bound) &
-     call bound_exchange(sgs_field_sumM(:,:,:,i),dimx1_d,dimx2_d,dimy1_d,dimy2_d,nz, &
-                                                           1+dimx1_d,dimx2_d-nx,YES3D+dimy1_d,1-YES3D+dimy2_d-ny,&
-                                                           4+nsgs_fields+nsgs_fields_diag+nmicro_fields+ntracers+i)
-   end do
-
- end if
+ !if (dompi) then
+!
+!   do i = 1,5+nmicro_fields+ntracers
+!       call task_exchange(sgs_field_sumM(:,:,:,i),dimx1_d,dimx2_d,dimy1_d,dimy2_d,nz, &
+!                                                             1+dimx1_d,dimx2_d-nx,YES3D+dimy1_d,1-YES3D+dimy2_d-ny,&
+!                                                             4+nsgs_fields+nsgs_fields_diag+nmicro_fields+ntracers+i)
+!   end do
+! else
+!
+!   do i = 1,5+ntracers+nmicro_fields
+!    if(dosgs.and.do_sgsdiag_bound) &
+!     call bound_exchange(sgs_field_sumM(:,:,:,i),dimx1_d,dimx2_d,dimy1_d,dimy2_d,nz, &
+!                                                           1+dimx1_d,dimx2_d-nx,YES3D+dimy1_d,1-YES3D+dimy2_d-ny,&
+!                                                           4+nsgs_fields+nsgs_fields_diag+nmicro_fields+ntracers+i)
+!   end do
+!
+! end if
 
 
 end subroutine sgs_proc
