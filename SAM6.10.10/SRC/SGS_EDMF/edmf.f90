@@ -174,10 +174,10 @@ implicit none
        UPQT(1,1)=q(i,j,1)+beta*wqt/(sqrt(0.2)*wstar(i,j)) !(sqrt(tke(1)) + 0.001 )
        UPTHV(1,1)=thetav1+beta*wthv/ (sqrt(0.2)*wstar(i,j)) !(sqrt(tke(1)) + 0.001 )
        UPTABS(1,1)=UPTHV(1,1)/(1.+epsv*UPQT(1,1)) * (pres(1)/1000.)**(rgas/cp) 
-       UPQCL(1,1)=qcl(i,j,1) + qpl(i,j,1)
-       UPQCI(1,1)=qci(i,j,1) + qpi(i,j,1)
+       UPQCL(1,1)=qcl(i,j,1) 
+       UPQCI(1,1)=qci(i,j,1) 
        UPT(1,1)= (1000./pres(1))**(rgas/cp) *&
-       (UPTABS(1,1) - fac_cond*(qcl(i,j,1)+qpl(i,j,1)) - fac_sub*(qci(i,j,1)+qpi(i,j,1)))    
+       (UPTABS(1,1) - fac_cond*(qcl(i,j,1)) - fac_sub*(qci(i,j,1)))    
        UPCF(1,1) = 0.0
        frac_mf(i,j,1) = UPA(1,1)
        qcsgs_mf(i,j,1) =  UPA(1,1)*UPQCL(1,1)
@@ -211,10 +211,10 @@ implicit none
          ! according to cheinet the 0.58 is for thetav, hence thetav is initialized (instead of theta)
          UPTHV(1,N)=thetav1+0.58*UPW(1,N)*sigmaTHV/sigmaW
          UPTABS(1,N)=UPTHV(1,N)/(1.+epsv*UPQT(1,N)) * (pres(1)/1000.)**(rgas/cp) 
-         UPQCL(1,N)=qcl(i,j,1) + qpl(i,j,1)
-         UPQCI(1,N)=qci(i,j,1) + qpi(i,j,1)
+         UPQCL(1,N)=qcl(i,j,1) 
+         UPQCI(1,N)=qci(i,j,1)
          UPT(1,N)= (1000./pres(1))**(rgas/cp) *&
-         (UPTABS(1,N) - fac_cond*(qcl(i,j,1)+qpl(i,j,1)) - fac_sub*(qci(i,j,1)+qpi(i,j,1)))    
+         (UPTABS(1,N) - fac_cond*(qcl(i,j,1)) - fac_sub*(qci(i,j,1)))    
          UPCF(1,N) = 0.0
          frac_mf(i,j,1) = frac_mf(i,j,1)+UPA(1,N)
          qcsgs_mf(i,j,1) = qcsgs_mf(i,j,1) + UPA(1,N)*UPQCL(1,N)
@@ -245,7 +245,7 @@ implicit none
           EntExp=exp(-ENT(k-1,N)*(zi(k)-zi(k-1)))
 
           QTn=q(i,j,k-1)*(1.-EntExp)+UPQT(k-1,N)*EntExp
-          Tn=(1000./pres(k-1))**(rgas/cp) * (t(i,j,k-1)-ggr/cp*z(k-1))*(1.-EntExp)+UPT(k-1,N)*EntExp
+          Tn=(1000./pres(k-1))**(rgas/cp) * (t(i,j,k-1)-ggr/cp*z(k-1)+fac_cond*qpl(i,j,k-1) + fac_sub*qpi(i,j,k-1))*(1.-EntExp)+UPT(k-1,N)*EntExp
           !Un=0.5*(u(i,j,k-1)+u(i+1,j,k-1))*(1.-EntExp)+UPU(k-1,i)*EntExp
           !if (RUN3D) then
           !Vn=0.5*(v(i,j,k-1)+v(i,j+YES3D,k-1))*(1.-EntExp)+UPV(k-1,i)*EntExp
@@ -265,7 +265,7 @@ implicit none
 !          end if
        
           ! based on density potential temperature (without qp effect since homogeneous across cell)
-          thetavenv = (1.+epsv*qv(i,j,k-1)-(qn(i,j,k-1)+qp(i,j,k-1)))*tabs(i,j,k-1)*(1000./pres(k-1))**(rgas/cp)
+          thetavenv = (1.+epsv*qv(i,j,k-1)-qn(i,j,k-1))*tabs(i,j,k-1)*(1000./pres(k-1))**(rgas/cp)
           BUOY(k-1,N)=ggr*(0.5*(THVn+UPTHV(k-1,N))/thetavenv-1.)
 
           !EntW=exp(-2.*(Wb+Wc*ENT(k-1,i))*(zi(k)-zi(k-1)))
@@ -301,7 +301,8 @@ implicit none
     DO k=2,nzm
       DO N=1,nup
         sgs_field_sumM(i,j,k,1)=sgs_field_sumM(i,j,k,1) + UPA(K,N)*UPW(K,N)
-        sgs_field_sumM(i,j,k,5)=sgs_field_sumM(i,j,k,5) + UPA(K,N)*((presi(k)/1000.)**(rgas/cp)*UPT(K,N)+ggr/cp*zi(k))*UPW(K,N)
+        sgs_field_sumM(i,j,k,5)=sgs_field_sumM(i,j,k,5) + UPA(K,N)*((presi(k)/1000.)**(rgas/cp)*UPT(K,N)+ggr/cp*zi(k)&
+            -fac_cond*qpl(i,j,k)-fac_sub*qpi(i,j,k))*UPW(K,N)
         sgs_field_sumM(i,j,k,6)=sgs_field_sumM(i,j,k,6) + UPA(K,N)*UPQT(K,N)*UPW(K,N)
         !sumMu(k)  =sumMu(k)+UPA(K,i)*UPW(K,I)*UPU(K,I)
         !sumMv(k)  =sumMv(k)+UPA(K,i)*UPW(K,I)*UPV(K,I)

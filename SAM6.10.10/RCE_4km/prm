@@ -12,7 +12,7 @@ nup=6
 
 &PARAMETERS
 
-caseid ='128x128x96_4km_10s_305K_EDMF',
+caseid ='128x128x96_4km_10s_305K_EDMF2',
 doconstdz=.false.,
 
 nrestart = 0,
