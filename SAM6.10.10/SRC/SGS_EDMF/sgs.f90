@@ -40,6 +40,7 @@ real uwsb3(nx,ny,nz)                          ! sgs vertical flux of u
 real vwsb3(nx,ny,nz)                          ! sgs vertical flux of v
 real tkewsb3(nx,ny,nz)                        ! sgs vertical flux of tke
 real thvflx(nx,ny,nzm)                        ! sgs buoyancy flux in TKE equation
+real thvflx1D(nzm)                        ! sgs buoyancy flux in TKE equation
 
 ! MF things
 real twsb3_mf (nx,ny,nz)                         ! sgs vertical flux of h/cp
@@ -217,6 +218,7 @@ subroutine sgs_init()
      frac_mf=0.
      cfrac_mf1D=0.
      frac_mf1D=0.
+     thvflx1D=0.
 
   end if
 
@@ -496,7 +498,8 @@ subroutine sgs_proc()
 
    integer :: i
 
-     if(dopblh) call get_pblh()
+     if (dopblh) call get_pblh()
+
 
      sgs_field_sumM = 0.
      if (dosgs.and.doedmf) call edmf()
@@ -578,6 +581,7 @@ subroutine sgs_statistics()
          call hbuf_put('BUOYAS',tkesbbuoy,factor_xy)
          call hbuf_put('SHEARS',tkesbshear,factor_xy)
          call hbuf_put('DISSIPS',tkesbdiss,factor_xy)
+         call hbuf_put('TKEWTHV',thvflx1D,factor_xy)
 
 !---------------------------------------------------------
 ! MF Massflux properties:
@@ -626,6 +630,13 @@ integer status(*),average_type(*),count,sgscount
    status(count) = 1
    average_type(count) = 0
 
+   count = count + 1
+   sgscount = sgscount + 1
+   namelist(count) = 'TKEWTHV'
+   deflist(count) = 'Buoyancy flux in tke equation'
+   unitlist(count) = 'K m/s'
+   status(count) = 1
+   average_type(count) = 0
 
 end subroutine sgs_hbuf_init
 

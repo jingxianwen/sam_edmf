@@ -44,7 +44,7 @@ endif
 ! compute coefficients needed for buoyancy flux
 call get_c0c1(cthl,cqt)
 
-
+thvflx1D=0.
 do i=1,nx
 do j=1,ny
 do k=1,nzm
@@ -58,6 +58,7 @@ do k=1,nzm
   wqt  = 0.5*(mkwsb3(i,j,k,1) + mkwsb3(i,j,k+1,1))
 
   thvflx(i,j,k) = cthl(i,j,k) * wthl + cqt(i,j,k) * wqt
+  thvflx1D(k) = thvflx1D(k) + thvflx(i,j,k)
 
 end do 
 end do

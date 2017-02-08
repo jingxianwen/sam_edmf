@@ -39,6 +39,7 @@ real,dimension(nzm) :: qtqt, thlthl, qtthl, thetali, thetaligrad, qtgrad, sigmas
 
 an = 1./(tbgmax-tbgmin) 
 
+
 !IF (tke(i,j,k).gt.1.d-3.and.dosgscloud) then
 IF (dosgscloud) then
 

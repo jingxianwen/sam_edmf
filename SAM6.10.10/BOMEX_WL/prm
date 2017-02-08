@@ -1,21 +1,17 @@
 &SGS_TKE
-dosmagor=.true.
-!dofixedtau = .true.,
-!ctketau=700.,
-!pblhthvgrad = .true.,
-!pblhfluxmin = .false.,
-!dopblh= .true.,
-!fixedeps=.false.,
-!donoplumesat=.false.,
-!dosingleplume=.false.,
-!tauneggers=500.,
-!pwmin=1.4,
-!nup=40
+dofixedtau = .true.,
+ctketau=700.,
+fixedeps=.false.,
+donoplumesat=.false.,
+dosingleplume=.false.,
+tauneggers=500.,
+pwmin=1.4,
+nup=40
 /
 
 &PARAMETERS
 
- caseid ='BOMEX_ED',
+ caseid ='BOMEX_EDMF10',
  nrestart = 0,
  perturb_type = -1, 
  day0 = 0.,
@@ -76,7 +72,7 @@ dosmagor=.true.
 
 nstop 	= 1080,
 nprint 	= 10,
-nstat 	= 10,
+nstat 	= 1,
 nstatfrq= 1,
 
 doSAMconditionals = .false.

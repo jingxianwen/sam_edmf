@@ -1,15 +1,12 @@
 &SGS_TKE
 dofixedtau = .true.,
 ctketau=700.,
-pblhthvgrad = .true.,
-pblhfluxmin = .false.,
-dopblh= .true.,
 fixedeps=.false.,
 donoplumesat=.false.,
 dosingleplume=.false.,
 tauneggers=500.,
 pwmin=1.4,
-nup=40
+nup=6
 /
 
 &PARAMETERS
@@ -29,6 +26,12 @@ perturb_type  = 0,
 day0 = 0.,
 dosgs           = .true.,
 doedmf          = .true.,
+pblhthvgrad = .true.,
+pblhfluxmin = .false.,
+dopblh= .true.,
+dosgscloud      = .true.,
+dozerosigma     = .true.,
+donoenvcloud    = .false.,
 dodamping       = .true.,
 doupperbound    = .true.,
 docloud         = .true.,
@@ -67,26 +70,27 @@ doisccp = .false.,
 domodis = .false.,
 domisr = .false.,
 
-nstop   = 1036800,
-nprint  = 17280,
-nstat = 720,
-nstatfrq = 60,
+nstop   = 518400,
+nprint  = 360,
+nstat = 360,
+nstatfrq = 36,
 
 doSAMconditionals = .false.,
 dosatupdnconditionals = .false.,
 
-nsave2D = 17280,
+nsave2D = 360,
 save2Davg=.false.,
 nsave2Dstart    = 0,
 nsave2Dend      = 9999999,
 save2Dsep = .false.,
 save2Dbin      = .false.,
 
-nsave3D = 17280,
+nsave3D = 360,
 nsave3Dstart    = 0,
 nsave3Dend      = 999999999,
 save3Dbin      = .false.,
 rad3Dout  = .true.,
+sgs3Dout  = .true.,
 
 nmovie       = 2,
 nmoviestart  = 99999990,

@@ -71,6 +71,21 @@ implicit none
         & facrit=1.e-4
 
 
+ qcsgs_mf=0.
+ qisgs_mf=0.
+ cfrac_mf=0.
+ frac_mf=0.
+ cfrac_mf1D=0.
+ frac_mf1D=0.
+
+ Wa = 0.4* Wc + 0.3
+ zs=50.
+ pwmax=3.5
+
+ do i=1,nx
+ do j=1,ny
+
+! set initial conditions for updrafts
 !initialize plume properties
  UPM=0.
  UPW=0.
@@ -86,20 +101,6 @@ implicit none
  UPV=0.
  ENT=0.
  BUOY=0.
- qcsgs_mf=0.
- qisgs_mf=0.
- cfrac_mf=0.
- frac_mf=0.
- cfrac_mf1D=0.
- frac_mf1D=0.
-
- Wa = 0.4* Wc + 0.3
-! set initial conditions for updrafts
- zs=50.
- pwmax=3.5
-
- do i=1,nx
- do j=1,ny
  
  ! surface fluxes
  ! sensible heat flux (K m s-1)
@@ -114,7 +115,7 @@ implicit none
 
  wstar(i,j)=max(0.,(ggr/thetav1*wthv*pblh(i,j))**(1./3.))
 
- ! quit in case of a non-positive buoyancy flux
+ ! move on in case of a non-positive buoyancy flux
  if (wthv.le.0.0) cycle
  
  ! get entrainment rate
