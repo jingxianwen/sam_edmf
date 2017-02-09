@@ -11,7 +11,7 @@ nup=6
 
 &PARAMETERS
 
-caseid ='4096x1x96_3km_10s_300K_SGSEDMF',
+caseid ='2048x1x96_3km_10s_300K_SGSEDMF',
 doconstdz=.false.,
 
 nrestart = 0,
