@@ -117,6 +117,7 @@ implicit none
 
  ! move on in case of a non-positive buoyancy flux
  if (wthv.le.0.0) cycle
+ if (doedmfpw.and.pw_xyinst(i,j).gt.0.8*pw_globalmax) cycle
  
  ! get entrainment rate
   !do i=1,nup

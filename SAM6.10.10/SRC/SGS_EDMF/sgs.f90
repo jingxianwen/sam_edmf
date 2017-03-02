@@ -92,6 +92,7 @@ logical :: dofixedtau   ! if true, tau=600 sec
 logical :: fixedeps
 logical :: donoplumesat
 logical :: dosingleplume
+logical :: doedmfpw
 real :: tauneggers
 real :: ctketau
 real :: beta
@@ -122,7 +123,7 @@ subroutine sgs_setparm()
   !======================================================================
   NAMELIST /SGS_TKE/ &
        dofixedtau,ctketau,fixedeps,tauneggers,&
-       dosingleplume,beta,donoplumesat,pwmin,nup,eps0
+       dosingleplume,beta,donoplumesat,pwmin,nup,eps0,doedmfpw
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
@@ -136,6 +137,7 @@ subroutine sgs_setparm()
   donoplumesat=.false.
   tauneggers=500. 
   dosingleplume=.false.
+  doedmfpw=.false.
   beta=0.3
   pwmin=1.4
   nup = 40
@@ -488,7 +490,7 @@ end subroutine sgs_scalars
 !
 subroutine sgs_proc()
 
-   use grid, only: nstep,dt,icycle,dompi
+   use grid, only: nstep,dt,icycle,dompi,nzm
    use params, only: dosmoke, dotracers, dosgs, dopblh
    use vars
    use microphysics
@@ -496,7 +498,31 @@ subroutine sgs_proc()
 
 
 
-   integer :: i
+   integer :: i,j,k
+   real :: pwmax,coef1
+
+
+     pw_xyinst=0.
+     do k=1,nzm
+        coef1 = rho(k)*dz*adz(k)
+        do i=1,nx
+        do j=1,ny
+         pw_xyinst(i,j) = pw_xyinst(i,j)+qv(i,j,k)*coef1 ! not weighted by dtn/dt
+                                                         !since used in edmf each cycle
+        end do
+        end do
+     end do
+
+     
+     ! get maximum of instantaneous PW distribution
+     pwmax=maxval(pw_xyinst)
+     if (dompi) then
+       call task_max_real(pwmax,pw_globalmax,1)
+     else
+       pw_globalmax=pwmax
+     end if
+
+
 
      if (dopblh) call get_pblh()
 

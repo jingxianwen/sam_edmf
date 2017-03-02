@@ -1,18 +1,20 @@
 &SGS_TKE
+!dosmagor=.true.,
 dofixedtau = .true.,
 ctketau=700.,
 fixedeps=.false.,
 donoplumesat=.false.,
 dosingleplume=.false.,
-tauneggers=500.,
+tauneggers=80.,
 pwmin=1.4,
-nup=6
+nup=6,
+doedmfpw        =.false.
 /
 
 
 &PARAMETERS
 
-caseid ='128x128x96_4km_10s_305K_EDMF2',
+caseid ='128x128x96_4km_10s_305K_EDMF_tn80',
 doconstdz=.false.,
 
 nrestart = 0,
@@ -68,8 +70,7 @@ doisccp = .false.,
 domodis = .false.,
 domisr = .false.,
 
-!nstop   = 864000,
-nstop   = 8640,
+nstop   = 1036800,
 nprint  = 8640,
 nstat = 720,
 nstatfrq = 40,
@@ -77,16 +78,14 @@ nstatfrq = 40,
 doSAMconditionals = .false.,
 dosatupdnconditionals = .false.,
 
-!nsave2D = 4320,
-nsave2D = 180,
+nsave2D = 4320,
 save2Davg=.false.,
 nsave2Dstart    = 0,
 nsave2Dend      = 9999999,
 save2Dsep = .false.,
 save2Dbin      = .false.,
 
-!nsave3D = 8640,
-nsave3D = 360,
+nsave3D = 1080,
 nsave3Dstart    = 0,
 nsave3Dend      = 999999999,
 save3Dbin      = .false.,

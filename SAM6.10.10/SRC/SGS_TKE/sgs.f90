@@ -381,10 +381,36 @@ end subroutine sgs_scalars
 !
 subroutine sgs_proc()
 
-   use grid, only: nstep,dt,icycle
+   use grid, only: nstep,dt,icycle,nzm
    use params, only: dosmoke, dopblh
 
+   integer :: i,j,k
+   real :: pwmax,coef1
+
+
 !    SGS TKE equation:
+
+     pw_xyinst=0.
+     do k=1,nzm
+        coef1 = rho(k)*dz*adz(k)
+        do i=1,nx
+        do j=1,ny
+         pw_xyinst(i,j) = pw_xyinst(i,j)+qv(i,j,k)*coef1 ! not weighted by dtn/dt
+                                                         !since used in edmf
+                                                         !each cycle
+        end do
+        end do
+     end do
+     
+     ! get maximum of instantaneous PW distribution
+     pwmax=maxval(pw_xyinst)
+     if (dompi) then
+       call task_max_real(pwmax,pw_globalmax,1)
+     else
+       pw_globalmax=pwmax
+     end if
+
+
 
      if(dopblh) call get_pblh()
 

@@ -293,6 +293,8 @@ end do
 dudt = 0.
 dvdt = 0.
 dwdt = 0.	   
+dudtdiff=0.
+dvdtdiff=0.
 	
 if(docloud.or.dosmoke) call micro_init()  !initialize microphysics
 
