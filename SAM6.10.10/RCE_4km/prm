@@ -1,20 +1,21 @@
 &SGS_TKE
 !dosmagor=.true.,
 dofixedtau = .true.,
-ctketau=700.,
+ctketau=400.,
 fixedeps=.false.,
 donoplumesat=.false.,
 dosingleplume=.false.,
-tauneggers=80.,
+tauneggers=120.,
 pwmin=1.4,
-nup=6,
-doedmfpw        =.false.
+nup=1,
+doedmfpw        =.false.,
+domffxdsflx = .true.
 /
 
 
 &PARAMETERS
 
-caseid ='128x128x96_4km_10s_305K_EDMF_tn80',
+caseid ='128x128x96_4km_10s_305K_EDMF_doedmffalse2',
 doconstdz=.false.,
 
 nrestart = 0,
@@ -28,7 +29,9 @@ dodynamicocean=.false.,
 perturb_type  = 0,
 day0 = 0.,
 dosgs           = .true.,
-doedmf          = .true.,
+donodrag        = .false.,
+dosfctauhomo    = .false.,
+doedmf          = .false.,
 pblhthvgrad = .true.,
 pblhfluxmin = .false.,
 dopblh= .true.,
@@ -42,6 +45,8 @@ doprecip        = .true.,
 dolongwave      = .true.,
 doshortwave     = .true.,
 dosurface       = .true.,
+sfc_tau_fxd     = .false.,
+tau0            = 0.00025,
 tabs_s=305.,
 dolargescale    = .false.,
 doradforcing    = .false.,
@@ -51,7 +56,6 @@ donudging_uv    = .true.,
 donudging_tq    = .false.,
 tauls = 7200.,
 SFC_FLX_FXD    = .false.,
-SFC_TAU_FXD    = .false.,
 
 nrad = 120,
 

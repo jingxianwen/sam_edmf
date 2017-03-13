@@ -43,7 +43,7 @@ implicit none
       INTEGER :: K,N,i,j, ic, jc
       REAL :: wthv,wqt,wthl,qstar,thstar,sigmaW,sigmaQT,sigmaTH,sigmaTHV,zs, &
            pwmax,wmin,wmax,wlv,wtv,thetav1,theta
-      REAL :: QTn,Tn,THVn,QCLn,QCIn,Un,Vn,Wn2,EntEXP,EntW, hlp, acrit, Wa, thetavenv
+      REAL :: QTn,Tn,THVn,QCLn,QCIn,Un,Vn,Wn2,EntEXP,EntW, hlp, acrit, Wa, thetavenv, zpblh
 
 ! w parameters
       REAL,PARAMETER :: &
@@ -104,16 +104,24 @@ implicit none
  
  ! surface fluxes
  ! sensible heat flux (K m s-1)
- wthl = fluxbt(i,j)
+ if (domffxdsflx) then
+   wthl= 7./1.13/cp
+   wqt = 95./1.13/lcond
+   zpblh = 700.
+ else
+   wthl = fluxbt(i,j)
+   wqt  = fluxbq(i,j) 
+   zpblh = pblh(i,j)
+ end if
  ! latent heat flux (m s-1)
- wqt  = fluxbq(i,j) 
+ 
  ! virtual pot. temp flux
- wthv = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)*fluxbq(i,j)
+ wthv = (1.+epsv*qv(i,j,1))*wthl + epsv*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)*wqt
 
  thetav1 = (1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)
  theta   = thetav1/(1.+epsv*qv(i,j,1)-(qn(i,j,1) +qp(i,j,1)))
 
- wstar(i,j)=max(0.,(ggr/thetav1*wthv*pblh(i,j))**(1./3.))
+ wstar(i,j)=max(0.,(ggr/thetav1*wthv*zpblh)**(1./3.))
 
  ! move on in case of a non-positive buoyancy flux
  if (wthv.le.0.0) cycle
@@ -144,9 +152,9 @@ implicit none
 ! see Lenschow et al. (1980), JAS
     qstar=wqt/wstar(i,j)
     thstar=wthl/wstar(i,j) 
-    sigmaW=1.34*wstar(i,j)*(zs/pblh(i,j))**(1./3.)*(1.-0.8*zs/pblh(i,j))
-    sigmaQT=1.34*qstar*(zs/pblh(i,j))**(-1./3.)
-    sigmaTH=1.34*thstar*(zs/pblh(i,j))**(-1./3.)
+    sigmaW=1.34*wstar(i,j)*(zs/zpblh)**(1./3.)*(1.-0.8*zs/zpblh)
+    sigmaQT=1.34*qstar*(zs/zpblh)**(-1./3.)
+    sigmaTH=1.34*thstar*(zs/zpblh)**(-1./3.)
  
 ! now get sigmaTHV from linearization of pot. temp. and using a corr. coeff between qv and theta of 0.75 (see Sobjan 1991)
     sigmaTHV=sqrt(sigmaTH**2+epsv**2*theta**2*sigmaQT**2 &

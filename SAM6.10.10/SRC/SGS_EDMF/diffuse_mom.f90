@@ -3,6 +3,7 @@ subroutine diffuse_mom
 !  Interface to the diffusion routines
 
 use vars
+use params, only : donodrag
 implicit none
 integer i,j,k
 real du(nx,ny,nz,3)
@@ -22,6 +23,11 @@ if(dostatis) then
   end do
 
 endif
+
+if (donodrag) then
+ fluxbu = 0. 
+ fluxbv = 0. 
+end if
 
 if(RUN3D) then
    call diffuse_mom3D()

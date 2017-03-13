@@ -33,7 +33,7 @@ select case (ptype)
        do i=1,nx
          rrr=1.-2.*ranf_()
          if(k.le.5) then
-            t(i,j,k)=t(i,j,k)+0.02*rrr*(6-k)
+            t(i,j,k)=t(i,j,k)+0.022*rrr*(6-k)
          endif
        end do
       end do

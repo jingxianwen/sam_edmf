@@ -93,6 +93,7 @@ logical :: fixedeps
 logical :: donoplumesat
 logical :: dosingleplume
 logical :: doedmfpw
+logical :: domffxdsflx
 real :: tauneggers
 real :: ctketau
 real :: beta
@@ -123,7 +124,7 @@ subroutine sgs_setparm()
   !======================================================================
   NAMELIST /SGS_TKE/ &
        dofixedtau,ctketau,fixedeps,tauneggers,&
-       dosingleplume,beta,donoplumesat,pwmin,nup,eps0,doedmfpw
+       dosingleplume,beta,donoplumesat,pwmin,nup,eps0,doedmfpw,domffxdsflx
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
@@ -138,6 +139,7 @@ subroutine sgs_setparm()
   tauneggers=500. 
   dosingleplume=.false.
   doedmfpw=.false.
+  domffxdsflx=.false.
   beta=0.3
   pwmin=1.4
   nup = 40

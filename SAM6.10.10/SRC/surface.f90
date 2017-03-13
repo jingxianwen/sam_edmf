@@ -237,6 +237,35 @@ end if ! SFC_FLX_FXD
 
    end if
 
+   if(dosfctauhomo) then
+
+	tau0 = 0.
+	do j=1,ny
+         do i=1,nx
+	   tau0 = tau0 + rhow(1)*ustar(i,j)**2
+         end do
+        end do
+	tau0 = tau0 / float(nx*ny)
+        if(dompi) then
+            buffer(1) = tau0
+            call task_sum_real8(buffer,buffer1,1)
+	    tau0 = buffer1(1) /float(nsubdomains)
+        end if ! dompi
+     
+	do j=1,ny
+         do i=1,nx
+          u_h0 = max(1.,sqrt((u(i,j,1)+ug)**2+ &
+                     (0.25*(v(i-1,j+YES3D,1)+v(i-1,j,1)+v(i,j+YES3D,1)+v(i,j,1))+vg)**2))
+	  fluxbu(i,j) = -(u(i,j,1)+ug)/u_h0 * tau0
+          u_h0 = max(1.,sqrt( &
+                       (0.25*(u(i+1,j-YES3D,1)+u(i,j-YES3D,1)+u(i+1,j,1)+u(i,j,1))+ug)**2+ &
+                       (v(i,j,1)+vg)**2))
+	  fluxbv(i,j) = -(v(i,j,1)+vg)/u_h0 * tau0
+          end do
+        end do
+
+   end if
+
 shf_xy(:,:) = shf_xy(:,:) + fluxbt(:,:) * dtfactor
 lhf_xy(:,:) = lhf_xy(:,:) + fluxbq(:,:) * dtfactor
 
