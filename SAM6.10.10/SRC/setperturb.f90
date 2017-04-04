@@ -14,7 +14,7 @@ integer i,j,k,ptype,it,jt
 real rrr,ranf_
 real xxx,yyy,zzz
 
-call ranset_(3*rank)
+call ranset_(3*rank+seedin)
 
 ptype = perturb_type
 
@@ -33,7 +33,7 @@ select case (ptype)
        do i=1,nx
          rrr=1.-2.*ranf_()
          if(k.le.5) then
-            t(i,j,k)=t(i,j,k)+0.02*rrr*(6-k)
+            t(i,j,k)=t(i,j,k)+bubble_dtemp*rrr*(6-k)
          endif
        end do
       end do

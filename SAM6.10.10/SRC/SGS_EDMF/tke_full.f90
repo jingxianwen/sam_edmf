@@ -93,7 +93,7 @@ do i=1,nx
 !thetavs
 thetavs = (1.+epsv*qv(i,j,1))*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)
 sfc_thv_flux = (1.+epsv*qv(i,j,1))*fluxbt(i,j) + epsv*tabs(i,j,1)*(1000./pres(1))**(rgas/cp)*fluxbq(i,j)
-if (.not.doedmf) then
+if (.not.(doedmf.or.dofixedtau)) then
   wstar(i,j)=max(0.,(ggr/thetavs*sfc_thv_flux*pblh(i,j))**(1./3.))
 end if
 if (dofixedtau) then

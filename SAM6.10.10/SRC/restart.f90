@@ -1,16 +1,24 @@
 	subroutine write_all()
 	
 	use vars
+        use params
 	implicit none
 	character *4 rankchar
 	character *256 filename
+        character *10 timechar
 	integer irank
 
         call t_startf ('restart_out')
 
+        write(timechar,'(i10)') nstep
+
         if(masterproc) then
          print*,'Writing restart file ...'
+         if (dokeeprestart) then
+         filename = './RESTART/'//trim(case)//'_'//trim(caseid)//'_'//trim(timechar(1:10))//'_misc_restart.bin'
+         else
          filename = './RESTART/'//trim(case)//'_'//trim(caseid)//'_misc_restart.bin'
+         end if
          open(66,file=trim(filename), status='unknown',form='unformatted')
         end if
 
@@ -19,8 +27,13 @@
 
           write(rankchar,'(i4)') rank
 
+          if (dokeeprestart) then
+          filename = './RESTART/'//trim(case)//'_'//trim(caseid)//'_'//&
+                rankchar(5-lenstr(rankchar):4)//'_'//trim(timechar(1:10))//'_restart.bin'
+          else
           filename = './RESTART/'//trim(case)//'_'//trim(caseid)//'_'//&
                 rankchar(5-lenstr(rankchar):4)//'_restart.bin'
+          end if
 
 
           open(65,file=trim(filename), status='unknown',form='unformatted')
@@ -30,9 +43,16 @@
 
 
 	else
+
 	  write(rankchar,'(i4)') nsubdomains
+
+          if (dokeeprestart) then
+	  filename = './RESTART/'//trim(case)//'_'//trim(caseid)//'_'//&
+                rankchar(5-lenstr(rankchar):4)//'_'//trim(timechar(1:10))//'_restart.bin'
+          else
 	  filename = './RESTART/'//trim(case)//'_'//trim(caseid)//'_'//&
                 rankchar(5-lenstr(rankchar):4)//'_restart.bin'
+          end if
 
 	  do irank=0,nsubdomains-1
 	
@@ -73,6 +93,7 @@
 	subroutine read_all()
 	
 	use vars
+        use params
 	implicit none
 	character *4 rankchar
 	character *256 filename
@@ -143,6 +164,8 @@
 	call task_barrier()
 	
         dtfactor = -1.
+
+        if (dopertrestart) call setperturb()
 
 ! update the boundaries 
 ! (just in case when some parameterization initializes and needs boundary points)

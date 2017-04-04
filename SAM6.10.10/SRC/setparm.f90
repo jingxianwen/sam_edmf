@@ -31,7 +31,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 nsave2D, nsave2Dstart, nsave2Dend, qnsave3D, & 
                 docolumn, save2Dbin, save2Davg, save3Dbin, sgs3Dout, &
                 save2Dsep, save3Dsep, dogzip2D, dogzip3D, restart_sep, &
-	        doseasons, doperpetual, doradhomo, dosfchomo,dosfctauhomo, doisccp, &
+	        doseasons, doperpetual, doradhomo,dolwhomoonly,dolwhomo, dosfchomo,dosfctauhomo, doisccp, &
                 domodis, domisr, dodynamicocean, ocean_type, delta_sst, &
                 depth_slab_ocean, Szero, deltaS, timesimpleocean, &
 		dosolarconstant, solar_constant, zenith_angle, rundatadir, &
@@ -44,7 +44,8 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 bubble_radius_ver,bubble_dtemp,bubble_dq, dosmoke, dossthomo, &
                 rad3Dout, nxco2, dosimfilesout, notracegases, &
                 doradlat, doradlon, ncycle_max, doseawater, dosgscloud, doedmf,&
-                dozerosigma,donoenvcloud,dopblh,pblhfluxmin,pblhthvgrad,donodrag   
+                dozerosigma,donoenvcloud,dopblh,pblhfluxmin,pblhthvgrad,donodrag, dokeeprestart,&
+                seedin,dopertrestart  
 	
 !----------------------------------
 !  Read namelist variables from the standard input:
@@ -93,6 +94,11 @@ end if
         if (dopblh .and.pblhfluxmin.and.pblhthvgrad) then
           write(*,*) 'WARNING: Only one method for the PBLH diagnostic may be chosen. '
           write(*,*) 'Setting pblhfluxmin=.false.'
+        end if
+ 
+        if (doradhomo.and.dolwhomoonly.and.(dolwhomo.lt.1.or.dolwhomo.gt.7)) then
+          write(*,*) 'ERROR: Option for LW homogenization has to be 1-7'
+          call task_abort()
         end if
 
 	if(ny.eq.1) dy=dx

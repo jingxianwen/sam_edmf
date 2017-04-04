@@ -1,12 +1,16 @@
 	subroutine write_rad()
 	
 	use rad
+	use params
         use radae, only: abstot_3d, absnxt_3d, emstot_3d
 	implicit none
 	character *4 rankchar
+	character *10 timechar
 	integer irank
         integer lenstr
         external lenstr
+
+        write(timechar,'(i10)') nstep
 
         if(masterproc) print*,'Writting radiation restart file...'
 
@@ -14,10 +18,22 @@
 
           write(rankchar,'(i4)') rank
 
+          if (dokeeprestart) then
+
+          open(56,file='./RESTART/'//case(1:len_trim(case))//'_'// &
+               caseid(1:len_trim(caseid))//'_'// &
+               rankchar(5-lenstr(rankchar):4)//'_'//trim(timechar(1:10))//'_restart_rad.bin', &
+               status='unknown',form='unformatted')
+
+          else
+
           open(56,file='./RESTART/'//case(1:len_trim(case))//'_'// &
                caseid(1:len_trim(caseid))//'_'// &
                rankchar(5-lenstr(rankchar):4)//'_restart_rad.bin', &
                status='unknown',form='unformatted')
+ 
+          end if
+
           write(56) nsubdomains
 	  write(56) initrad,nradsteps,tabs_rad,qc_rad,qi_rad,qv_rad, &
                     cld_rad, rel_rad, rei_rad, &
@@ -36,18 +52,34 @@
 
                if(masterproc) then
 
+                 if (dokeeprestart) then
+                  open(56,file='./RESTART/'//case(1:len_trim(case))//'_'// &
+                      caseid(1:len_trim(caseid))//'_'// &
+                      rankchar(5-lenstr(rankchar):4)//'_'//trim(timechar(1:10))//'_restart_rad.bin', &
+                      status='unknown',form='unformatted')
+                 else
                   open(56,file='./RESTART/'//case(1:len_trim(case))//'_'// &
                       caseid(1:len_trim(caseid))//'_'// &
                       rankchar(5-lenstr(rankchar):4)//'_restart_rad.bin', &
                       status='unknown',form='unformatted')
-                  write(56) nsubdomains
+   
+                 end if
+                 write(56) nsubdomains
 
                else
 
-                  open(56,file='./RESTART/'//case(1:len_trim(case))//'_'// & 
+                 if (dokeeprestart) then
+                  open(56,file='./RESTART/'//case(1:len_trim(case))//'_'// &
+                      caseid(1:len_trim(caseid))//'_'// &
+                      rankchar(5-lenstr(rankchar):4)//'_'//trim(timechar(1:10))//'_restart_rad.bin', &
+                      status='unknown',form='unformatted',position='append')
+                 else
+                  open(56,file='./RESTART/'//case(1:len_trim(case))//'_'// &
                       caseid(1:len_trim(caseid))//'_'// &
                       rankchar(5-lenstr(rankchar):4)//'_restart_rad.bin', &
-                      status='unknown',form='unformatted', position='append')
+                      status='unknown',form='unformatted',position='append')
+   
+                 end if
 
                end if
 

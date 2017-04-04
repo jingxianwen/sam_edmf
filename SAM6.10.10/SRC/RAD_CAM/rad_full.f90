@@ -7,6 +7,17 @@ subroutine rad_full()
   !     Khairoutdinov
   ! Adapted to CAM3.0 radiation code by Peter Blossey, August 2004.
   !
+
+  ! WL 2017 added options to homogenize LW heating rates; if doradhomo and dolwhomoonly 
+  ! then only LW tendencies are homogenized; the folloing options (dolwhomo) exist:
+  ! 1: homogenize clear-sky upwelling
+  ! 2: homogenize cloudy-sky upwelling
+  ! 3: homogenize all-sky upwelling
+  ! 4: homogenize clear-sky downwelling
+  ! 5: homogenize cloudy-sky downwelling
+  ! 6: homogenize all-sky downwelling
+  ! 7: homogenize all-sky up- and downwelling
+
   use rad
   use ppgrid
   use vars
@@ -66,9 +77,13 @@ subroutine rad_full()
   real(r4) fnl(pcols,pverp)	! Net Longwave Flux at interfaces
   real(r4) fns(pcols,pverp)	! Net Shortwave Flux at interfaces
   real(r4) fcnl(pcols,pverp)	! Net Clearsky Longwave Flux at interfaces
+  real(r4) fcul(pcols,pverp)	! Net Clearsky Longwave Flux at interfaces
+  real(r4) fcdl(pcols,pverp)	! Net Clearsky Longwave Flux at interfaces
   real(r4) fcns(pcols,pverp)	! Net Clearsky Shortwave Flux at interfaces
   real(r4) flu(pcols,pverp)	! Longwave upward flux
   real(r4) fld(pcols,pverp)	! Longwave downward flux
+  real(r4) fsul(pcols,pverp)	! clear sky Longwave upward flux
+  real(r4) fsdl(pcols,pverp)	! clear sky Longwave downward flux
   real(r4) fsu(pcols,pverp)	! Shortwave upward flux
   real(r4) fsd(pcols,pverp)	! Shortwave downward flux
 
@@ -136,6 +151,12 @@ subroutine rad_full()
   real(r4) clat(pcols),clon(pcols)
   real(r4) pii
   real(r4) tmp_ggr, tmp_cp, tmp_eps, tmp_ste, tmp_pst
+
+  real fulijk  (nx, ny, pverp)
+  real fdlijk  (nx, ny, pverp)
+  real fsulijk  (nx, ny, pverp)
+  real fsdlijk  (nx, ny, pverp)
+  real masslijk (nx,ny,pver)	! Level mass (g/m2)
   
   if(icycle.ne.1) goto 999  ! ugly way to handle the subcycles. add rad heating.
 
@@ -291,9 +312,15 @@ subroutine rad_full()
   do k=1,nz
      cld(:,k)=0.
      flu(:,k)=0.
+     fsul(:,k)=0.
      fld(:,k)=0.
+     fsdl(:,k)=0.
      fsu(:,k)=0.
      fsd(:,k)=0.
+     fsulijk(:,:,k)=0.
+     fsdlijk(:,:,k)=0.
+     fulijk(:,:,k)=0.
+     fdlijk(:,:,k)=0.
   end do
 
   ! Initialize aerosol mass mixing ratio to zero.
@@ -387,11 +414,15 @@ subroutine rad_full()
                 cld     ,emis    ,pmxrgn  ,nmxrgn  ,qrl     , &
                 flns    ,flnt    ,flnsc   ,flntc   ,flwds   , &
                 flut    ,flutc   , &
-                aer_mass,fnl     ,fcnl    ,flu     ,fld)
+                aer_mass,fnl     ,fsul, fsdl  ,flu   ,fld)
+           !compute net clearsky flux
+           fcnl(1,:) = fsul(1,:) - fsdl(1,:)
         end do
      end do
 
   endif
+
+
 
 
   !------------------------------------------------------
@@ -641,9 +672,11 @@ subroutine rad_full()
                    cld     ,emis    ,pmxrgn  ,nmxrgn  ,qrl     , &
                    flns    ,flnt    ,flnsc   ,flntc   ,flwds   , &
                    flut    ,flutc   , &
-                   aer_mass,fnl     ,fcnl    ,flu    ,fld)
+                   aer_mass,fnl     ,fsul,  fsdl  ,flu    ,fld)
               ! convert radiative heating from units of J/kg/s to K/s
               qrl = qrl/cp
+              ! compute net clear sky
+              fcnl(1,:) = fsul(1,:) - fsdl(1,:)
               !
               ! change toa/surface fluxes from cgs to mks units
               !
@@ -819,10 +852,18 @@ subroutine rad_full()
                   + tau_067_snow (i,j,:)
              emis_105(i,j,1:nzm) = emis(1,nzm:1:-1)
            end if 
+
            
-           do k=1,nzm
+           do k=1,nz
+  
+              if (k.lt.nz) then
               m=nz-k
+              if (.not.(doradhomo.and.dolwhomoonly)) then
               qrad(i,j,m)=qrl(1,k)+qrs(1,k)
+              else
+              qrad(i,j,m)=qrs(1,k)
+              end if
+              masslijk(i,j,k) = massl(1,k)
               radlwup(m)=radlwup(m)+flu(1,k)*1.e-3
               radlwdn(m)=radlwdn(m)+fld(1,k)*1.e-3
               radqrlw(m)=radqrlw(m)+qrl(1,k)
@@ -832,6 +873,13 @@ subroutine rad_full()
               !bloss: clearsky heating rates
               radqrclw(m)=radqrclw(m)+(fcnl(1,k+1)-fcnl(1,k))/massl(1,k)/cp
               radqrcsw(m)=radqrcsw(m)-(fcns(1,k+1)-fcns(1,k))/massl(1,k)/cp
+              end if
+
+              fsulijk(i,j,k) = fsul(1,k)
+              fsdlijk(i,j,k) = fsdl(1,k)
+              fulijk(i,j,k) = flu(1,k)
+              fdlijk(i,j,k) = fld(1,k)
+              
            enddo
 
            lwnsxy(i,j) = flns(1)
@@ -885,7 +933,80 @@ subroutine rad_full()
 
    ! Homogenize radiation:
 
+
      if(doradhomo) then    
+
+        if (dolwhomoonly) then
+
+        factor = 1./dble(nx*ny)
+        do k=1,nzm
+          m=nz-k
+          qradz(m) = 0.
+           do j=1,ny
+             do i=1,nx
+              if (dolwhomo.eq.1) then
+              ! average clearsky upward
+              !-(ful(i,k) - fdl(i,k) - ful(i,k+1) + fdl(i,k+1))
+              qradz(m) = qradz(m) - (fsulijk(i,j,k)-fsulijk(i,j,k+1))/masslijk(i,j,k)/cp
+              elseif (dolwhomo.eq.2) then
+              ! average cloudy sky upward
+              qradz(m) = qradz(m) - (fulijk(i,j,k)-fsulijk(i,j,k)-(fulijk(i,j,k+1)-fsulijk(i,j,k+1)))/masslijk(i,j,k)/cp
+              elseif (dolwhomo.eq.3) then
+              ! average all-sky upward
+              qradz(m) = qradz(m) - (fulijk(i,j,k)-fulijk(i,j,k+1))/masslijk(i,j,k)/cp
+              elseif (dolwhomo.eq.4) then
+              ! average clearsky downward
+              qradz(m) = qradz(m) + (fsdlijk(i,j,k)-fsdlijk(i,j,k+1))/masslijk(i,j,k)/cp
+              elseif (dolwhomo.eq.5) then
+              ! average cloudy sky downward
+              qradz(m) = qradz(m) + (fdlijk(i,j,k)-fsdlijk(i,j,k)-(fdlijk(i,j,k+1)-fsdlijk(i,j,k+1)))/masslijk(i,j,k)/cp
+              elseif (dolwhomo.eq.6) then
+              ! average all-sky downward
+              qradz(m) = qradz(m) + (fdlijk(i,j,k)-fdlijk(i,j,k+1))/masslijk(i,j,k)/cp
+              else
+              qradz(m) = qradz(m) + (fdlijk(i,j,k)-fdlijk(i,j,k+1))/masslijk(i,j,k)/cp &
+                                  - (fulijk(i,j,k)-fulijk(i,j,k+1))/masslijk(i,j,k)/cp
+              end if
+             end do
+           end do
+           qradz(m) = qradz(m) * factor
+           buffer(m) = qradz(m)
+        end do
+
+        factor = 1./float(nsubdomains)
+        if(dompi) call task_sum_real8(qradz,buffer,nzm)
+
+        do k=1,nzm
+           m=nz-k
+           qradz(m)=buffer(m)*factor
+           do j=1,ny
+             do i=1,nx
+               ! add homogeneous LW to SW part
+               qrad(i,j,m) = qrad(i,j,m) + qradz(m) 
+               ! add LW part that's not homogeneous
+               if (dolwhomo.eq.1) then
+                 qrad(i,j,m) = qrad(i,j,m) - (fulijk(i,j,k)-fsulijk(i,j,k)-(fulijk(i,j,k+1)-fsulijk(i,j,k+1)))/masslijk(i,j,k)/cp  
+                 qrad(i,j,m) = qrad(i,j,m) + (fdlijk(i,j,k)-fdlijk(i,j,k+1))/masslijk(i,j,k)/cp  
+              elseif (dolwhomo.eq.2) then
+                 qrad(i,j,m) = qrad(i,j,m) - (fsulijk(i,j,k)-fsulijk(i,j,k+1))/masslijk(i,j,k)/cp
+                 qrad(i,j,m) = qrad(i,j,m) + (fdlijk(i,j,k)-fdlijk(i,j,k+1))/masslijk(i,j,k)/cp  
+              elseif (dolwhomo.eq.3) then
+                 qrad(i,j,m) = qrad(i,j,m) + (fdlijk(i,j,k)-fdlijk(i,j,k+1))/masslijk(i,j,k)/cp  
+              elseif (dolwhomo.eq.4) then
+                 qrad(i,j,m) = qrad(i,j,m) + (fdlijk(i,j,k)-fsdlijk(i,j,k)-(fdlijk(i,j,k+1)-fsdlijk(i,j,k+1)))/masslijk(i,j,k)/cp
+                 qrad(i,j,m) = qrad(i,j,m) - (fulijk(i,j,k)-fulijk(i,j,k+1))/masslijk(i,j,k)/cp
+              elseif (dolwhomo.eq.5) then
+                 qrad(i,j,m) = qrad(i,j,m) + (fsdlijk(i,j,k)-fsdlijk(i,j,k+1))/masslijk(i,j,k)/cp
+                 qrad(i,j,m) = qrad(i,j,m) - (fulijk(i,j,k)-fulijk(i,j,k+1))/masslijk(i,j,k)/cp
+              elseif (dolwhomo.eq.6) then
+                 qrad(i,j,m) = qrad(i,j,m) - (fulijk(i,j,k)-fulijk(i,j,k+1))/masslijk(i,j,k)/cp
+              end if
+                 
+             end do
+           end do
+        end do
+
+        else ! homogenize LW and SW
 
         factor = 1./dble(nx*ny)
         do k=1,nzm
@@ -910,6 +1031,8 @@ subroutine rad_full()
              end do
            end do
         end do
+
+        end if !dolwhomoonly
 
      end if
 

@@ -7,7 +7,7 @@ subroutine radclwmx(lchnk   ,ncol    ,                            &
                     cld     ,emis    ,pmxrgn  ,nmxrgn  ,qrl     , &
                     flns    ,flnt    ,flnsc   ,flntc   ,flwds   , &
                     flut    ,flutc   , &
-                    aer_mass,fnl     ,fcnl    ,ful     , fdl)
+                    aer_mass,fnl     ,fsul, fsdl    ,ful     , fdl)
 !----------------------------------------------------------------------- 
 ! 
 ! Purpose: 
@@ -90,8 +90,11 @@ subroutine radclwmx(lchnk   ,ncol    ,                            &
    real(r4), intent(out) :: flntc(pcols)         ! Net clear sky outgoing flux
    real(r4), intent(out) :: flutc(pcols)         ! Upward clear-sky flux at top of model
    real(r4), intent(out) :: flwds(pcols)         ! Down longwave flux at surface
-   real(r4),intent(out)  :: fcnl(pcols,pverp)    ! clear sky net flux at interfaces
+   real(r4),intent(out)  :: fsul(pcols,pverp)    ! clear sky net flux at interfaces
+   real(r4),intent(out)  :: fsdl(pcols,pverp)    ! clear sky net flux at interfaces
    real(r4),intent(out)  :: fnl(pcols,pverp)     ! net flux at interfaces
+   real(r4),intent(out)  :: ful(pcols,pverp)     ! upward flux at interfaces
+   real(r4),intent(out)  :: fdl(pcols,pverp)     ! downward flux at interfaces
 !
 !---------------------------Local variables-----------------------------
 !
@@ -132,10 +135,7 @@ subroutine radclwmx(lchnk   ,ncol    ,                            &
    real(r4) bk1(pcols)           ! Absrptvty for vertical quadrature
    real(r4) bk2(pcols)           ! Absrptvty for vertical quadrature
    real(r4) cldp(pcols,pverp)    ! Cloud cover with extra layer
-   real(r4) ful(pcols,pverp)     ! Total upwards longwave flux
-   real(r4) fsul(pcols,pverp)    ! Clear sky upwards longwave flux
-   real(r4) fdl(pcols,pverp)     ! Total downwards longwave flux
-   real(r4) fsdl(pcols,pverp)    ! Clear sky downwards longwv flux
+   real(r4) fcnl(pcols,pverp)    ! Net Clear sky longwv flux
    real(r4) fclb4(pcols,-1:pver)    ! Sig t**4 for cld bottom interfc
    real(r4) fclt4(pcols,0:pver)    ! Sig t**4 for cloud top interfc
    real(r4) s(pcols,pverp,pverp) ! Flx integral sum

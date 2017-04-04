@@ -114,6 +114,8 @@ logical:: docup = .false.
 logical:: doperpetual = .false. 
 logical:: doseasons = .false. 
 logical:: doradhomo = .false. 
+logical :: dolwhomoonly=.false.
+integer :: dolwhomo=7
 logical:: dosfchomo = .false.
 logical :: dosfctauhomo = .false.
 logical:: dossthomo = .false. 
@@ -123,6 +125,7 @@ logical:: dotracers = .false.
 logical:: dosmoke = .false. 
 logical:: notracegases = .false.
 logical:: doseawater = .false.
+logical :: dokeeprestart=.false.
 
 ! Specify solar constant and zenith angle for perpetual insolation.
 ! Based onn Tompkins and Graig (1998)
@@ -133,6 +136,8 @@ real:: zenith_angle = 51.7   ! zenith angle (in degrees)
 
 integer:: nensemble =0   ! the number of subensemble set of perturbations
 integer:: perturb_type  = 0 ! type of initial noise in setperturb()
+integer:: seedin = 0
+logical :: dopertrestart=.false.
 
 ! Initial bubble parameters. Activated when perturb_type = 2
   real:: bubble_x0 = 0.

@@ -1,21 +1,21 @@
 &SGS_TKE
-!dosmagor=.true.,
-dofixedtau = .true.,
-ctketau=400.,
-fixedeps=.false.,
-donoplumesat=.false.,
-dosingleplume=.false.,
-tauneggers=120.,
-pwmin=1.4,
-nup=1,
-doedmfpw        =.false.,
-domffxdsflx = .true.
+dosmagor=.true.,
+!dofixedtau = .true.,
+!ctketau=700.,
+!fixedeps=.false.,
+!donoplumesat=.false.,
+!dosingleplume=.false.,
+!tauneggers=120.,
+!pwmin=1.4,
+!nup=1,
+!doedmfpw        =.false.,
+!domffxdsflx = .true.
 /
 
 
 &PARAMETERS
 
-caseid ='128x128x96_4km_10s_305K_EDMF_doedmffalse2',
+caseid ='128x128x96_4km_10s_305K_TKE_restarts',
 doconstdz=.false.,
 
 nrestart = 0,
@@ -34,8 +34,8 @@ dosfctauhomo    = .false.,
 doedmf          = .false.,
 pblhthvgrad = .true.,
 pblhfluxmin = .false.,
-dopblh= .true.,
-dosgscloud      = .true.,
+dopblh= .false.,
+dosgscloud      = .false.,
 dozerosigma     = .true.,
 donoenvcloud    = .false.,
 dodamping       = .true.,
@@ -78,23 +78,25 @@ nstop   = 1036800,
 nprint  = 8640,
 nstat = 720,
 nstatfrq = 40,
+dokeeprestart=.true.,
+nrestart_skip=1,
 
 doSAMconditionals = .false.,
 dosatupdnconditionals = .false.,
 
-nsave2D = 4320,
+nsave2D = 2160,
 save2Davg=.false.,
 nsave2Dstart    = 0,
 nsave2Dend      = 9999999,
 save2Dsep = .false.,
 save2Dbin      = .false.,
 
-nsave3D = 1080,
+nsave3D = 2160,
 nsave3Dstart    = 0,
 nsave3Dend      = 999999999,
 save3Dbin      = .false.,
 rad3Dout  = .true.,
-sgs3Dout  = .true.,
+sgs3Dout  = .false.,
 
 nmovie       = 2,
 nmoviestart  = 99999990,

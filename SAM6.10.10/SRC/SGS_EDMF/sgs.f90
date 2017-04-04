@@ -492,7 +492,7 @@ end subroutine sgs_scalars
 !
 subroutine sgs_proc()
 
-   use grid, only: nstep,dt,icycle,dompi,nzm
+   use grid, only: nstep,dt,icycle,dompi,nzm,ncycle
    use params, only: dosmoke, dotracers, dosgs, dopblh
    use vars
    use microphysics
@@ -516,12 +516,43 @@ subroutine sgs_proc()
      end do
 
      
-     ! get maximum of instantaneous PW distribution
-     pwmax=maxval(pw_xyinst)
-     if (dompi) then
-       call task_max_real(pwmax,pw_globalmax,1)
-     else
-       pw_globalmax=pwmax
+      ! get maximum of instantaneous PW distribution
+     pw_globalmax=0.0
+     if (doedmfpw.and.doedmf.and.icycle.eq.1) then
+
+       pw_xyinst=0.
+       do k=1,nzm
+          coef1 = rho(k)*dz*adz(k)
+          do i=1,nx
+          do j=1,ny
+           pw_xyinst(i,j) = pw_xyinst(i,j)+qv(i,j,k)*coef1 ! not weighted by dtn/dt
+                                                           !since used in edmf
+                                                         !each cycle
+          end do
+          end do
+       end do
+       pwmax=maxval(pw_xyinst)
+       if (dompi) then
+         call task_max_real(pwmax,pw_globalmax,1)
+       else
+         pw_globalmax=pwmax
+       end if
+ 
+     elseif (icycle.eq.ncycle .and. .not.doedmf) then
+    
+       pw_xyinst=0.
+       do k=1,nzm
+          coef1 = rho(k)*dz*adz(k)
+          do i=1,nx
+          do j=1,ny
+           pw_xyinst(i,j) = pw_xyinst(i,j)+qv(i,j,k)*coef1 ! not weighted by dtn/dt
+                                                           !since used in edmf
+                                                         !each cycle
+          end do
+          end do
+       end do
+     
+
      end if
 
 
