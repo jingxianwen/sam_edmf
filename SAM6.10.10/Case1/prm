@@ -1,0 +1,115 @@
+&SGS_TKE
+dosmagor=.true.,
+!dofixedtau = .true.,
+!ctketau=700.,
+!fixedeps=.false.,
+!donoplumesat=.false.,
+!dosingleplume=.false.,
+!tauneggers=300.,
+!pwmin=1.4,
+!nup=6,
+!doedmfpw        =.false.,
+!domffxdsflx = .false.
+/
+
+
+&PARAMETERS
+
+caseid ='128x128x96_4km_10s_305K_TKE_case1_293760_LWhomo_o6',
+doconstdz=.false.,
+
+nrestart = 2,
+dopertrestart=.false.,
+seedin = 0
+bubble_dtemp = 0.1,
+case_restart='RCE_4km',
+caseid_restart='128x128x96_4km_10s_305K_TKE_restarts',
+
+CEM = .true.,
+LES = .false.,
+OCEAN = .true.,
+ocean_type=0,
+doseawater = .false.,
+dodynamicocean=.false.,
+perturb_type  = 0,
+day0 = 0.,
+dosgs           = .true.,
+donodrag        = .false.,
+dosfctauhomo    = .false.,
+doedmf          = .false.,
+pblhthvgrad = .true.,
+pblhfluxmin = .false.,
+dopblh= .false.,
+dosgscloud      = .false.,
+dozerosigma     = .true.,
+donoenvcloud    = .false.,
+dodamping       = .true.,
+doupperbound    = .true.,
+docloud         = .true.,
+doprecip        = .true.,
+dolongwave      = .true.,
+doshortwave     = .true.,
+dosurface       = .true.,
+dosfchomo=.false.,
+sfc_tau_fxd     = .false.,
+tau0            = 0.00025,
+tabs_s=305.,
+dolargescale    = .false.,
+doradforcing    = .false.,
+dosfcforcing    = .false.,
+docoriolis      = .false.,
+donudging_uv    = .true.,
+donudging_tq    = .false.,
+tauls = 7200.,
+SFC_FLX_FXD    = .false.,
+
+nrad = 120,
+
+dx =    4000.,
+dy =    4000.,
+
+dt =    10.,
+
+doseasons = .false.,
+doradhomo=.true.,
+dolwhomoonly=.true.,
+dolwhomo=6,
+doperpetual=.true.,
+dosolarconstant=.true.,
+solar_constant = 650.83,
+zenith_angle = 50.5,
+doisccp = .false.,
+domodis = .false.,
+domisr = .false.,
+
+nstop   = 120960,
+nprint  = 8640,
+nstat = 90,
+nstatfrq = 20,
+dokeeprestart=.false.,
+!nrestart_skip=2,
+
+doSAMconditionals = .false.,
+dosatupdnconditionals = .false.,
+
+nsave2D = 180,
+save2Davg=.false.,
+nsave2Dstart    = 0,
+nsave2Dend      = 9999999,
+save2Dsep = .false.,
+save2Dbin      = .false.,
+
+nsave3D = 180,
+nsave3Dstart    = 0,
+nsave3Dend      = 999999999,
+save3Dbin      = .false.,
+rad3Dout  = .true.,
+sgs3Dout  = .false.,
+
+nmovie       = 2,
+nmoviestart  = 99999990,
+nmovieend    = 99960480
+
+/
+
+
