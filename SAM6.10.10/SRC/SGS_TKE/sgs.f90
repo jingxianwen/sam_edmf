@@ -5,6 +5,7 @@ module sgs
 
 use grid, only: nx,nxp1,ny,nyp1,YES3D,nzm,nz,dimx1_s,dimx2_s,dimy1_s,dimy2_s 
 use params, only: dosgs
+use microphysics, only : nmicro_fields
 implicit none
 
 !----------------------------------------------------------------------
@@ -43,6 +44,11 @@ real sgsadv(nz,1:nsgs_fields)  ! tendency due to vertical advection
 real sgslsadv(nz,1:nsgs_fields)  ! tendency due to large-scale vertical advection
 real sgsdiff(nz,1:nsgs_fields)  ! tendency due to vertical diffusion
 
+! 3D fluxes
+real twsb3 (nx,ny,nz)                         ! sgs vertical flux of h/cp
+real mkwsb3(nx,ny,nz,1:nmicro_fields)         ! sgs vertical flux of qx
+
+
 !------------------------------------------------------------------
 ! internal (optional) definitions:
 
@@ -64,6 +70,7 @@ real grdf_y(nzm)! grid factor for eddy diffusion in y
 real grdf_z(nzm)! grid factor for eddy diffusion in z
 
 logical:: dosmagor   ! if true, then use Smagorinsky closure
+real :: tkvfac
 
 ! Local diagnostics:
 
@@ -84,11 +91,12 @@ subroutine sgs_setparm()
 
   !======================================================================
   NAMELIST /SGS_TKE/ &
-       dosmagor ! Diagnostic Smagorinsky closure
+       dosmagor,tkvfac ! Diagnostic Smagorinsky closure
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
   dosmagor = .true. ! default 
+  tkvfac=1.0
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
@@ -140,6 +148,9 @@ subroutine sgs_init()
 
      fluxbsgs = 0.
      fluxtsgs = 0.
+
+     twsb3 = 0.
+     mkwsb3 = 0.
 
   end if
 
@@ -290,8 +301,10 @@ end do
 cfl = 0.
 do k=1,nzm
   cfl = max(cfl,        &
-     0.5*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2, &
-     0.5*tkhmax(k)*grdf_x(k)*dt/dx**2, &
+     !0.5*tkvfac*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2, &
+     !0.5*tkhmax(k)*grdf_x(k)*dt/dx**2, &
+     2.0*tkvfac*tkhmax(k)*grdf_z(k)*dt/(dz*adzw(k))**2, &
+     2.0*tkhmax(k)*grdf_x(k)*dt/dx**2, &
      YES3D*0.5*tkhmax(k)*grdf_y(k)*dt/dy**2)
 end do
 
@@ -318,16 +331,16 @@ subroutine sgs_scalars()
   use params, only: dotracers
   implicit none
 
-    real dummy(nz)
+    real dummy(nz), dummy3(nx,ny,nz)
     real fluxbtmp(nx,ny), fluxttmp(nx,ny) !bloss
     integer k
 
 
-      call diffuse_scalar(t,fluxbt,fluxtt,tdiff,twsb, &
+      call diffuse_scalar(t,fluxbt,fluxtt,tdiff,twsb,twsb3, &
                            t2lediff,t2lediss,twlediff,.true.)
     
       if(advect_sgs) then
-         call diffuse_scalar(tke,fzero,fzero,dummy,sgswsb, &
+         call diffuse_scalar(tke,fzero,fzero,dummy,sgswsb,dummy3, &
                                     dummy,dummy,dummy,.false.)
       end if
 
@@ -346,7 +359,7 @@ subroutine sgs_scalars()
            fluxbtmp(1:nx,1:ny) = fluxbmk(1:nx,1:ny,k)
            fluxttmp(1:nx,1:ny) = fluxtmk(1:nx,1:ny,k)
            call diffuse_scalar(micro_field(:,:,:,k),fluxbtmp,fluxttmp, &
-                mkdiff(:,k),mkwsb(:,k), dummy,dummy,dummy,.false.)
+                mkdiff(:,k),mkwsb(:,k), mkwsb3(:,:,:,k),dummy,dummy,dummy,.false.)
        end if
       end do
 
@@ -363,7 +376,7 @@ subroutine sgs_scalars()
           fluxbtmp = fluxbtr(:,:,k)
           fluxttmp = fluxttr(:,:,k)
           call diffuse_scalar(tracer(:,:,:,k),fluxbtmp,fluxttmp, &
-               trdiff(:,k),trwsb(:,k), &
+               trdiff(:,k),trwsb(:,k), dummy3, &
                dummy,dummy,dummy,.false.)
 !!$          call diffuse_scalar(tracer(:,:,:,k),fluxbtr(:,:,k),fluxttr(:,:,k),trdiff(:,k),trwsb(:,k), &
 !!$                           dummy,dummy,dummy,.false.)

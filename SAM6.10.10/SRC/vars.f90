@@ -161,7 +161,7 @@ real, parameter :: t00 = 300.   ! constant offset for sstxy
 real &
     twle(nz), twsb(nz), precflux(nz), twsbmf(nz), &
     uwle(nz), uwsb(nz), vwle(nz), vwsb(nz), &
-    radlwup(nz), radlwdn(nz), radswup(nz), radswdn(nz), &
+    radlwup(nz), radlwdn(nz), radswup(nz), radswdn(nz),radlwupc(nz), radlwdnc(nz), &
     radqrlw(nz), radqrsw(nz), w_max, u_max, s_acld, s_acldcold, s_ar, s_arthr, s_sst, &
     s_acldl, s_acldm, s_acldh,  ncmn, nrmn, z_pbl, z_pwmax, z_inv, z_cb, z_ct, z_cbmn, z_ctmn, &
     z2_inv, z2_cb, z2_ct, cwpmean, cwp2, precmean, prec2, precmax, nrainy, ncloudy, &
@@ -197,7 +197,7 @@ real &
 
 ! conditional average statistics, subsumes cloud_factor, core_factor, coredn_factor
 integer :: ncondavg, icondavg_cld, icondavg_cor, icondavg_cordn, &
-     icondavg_satdn, icondavg_satup, icondavg_env
+     icondavg_satdn, icondavg_satup, icondavg_env, icondavg_per
 real, allocatable :: condavg_factor(:,:) ! replaces cloud_factor, core_factor
 real, allocatable :: condavg_mask(:,:,:,:) ! indicator array for various conditional averages
 character(LEN=8), allocatable :: condavgname(:) ! array of short names

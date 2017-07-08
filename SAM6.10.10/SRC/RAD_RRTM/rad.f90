@@ -63,7 +63,7 @@ module rad
   use vars, only : t, tabs, qv, qcl, qci, sstxy, rho, t00, cfrac_tot, &
        latitude, longitude,                         &
                                 ! Domain-average diagnostic fields
-       radlwup, radlwdn, radswup, radswdn, radqrlw, radqrsw, &
+       radlwup, radlwdn, radswup, radswdn, radqrlw, radqrsw,radlwupc,radlwdnc,radlwupcf, radlwdncf, &
                                 ! 2D diagnostics
        lwns_xy, lwnt_xy, swns_xy, swnt_xy, solin_xy, &      
        lwnsc_xy, lwntc_xy, swnsc_xy, swntc_xy, &
@@ -276,6 +276,8 @@ contains
         ! Initialize 1D diagnostics
         !
         radlwup(:) = 0.; radlwdn(:) = 0.
+        radlwupcf(:) = 0.; radlwdncf(:) = 0.
+        radlwupc(:) = 0.; radlwdnc(:) = 0.
         radswup(:) = 0.; radswdn(:) = 0.
         radqrlw(:) = 0.; radqrsw(:) = 0.
         radqrclw(:) = 0.; radqrcsw(:) = 0.

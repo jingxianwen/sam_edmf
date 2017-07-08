@@ -2,7 +2,7 @@
 subroutine write_fields3D
 	
 use vars
-use rad, only: qrad
+use rad, only: qrad,lwu3D,lwd3D,lwus3D,lwds3D
 use params
 use microphysics, only: nmicro_fields, micro_field, flag_number, &
      flag_micro3Dout, mkname, mklongname, mkunits, mkoutputscale, &
@@ -26,7 +26,7 @@ if(.not.doprecip) nfields=nfields-1
 !bloss: add 3D outputs for microphysical fields specified by flag_micro3Dout
 !       except for water vapor (already output as a SAM default).
 if(docloud) nfields=nfields+SUM(flag_micro3Dout)-flag_micro3Dout(index_water_vapor)
-if((dolongwave.or.doshortwave).and..not.doradhomo) nfields=nfields+1
+if((dolongwave.or.doshortwave)) nfields=nfields+5
 if(compute_reffc.and.(dolongwave.or.doshortwave).and.rad3Dout) nfields=nfields+1
 if(compute_reffi.and.(dolongwave.or.doshortwave).and.rad3Dout) nfields=nfields+1
 if (dosgs.and.sgs3dout) nfields=nfields+2
@@ -186,7 +186,7 @@ end if ! masterproc.or.output_sep
                                  save3Dbin,dompi,rank,nsubdomains)
 
 
-if((dolongwave.or.doshortwave).and..not.doradhomo) then
+if((dolongwave.or.doshortwave)) then
   nfields1=nfields1+1
   do k=1,nzm
    do j=1,ny
@@ -198,6 +198,58 @@ if((dolongwave.or.doshortwave).and..not.doradhomo) then
   name='QRAD'
   long_name='Radiative heating rate'
   units='K/day'
+  call compress3D(tmp,nx,ny,nzm,name,long_name,units, &
+                                 save3Dbin,dompi,rank,nsubdomains)
+  nfields1=nfields1+1
+  do k=1,nzm
+   do j=1,ny
+    do i=1,nx
+      tmp(i,j,k)=lwu3D(i,j,k)
+    end do
+   end do
+  end do
+  name='LWU'
+  long_name='Longwave upward all-sky'
+  units='W/m2'
+  call compress3D(tmp,nx,ny,nzm,name,long_name,units, &
+                                 save3Dbin,dompi,rank,nsubdomains)
+  nfields1=nfields1+1
+  do k=1,nzm
+   do j=1,ny
+    do i=1,nx
+      tmp(i,j,k)=lwd3D(i,j,k)
+    end do
+   end do
+  end do
+  name='LWD'
+  long_name='Longwave downward all-sky'
+  units='W/m2'
+  call compress3D(tmp,nx,ny,nzm,name,long_name,units, &
+                                 save3Dbin,dompi,rank,nsubdomains)
+  nfields1=nfields1+1
+  do k=1,nzm
+   do j=1,ny
+    do i=1,nx
+      tmp(i,j,k)=lwus3D(i,j,k)
+    end do
+   end do
+  end do
+  name='LWUS'
+  long_name='Longwave upward clear-sky'
+  units='W/m2'
+  call compress3D(tmp,nx,ny,nzm,name,long_name,units, &
+                                 save3Dbin,dompi,rank,nsubdomains)
+  nfields1=nfields1+1
+  do k=1,nzm
+   do j=1,ny
+    do i=1,nx
+      tmp(i,j,k)=lwds3D(i,j,k)
+    end do
+   end do
+  end do
+  name='LWDS'
+  long_name='Longwave downward clear-sky'
+  units='W/m2'
   call compress3D(tmp,nx,ny,nzm,name,long_name,units, &
                                  save3Dbin,dompi,rank,nsubdomains)
 end if

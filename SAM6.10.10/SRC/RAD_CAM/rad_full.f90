@@ -143,7 +143,7 @@ subroutine rad_full()
 
   real(r4) qtot
   real(r4) dayy
-  integer i,j,k,m,ii,jj,i1,j1,tmp_count,nrad_call
+  integer i,j,k,m,ii,jj,i1,j1,tmp_count,nrad_call,m2
   integer iday, iday0
   real(r4) coef,factor,tmp(1)
   real(8) qradz(nzm),buffer(nzm)
@@ -225,6 +225,10 @@ subroutine rad_full()
 	         rel_rad(i,j,k)=25.
 	         rei_rad(i,j,k)=25.
 	         qrad(i,j,k)=0.
+	         lwu3D(i,j,k)=0.
+	         lwd3D(i,j,k)=0.
+	         lwus3D(i,j,k)=0.
+	         lwds3D(i,j,k)=0.
               end do
            end do
         end do
@@ -232,6 +236,8 @@ subroutine rad_full()
         do k=1,nz
            radlwup(k) = 0.
            radlwdn(k) = 0.
+           radlwupc(k) = 0.
+           radlwdnc(k) = 0.
            radswup(k) = 0.
            radswdn(k) = 0.
            radqrlw(k) = 0.
@@ -443,10 +449,22 @@ subroutine rad_full()
     do k=1,nzm
       do j=1,ny
         do i=1,nx
-          qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
-          qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          if (.not.doradnoqc) then
+            qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          else
+            qc_rad(i,j,k)=0.0
+          end if
+          if (.not.doradnoqi) then
+            qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          else
+            qi_rad(i,j,k)=0.
+          end if
           qs_rad(i,j,k)=qs_rad(i,j,k)+SnowMassMixingRatio(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
-          cld_rad(i,j,k) = cld_rad(i,j,k)+ cfrac_tot(i,j,k)
+          if ((doradnoqc.or.doradnoqi).and.qi_rad(i,j,k).lt.1d-05.and.qc_rad(i,j,k).lt.1d-05) then
+              cld_rad(i,j,k) = 0.0 
+          else
+              cld_rad(i,j,k) = cld_rad(i,j,k)+cfrac_tot(i,j,k)
+          end if
         end do
       end do
     end do
@@ -455,9 +473,21 @@ subroutine rad_full()
     do k=1,nzm
       do j=1,ny
         do i=1,nx
-          qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
-          qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
-          cld_rad(i,j,k) = cld_rad(i,j,k)+cfrac_tot(i,j,k)
+          if (.not.doradnoqc) then
+            qc_rad(i,j,k)=qc_rad(i,j,k)+qcl(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          else
+            qc_rad(i,j,k)=0.0
+          end if
+          if (.not.doradnoqi) then
+             qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+          else
+             qi_rad(i,j,k)=0.0
+          end if
+          if ((doradnoqc.or.doradnoqi).and.qi_rad(i,j,k).lt.1d-05.and.qc_rad(i,j,k).lt.1d-05) then
+              cld_rad(i,j,k) = 0.0 
+          else
+              cld_rad(i,j,k) = cld_rad(i,j,k)+cfrac_tot(i,j,k)
+          end if
         end do
       end do
     end do
@@ -490,6 +520,8 @@ subroutine rad_full()
      do k=1,nz
         radlwup(k) = 0.
         radlwdn(k) = 0.
+        radlwupc(k) = 0.
+        radlwdnc(k) = 0.
         radswup(k) = 0.
         radswdn(k) = 0.
         radqrlw(k) = 0.
@@ -856,6 +888,12 @@ subroutine rad_full()
            
            do k=1,nz
   
+              m2=nz-k+1
+              lwu3D(i,j,m2)  = flu(1,k)*1.e-3
+              lwd3D(i,j,m2)  = fld(1,k)*1.e-3
+              lwus3D(i,j,m2) = fsul(1,k)*1.e-3
+              lwds3D(i,j,m2) = fsdl(1,k)*1.e-3
+
               if (k.lt.nz) then
               m=nz-k
               if (.not.(doradhomo.and.dolwhomoonly)) then
@@ -866,6 +904,8 @@ subroutine rad_full()
               masslijk(i,j,k) = massl(1,k)
               radlwup(m)=radlwup(m)+flu(1,k)*1.e-3
               radlwdn(m)=radlwdn(m)+fld(1,k)*1.e-3
+              radlwupc(m)=radlwupc(m)+fsul(1,k)*1.e-3
+              radlwdnc(m)=radlwdnc(m)+fsdl(1,k)*1.e-3
               radqrlw(m)=radqrlw(m)+qrl(1,k)
               radswup(m)=radswup(m)+fsu(1,k)*1.e-3
               radswdn(m)=radswdn(m)+fsd(1,k)*1.e-3

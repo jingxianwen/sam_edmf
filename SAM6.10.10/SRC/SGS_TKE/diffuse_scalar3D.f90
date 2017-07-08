@@ -1,14 +1,15 @@
-subroutine diffuse_scalar3D (field,fluxb,fluxt,tkh,rho,rhow,flux)
+subroutine diffuse_scalar3D (field,fluxb,fluxt,tkh,rho,rhow,flux,flux3)
 
 use grid
 use params, only: docolumn,dowallx,dowally,dosgs
-use sgs, only: grdf_x,grdf_y,grdf_z
+use sgs, only: grdf_x,grdf_y,grdf_z,tkvfac
 implicit none
 ! input	
 real field(dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm)	! scalar
 real tkh(0:nxp1,1-YES3D:nyp1,nzm)	! eddy conductivity
 real fluxb(nx,ny)		! bottom flux
 real fluxt(nx,ny)		! top flux
+real flux3(nx,ny,nz)
 real rho(nzm)
 real rhow(nz)
 real flux(nz)
@@ -19,6 +20,7 @@ real rdx2,rdy2,rdz2,rdz,rdx5,rdy5,rdz5,tmp
 real dxy,dxz,dyx,dyz,dzx,dzy,tkx,tky,tkz,rhoi
 integer i,j,k,ib,ic,jb,jc,kc,kb
 
+flux3=0.
 
 if(.not.dosgs) return
 
@@ -123,6 +125,8 @@ do j=1,ny
    flx(i,j,0)=fluxb(i,j)*rdz*rhow(1)
    flx(i,j,nzm)=fluxt(i,j)*rdz*tmp*rhow(nz)
    flux(1) = flux(1) + flx(i,j,0)
+   flux3(i,j,1) = fluxb(i,j)
+   flux3(i,j,nz) = 0.0
  end do
 end do
 
@@ -135,8 +139,9 @@ do k=1,nzm-1
  do j=1,ny
   do i=1,nx
     tkz=rdz5*(tkh(i,j,k)+tkh(i,j,kc))
-    flx(i,j,k)=-tkz*(field(i,j,kc)-field(i,j,k))*rhoi
+    flx(i,j,k)=-tkvfac*tkz*(field(i,j,kc)-field(i,j,k))*rhoi
     flux(kc) = flux(kc) + flx(i,j,k)
+    flux3(i,j,kc)=(-1.) /adzw(kc)/dz *0.5*(tkh(i,j,kc) +tkh(i,j,k))*(field(i,j,kc)-field(i,j,k))
   end do 
  end do
 end do

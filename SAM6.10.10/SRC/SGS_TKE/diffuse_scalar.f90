@@ -1,5 +1,5 @@
 subroutine diffuse_scalar (f,fluxb,fluxt, &
-                          fdiff,flux,f2lediff,f2lediss,fwlediff,doit)
+                          fdiff,flux,flux3,f2lediff,f2lediss,fwlediff,doit)
 
 use grid
 use vars, only: rho, rhow
@@ -11,6 +11,7 @@ real f(dimx1_s:dimx2_s, dimy1_s:dimy2_s, nzm)	! scalar
 real fluxb(nx,ny)		! bottom flux
 real fluxt(nx,ny)		! top flux
 real flux(nz)
+real flux3(nx,ny,nz)
 real fdiff(nz)
 real f2lediff(nzm)
 real f2lediss(nzm)
@@ -36,9 +37,10 @@ if(dostatis) then
 
 endif
 
+flux3=0.
 
 if(RUN3D) then
-  call diffuse_scalar3D (f,fluxb,fluxt,tkh,rho,rhow,flux)
+  call diffuse_scalar3D (f,fluxb,fluxt,tkh,rho,rhow,flux,flux3)
 else  
   call diffuse_scalar2D (f,fluxb,fluxt,tkh,rho,rhow,flux)
 endif

@@ -36,7 +36,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 depth_slab_ocean, Szero, deltaS, timesimpleocean, &
 		dosolarconstant, solar_constant, zenith_angle, rundatadir, &
                 dotracers, output_sep, perturb_type, &
-                doSAMconditionals, dosatupdnconditionals, &
+                doSAMconditionals, dopercentconditionals, dosatupdnconditionals, &
                 doscamiopdata, iopfile, dozero_out_day0, &
                 nstatmom, nstatmomstart, nstatmomend, savemomsep, savemombin, &
                 nmovie, nmoviestart, nmovieend, nrestart_skip, &
@@ -45,7 +45,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 rad3Dout, nxco2, dosimfilesout, notracegases, &
                 doradlat, doradlon, ncycle_max, doseawater, dosgscloud, doedmf,&
                 dozerosigma,donoenvcloud,dopblh,pblhfluxmin,pblhthvgrad,donodrag, dokeeprestart,&
-                seedin,dopertrestart  
+                seedin,dopertrestart,dosfchomoqvonly,doradnoqc,doradnoqi  
 	
 !----------------------------------
 !  Read namelist variables from the standard input:
@@ -137,6 +137,7 @@ end if
 
         !bloss: set up conditional averages
         ncondavg = 1 ! always output CLD conditional average
+        if(dopercentconditionals) ncondavg = ncondavg + 1
         if(doSAMconditionals) ncondavg = ncondavg + 2
         if(dosatupdnconditionals) ncondavg = ncondavg + 3
         if(allocated(condavg_factor)) then ! avoid double allocation when nrestart=2
@@ -157,6 +158,7 @@ end if
         !   is present.  If >0, these give the index into the condavg arrays
         !   where this particular conditional average appears.
         icondavg_cld = -1
+        icondavg_per = -1
         icondavg_cor = -1
         icondavg_cordn = -1
         icondavg_satup = -1
@@ -168,6 +170,13 @@ end if
         condavgname(icondavg) = 'CLD'
         condavglongname(icondavg) = 'cloud'
         icondavg_cld = icondavg
+
+        if(dopercentconditionals) then
+           icondavg = icondavg + 1
+           condavgname(icondavg) = 'w1%'
+           condavglongname(icondavg) = 'top 1% w'
+           icondavg_per = icondavg
+        end if
 
         if(doSAMconditionals) then
            icondavg = icondavg + 1

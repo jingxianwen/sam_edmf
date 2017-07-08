@@ -17,6 +17,10 @@ implicit none
         real(r4)  rel_rad  (nx, ny, nzm)      ! accumulated effective radius for liquid water (mkm)
         real(r4)  rei_rad  (nx, ny, nzm)      ! accumulated effective radius for ice water (mkm)
 	real qrad    (nx, ny, nzm)	 ! radiative heating(K/s)
+	real lwu3D   (nx, ny, nz)	 ! lw up all sky
+	real lwd3D   (nx, ny, nz)	 ! lw down all sky
+	real lwus3D   (nx, ny, nz)	 ! lw up clear sky
+	real lwds3D   (nx, ny, nz)	 ! lw down clear sky
 	real lwnsxy  (nx, ny)
 	real swnsxy  (nx, ny)
 	real lwntxy  (nx, ny)

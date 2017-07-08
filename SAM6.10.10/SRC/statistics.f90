@@ -75,14 +75,16 @@ implicit none
 
 	real tvirt(nx,ny,nzm)
 	
-	integer i,j,k,n,ntr
+	integer i,j,k,n,ntr,niter,numltwc
 	real qcc,qii,qrr,qss,lstarn,lstarp,coef,coef1
 	real factor_xy, factor_n, tmp(4), tmp1(4)
         real buffer(nzm,6),buffer1(nzm,6)
+        real ibuffer(2),ibuffer1(2)
 	real prof1(nzm),prof2(nzm),prof3(nzm),prof4(nzm)	
 	real cwpmax,cwp(nx,ny),cwpl(nx,ny),cwpm(nx,ny),cwph(nx,ny)
 	logical condition, condition_cl
 	real zero(nzm)
+        real wcnew,wcold,dw,wmax,wmin,wmax1
 
 	integer topind(nx,ny),z_inv_ind(nx,ny),z_base_ind(nx,ny),z_top_ind(nx,ny),ncloud	
         real zzz,grad_max(nx,ny),grad
@@ -664,12 +666,63 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
             else
                coef=min(1.e-5,0.01*qsatw(tabs0(k),pres(k)))
             endif
+
+            if (icondavg_per.gt.0) then
+
+               ! compute approximate 99th percentile of w distribution
+               wmin=0.
+               wcold=wmin
+               wcnew=wcold
+               wmax=maxval(0.5*(w(:,:,k)+w(:,:,k+1)))
+               if (dompi) then
+                 call task_max_real(wmax,wmax1,1)
+                 wmax=wmax1
+               end if
+
+               niter=0
+               do while (niter.le.10)
+                 niter=niter+1
+                 do j = 1,ny
+                 do i = 1,nx
+                   if (0.5*(w(i,j,k)+w(i,j,k+1)).lt.wcnew ) then
+                     condavg_mask(i,j,k,icondavg_per) = 1. 
+                   end if
+                 end do
+                 end do
+
+                 numltwc = int(sum(condavg_mask(:,:,k,icondavg_per)))
+                 if (dompi) then
+                    ibuffer(1) = numltwc
+                    call task_sum_integer(ibuffer,ibuffer1,1)
+                    numltwc = ibuffer1(1)
+                 end if
+ 
+                 if (float(numltwc)/float(nx_gl*ny_gl).gt.0.99) then
+                   wmax=wcnew
+                   dw=-(wcnew-wmin)*0.5
+                 else
+                   wmin=wcnew
+                   dw=(wmax-wcnew)*0.5
+                 end if
+ 
+                 wcold=wcnew
+                 wcnew=wcold + dw
+                  
+                 condavg_mask(:,:,k,icondavg_per)=0.0
+               end do
+            end if
+
             do j = 1,ny
                do i = 1,nx
                   
+                  if (icondavg_per.gt.0.and.(0.5*(w(i,j,k)+w(i,j,k+1)).ge.wcnew) ) then
+                     condavg_mask(i,j,k,icondavg_per) = 1.
+                  end if
+
                   if((icondavg_cld.gt.0).and.(qcl(i,j,k)+qci(i,j,k).gt.coef)) then
                      condavg_mask(i,j,k,icondavg_cld) = 1. ! cloud
                   end if
+
 
                   if(icondavg_cor.gt.0) then
                      ! updraft (w>1) core (tv'>0) statistics
@@ -1201,6 +1254,8 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
 
 	call hbuf_put('RADLWUP',radlwup,factor_xy)
 	call hbuf_put('RADLWDN',radlwdn,factor_xy)
+	call hbuf_put('RADLWUPC',radlwupc,factor_xy)
+	call hbuf_put('RADLWDNC',radlwdnc,factor_xy)
 	call hbuf_put('RADSWUP',radswup,factor_xy)
 	call hbuf_put('RADSWDN',radswdn,factor_xy)
 	call hbuf_put('RADQRLW',radqrlw,factor_xy*86400.) 	

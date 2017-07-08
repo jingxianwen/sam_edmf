@@ -15,10 +15,12 @@ dosmagor=.true.,
 
 &PARAMETERS
 
-caseid ='128x128x96_4km_10s_305K_TKE_restarts',
+caseid ='128x128x96_4km_10s_305K_TKE4_avg2D',
 doconstdz=.false.,
 
 nrestart = 0,
+seedin = 2
+bubble_dtemp = 0.5,
 
 CEM = .true.,
 LES = .false.,
@@ -78,20 +80,22 @@ nstop   = 1036800,
 nprint  = 8640,
 nstat = 720,
 nstatfrq = 40,
-dokeeprestart=.true.,
+dokeeprestart=.false.,
 nrestart_skip=1,
 
 doSAMconditionals = .false.,
 dosatupdnconditionals = .false.,
 
-nsave2D = 2160,
-save2Davg=.false.,
+!nsave2D = 1080, ! every 3 h
+nsave2D = 8480, ! every 24 h
+save2Davg=.true.,
 nsave2Dstart    = 0,
 nsave2Dend      = 9999999,
 save2Dsep = .false.,
 save2Dbin      = .false.,
 
-nsave3D = 2160,
+!nsave3D = 1080,! every 3 h
+nsave3D = 8480, ! every 24 h
 nsave3Dstart    = 0,
 nsave3Dend      = 999999999,
 save3Dbin      = .false.,

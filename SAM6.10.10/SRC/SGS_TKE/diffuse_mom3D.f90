@@ -4,7 +4,7 @@ subroutine diffuse_mom3D
 !        momentum tendency due to SGS diffusion
 
 use vars
-use sgs, only: tk, grdf_x, grdf_y, grdf_z
+use sgs, only: tk, grdf_x, grdf_y, grdf_z, tkvfac
 use params, only: docolumn, dowallx, dowally
 implicit none
 
@@ -139,12 +139,12 @@ do k=1,nzm-1
    jb=j-1
    do i=1,nx
     ib=i-1
-    tkz=rdz2*tk(i,j,k)
+    tkz=rdz2*tk(i,j,k)*tkvfac
     fw(i,j,kc)=-2.*tkz*(w(i,j,kc)-w(i,j,k))*rho(k)*iadz
-    tkz=rdz25*(tk(i,j,k)+tk(ib,j,k)+tk(i,j,kc)+tk(ib,j,kc))
+    tkz=tkvfac*rdz25*(tk(i,j,k)+tk(ib,j,k)+tk(i,j,kc)+tk(ib,j,kc))
     fu(i,j,kc)=-tkz*( (u(i,j,kc)-u(i,j,k))*iadzw + &
                        (w(i,j,kc)-w(ib,j,kc))*dzx)*rhow(kc) 	
-    tkz=rdz25*(tk(i,j,k)+tk(i,jb,k)+tk(i,j,kc)+tk(i,jb,kc))
+    tkz=tkvfac*rdz25*(tk(i,j,k)+tk(i,jb,k)+tk(i,j,kc)+tk(i,jb,kc))
     fv(i,j,kc)=-tkz*( (v(i,j,kc)-v(i,j,k))*iadzw + &
                        (w(i,j,kc)-w(i,jb,kc))*dzy)*rhow(kc)
     uwsb(kc)=uwsb(kc)+fu(i,j,kc)
@@ -158,7 +158,7 @@ vwsb(1) = 0.
 	
 do j=1,ny
  do i=1,nx
-   tkz=rdz2*grdf_z(nzm)*tk(i,j,nzm)
+   tkz=rdz2*grdf_z(nzm)*tk(i,j,nzm) * tkvfac
    fw(i,j,nz)=-2.*tkz*(w(i,j,nz)-w(i,j,nzm))/adz(nzm)*rho(nzm)
    fu(i,j,1)=fluxbu(i,j) * rdz * rhow(1)
    fv(i,j,1)=fluxbv(i,j) * rdz * rhow(1)

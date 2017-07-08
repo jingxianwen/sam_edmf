@@ -130,6 +130,7 @@ logical:: domisr = .false.
 logical:: dosimfilesout = .false.
 
 logical:: doSAMconditionals = .false. !core updraft,downdraft conditional statistics
+logical:: dopercentconditionals = .false. !top 1% w conditional statistics
 logical:: dosatupdnconditionals = .false.!cloudy updrafts,downdrafts and cloud-free
 logical:: doscamiopdata = .false.! initialize the case from a SCAM IOP netcdf input file
 logical:: dozero_out_day0 = .false.

@@ -6,7 +6,7 @@ use microphysics, only: micro_field, index_water_vapor
 implicit none
 	
 real qvs(0:nx,1-YES3D:ny),t_s, q_s, u_h0
-real taux0, tauy0, xlmo
+real taux0, tauy0, xlmo, qvone
 real diag_ustar, coef, coef1
 integer i,j
 real(8) buffer(2), buffer1(2)
@@ -49,13 +49,36 @@ if(.not.SFC_FLX_FXD) then
 
        qvs(0:nx,1-YES3D:ny) = micro_field(0:nx,1-YES3D:ny,1,index_water_vapor)
 
+       if (dosfchomo.and.dosfchomoqvonly) then
+         qvone = 0.
+        do j=1,ny
+         do i=1,nx
+           qvone = qvone + qv(i,j,1)
+         end do
+        end do
+        qvone = qvone / float(nx*ny)
+        if(dompi) then
+            buffer(1) = qvone
+            call task_sum_real8(buffer,buffer1,1)
+            qvone = buffer1(1) /float(nsubdomains)
+        end if ! dompi
+       end if
+
+
        do j=1,ny
          do i=1,nx
 
-           call oceflx(pres(1),0.5*(u(i+1,j,1)+u(i,j,1))+ug, &
+           if (dosfchomo.and.dosfchomoqvonly) then
+             call oceflx(pres(1),0.5*(u(i+1,j,1)+u(i,j,1))+ug, &
+                         0.5*(v(i,j+YES3D,1)+v(i,j,1))+vg, &
+                         t(i,j,1)-gamaz(1),qvone,t(i,j,1),z(1), &
+                         sstxy(i,j)+t00, fluxt0, fluxq0, taux0, tauy0, q_s)
+           else
+             call oceflx(pres(1),0.5*(u(i+1,j,1)+u(i,j,1))+ug, &
                        0.5*(v(i,j+YES3D,1)+v(i,j,1))+vg, &
                        t(i,j,1)-gamaz(1),qv(i,j,1),t(i,j,1),z(1), &
                        sstxy(i,j)+t00, fluxt0, fluxq0, taux0, tauy0, q_s)
+           end if
            fluxbt(i,j) = fluxt0
            fluxbq(i,j) = fluxq0
            ustar(i,j)  = (taux0**2  +  tauy0**2)**0.25/rhow(1)**0.5
@@ -213,7 +236,7 @@ end if ! SFC_FLX_FXD
 !
 ! Homogenize the surface scalar fluxes if needed for sensitivity studies
 !
-   if(dosfchomo) then
+   if(dosfchomo.and.(.not.dosfchomoqvonly)) then
 
 	fluxt0 = 0.
 	fluxq0 = 0.

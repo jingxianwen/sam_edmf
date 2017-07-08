@@ -25,8 +25,10 @@ subroutine init()
   ustor = 0.
   vstor = 0.
 
-  radlwup = 0.
-  radlwdn = 0.
+  radlwup   = 0.
+  radlwdn   = 0.
+  radlwupc  = 0.
+  radlwdnc  = 0.
   radswup = 0.
   radswdn = 0.
   radqrlw = 0.
