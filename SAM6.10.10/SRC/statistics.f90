@@ -7,7 +7,9 @@ use tracers
 use params
 use hbuffer
 use instrument_diagnostics, only: compute_instr_diags
+use grid
 implicit none	
+include 'mpif.h'
 	
 	real mse(nzm)
 	real dse(nzm)
@@ -75,16 +77,17 @@ implicit none
 
 	real tvirt(nx,ny,nzm)
 	
-	integer i,j,k,n,ntr,niter,numltwc
-	real qcc,qii,qrr,qss,lstarn,lstarp,coef,coef1
+	integer i,j,k,n,ntr,niter,numltwc,ierr
+	real qcc,qii,qrr,qss,lstarn,lstarp,coef,coef1,wcfrac
 	real factor_xy, factor_n, tmp(4), tmp1(4)
         real buffer(nzm,6),buffer1(nzm,6)
-        real ibuffer(2),ibuffer1(2)
+        real rbuf(1),rbuf1(1)
 	real prof1(nzm),prof2(nzm),prof3(nzm),prof4(nzm)	
 	real cwpmax,cwp(nx,ny),cwpl(nx,ny),cwpm(nx,ny),cwph(nx,ny)
 	logical condition, condition_cl
 	real zero(nzm)
-        real wcnew,wcold,dw,wmax,wmin,wmax1
+        real wcnew,wcold,dw,wmax(1),wmin(1),wmax1(1),wmin1(1)
+        real w1p(nzm)
 
 	integer topind(nx,ny),z_inv_ind(nx,ny),z_base_ind(nx,ny),z_top_ind(nx,ny),ncloud	
         real zzz,grad_max(nx,ny),grad
@@ -670,39 +673,57 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
             if (icondavg_per.gt.0) then
 
                ! compute approximate 99th percentile of w distribution
-               wmin=0.
-               wcold=wmin
-               wcnew=wcold
-               wmax=maxval(0.5*(w(:,:,k)+w(:,:,k+1)))
+               wmin(1)=minval(0.5*(w(1:nx,1:ny,k)+w(1:nx,1:ny,k+1)))
+               if (dompi) then
+                 call task_min_real(wmin,wmin1,1)
+                 wmin(1)=wmin1(1)
+               end if
+               wmax(1)=maxval(0.5*(w(1:nx,1:ny,k)+w(1:nx,1:ny,k+1)))
                if (dompi) then
                  call task_max_real(wmax,wmax1,1)
-                 wmax=wmax1
+                 wmax(1)=wmax1(1)
                end if
+               dw=0.5*(wmax(1)-wmin(1))
+               wcold=wmin(1)
+               wcnew=wcold+dw
+               wcfrac=0.0
 
                niter=0
-               do while (niter.le.10)
+               do while (niter.le.nitermax.and.abs(dw).gt.1.e-3)
+
+                 call MPI_BARRIER(MPI_COMM_WORLD,ierr)
+   
                  niter=niter+1
                  do j = 1,ny
                  do i = 1,nx
                    if (0.5*(w(i,j,k)+w(i,j,k+1)).lt.wcnew ) then
                      condavg_mask(i,j,k,icondavg_per) = 1. 
+                   else
+                     condavg_mask(i,j,k,icondavg_per) = 0. 
                    end if
                  end do
                  end do
 
-                 numltwc = int(sum(condavg_mask(:,:,k,icondavg_per)))
+                 !numltwc = int(sum(condavg_mask(1:nx,1:ny,k,icondavg_per)))
+                 rbuf(1) = sum(condavg_mask(1:nx,1:ny,k,icondavg_per)) 
                  if (dompi) then
-                    ibuffer(1) = numltwc
-                    call task_sum_integer(ibuffer,ibuffer1,1)
-                    numltwc = ibuffer1(1)
+                    call MPI_ALLREDUCE(rbuf,rbuf1,1, &
+                           MPI_REAL,MPI_SUM,MPI_COMM_WORLD,ierr)
+                    !call task_sum_real(rbuf,rbuf1,1)
+                    !call task_barrier()
+                    rbuf(1) = rbuf1(1)
                  end if
- 
-                 if (float(numltwc)/float(nx_gl*ny_gl).gt.0.99) then
-                   wmax=wcnew
-                   dw=-(wcnew-wmin)*0.5
+                 wcfrac=rbuf(1)/float(nx_gl*ny_gl) 
+                 !wcfrac=float(numltwc)/float(nx*ny) 
+                 !if (masterproc.and.k.eq.25) then
+                 !    write(*,*) 'i= ',niter,' z(25) = ',z(k),' wmin=',wmin(1),' wmax=',wmax(1),' wcold=',wcold,' wcnew=',wcnew,' p=',wcfrac !,' n=',numltwc
+                 !end if
+                 if (wcfrac.gt.0.99) then
+                   wmax(1)=wcnew
+                   dw=-(wcnew-wmin(1))*0.5
                  else
-                   wmin=wcnew
-                   dw=(wmax-wcnew)*0.5
+                   wmin(1)=wcnew
+                   dw=(wmax(1)-wcnew)*0.5
                  end if
  
                  wcold=wcnew
@@ -711,6 +732,8 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
                  condavg_mask(:,:,k,icondavg_per)=0.0
                end do
             end if
+
+            w1p(k)=wcnew
 
             do j = 1,ny
                do i = 1,nx
@@ -764,6 +787,13 @@ real, dimension(nzm) :: rhowcl, rhowmsecl, rhowtlcl, rhowqtcl,  &
                end do
             end do
          end do
+
+         !if (masterproc) then
+         !print *, '      z     w1%'
+         !do k=1,nzm
+         !   write(*,'(f7.1,1x,f7.3)') z(k),w1p(k)
+         !end do
+         !end if
             
          do ncond = 1,ncondavg
             cld(:) = 0.

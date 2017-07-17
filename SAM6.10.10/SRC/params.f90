@@ -140,6 +140,7 @@ real:: zenith_angle = 51.7   ! zenith angle (in degrees)
 integer:: nensemble =0   ! the number of subensemble set of perturbations
 integer:: perturb_type  = 0 ! type of initial noise in setperturb()
 integer:: seedin = 0
+integer :: nitermax = 10  ! used if dopercentconditionals to find precentile
 logical :: dopertrestart=.false.
 
 ! Initial bubble parameters. Activated when perturb_type = 2

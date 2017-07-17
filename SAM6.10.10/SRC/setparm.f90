@@ -45,7 +45,7 @@ NAMELIST /PARAMETERS/ dodamping, doupperbound, docloud, doprecip, &
                 rad3Dout, nxco2, dosimfilesout, notracegases, &
                 doradlat, doradlon, ncycle_max, doseawater, dosgscloud, doedmf,&
                 dozerosigma,donoenvcloud,dopblh,pblhfluxmin,pblhthvgrad,donodrag, dokeeprestart,&
-                seedin,dopertrestart,dosfchomoqvonly,doradnoqc,doradnoqi  
+                seedin,dopertrestart,dosfchomoqvonly,doradnoqc,doradnoqi,nitermax  
 	
 !----------------------------------
 !  Read namelist variables from the standard input:
