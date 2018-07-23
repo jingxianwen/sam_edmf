@@ -100,6 +100,9 @@ real :: beta
 real :: pwmin
 integer :: nup
 real ::eps0
+real :: alphaqt
+real :: alphathv
+real :: Wc
 
 real :: wstar(nx,ny)
 
@@ -124,7 +127,8 @@ subroutine sgs_setparm()
   !======================================================================
   NAMELIST /SGS_TKE/ &
        dofixedtau,ctketau,fixedeps,tauneggers,&
-       dosingleplume,beta,donoplumesat,pwmin,nup,eps0,doedmfpw,domffxdsflx
+       dosingleplume,beta,donoplumesat,pwmin,nup,eps0,doedmfpw,domffxdsflx,&
+       alphaqt,alphathv, Wc
 
   NAMELIST /BNCUIODSBJCB/ place_holder
 
@@ -144,6 +148,9 @@ subroutine sgs_setparm()
   pwmin=1.4
   nup = 40
   eps0=1.0e-3
+  alphaqt=0.32
+  alphathv=0.58
+  Wc=0.5
 
   !----------------------------------
   !  Read namelist for microphysics options from prm file:
@@ -227,7 +234,7 @@ subroutine sgs_init()
   end if
 
   if(masterproc) then
-     write(*,*) 'Teixeira PBL scheme'
+     write(*,*) 'EDMF scheme'
   end if
 
   if(LES) then

@@ -50,11 +50,9 @@ implicit none
         ! witek
         !&Wa=2.,& 
         !&Wb= 0.0 , & 
-        !&Wc= 1.0 
         ! de roode
      !   &Wa=0.5,& 
-     Wb= 0.0,&  
-     Wc= 0.9
+     Wb= 0.0  
         ! suselj
         !&Wa=2./3.,& 
         !&Wb= 0.002 , & 
@@ -217,9 +215,9 @@ implicit none
          end if
 
          ! specific humidity needed (will be convert back in the end)
-         UPQT(1,N)=q(i,j,1)+0.32*UPW(1,N)*sigmaQT/sigmaW
+         UPQT(1,N)=q(i,j,1)+alphaqt*UPW(1,N)*sigmaQT/sigmaW
          ! according to cheinet the 0.58 is for thetav, hence thetav is initialized (instead of theta)
-         UPTHV(1,N)=thetav1+0.58*UPW(1,N)*sigmaTHV/sigmaW
+         UPTHV(1,N)=thetav1+alphathv*UPW(1,N)*sigmaTHV/sigmaW
          UPTABS(1,N)=UPTHV(1,N)/(1.+epsv*UPQT(1,N)) * (pres(1)/1000.)**(rgas/cp) 
          UPQCL(1,N)=qcl(i,j,1) 
          UPQCI(1,N)=qci(i,j,1)
@@ -233,6 +231,7 @@ implicit none
 
     end if
 
+    ! in-cloud condensate
     qcsgs_mf(i,j,1)=qcsgs_mf(i,j,1)/frac_mf(i,j,1)
     qisgs_mf(i,j,1)=qisgs_mf(i,j,1)/frac_mf(i,j,1)
     frac_mf1D(1)  = frac_mf1D(1) + frac_mf(i,j,1)
@@ -265,7 +264,7 @@ implicit none
           
 
 
-          ! all-or-nothing condensation scheme
+          ! all-or-nothing condensation scheme in plumes
             call condensation_edmf(QTn,Tn,presi(k),zi(k),THVn,QCLn,QCIn)
             if (donoplumesat) then
               QCLn=0.0

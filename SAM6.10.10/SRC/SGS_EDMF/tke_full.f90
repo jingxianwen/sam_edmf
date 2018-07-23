@@ -119,7 +119,7 @@ end if
   buoy_sgs=ggr/thetav_k * (thetav_c-thetav_b)/ (z(kc)-z(kb))
 
   l23 = (tketau*sqrt(tke(i,j,k)+1.d-10)+1.d-10)**(-1)
-  if (buoy_sgs.gt.0.0) l23 = l23 + (max(0.7*sqrt(tke(i,j,k)+1.d-10)/sqrt(buoy_sgs),adz(k)*dz/2.))**(-1)
+  if (buoy_sgs.gt.0.0) l23 = l23 + (max(0.76*sqrt(tke(i,j,k)/(buoy_sgs+1.d-10)),adz(k)*dz/2.))**(-1)
   l23 = l23**(-1)
   smix=  l23 + (xkar*z(k)-l23)*exp(-z(k)/100.)
   tk(i,j,k) = min(1000.0,Ck*smix*sqrt(tke(i,j,k)))
