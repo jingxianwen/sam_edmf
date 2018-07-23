@@ -16,8 +16,8 @@ module instrument_diagnostics
   !  - Modified output of *.isccp, *.misr and *.modis files, so that they will be
   !    written in single precision even when model is run in double precision.
   !
-  use vars,   only: nx, ny, nz, nzm, sstxy, t00, qv, tabs, qcl, qci, z, pres, pres0, tabs0, qv0
-  use grid,   only: pres, presi, doisccp, domodis, domisr, dosimfilesout 
+  use vars,   only: nx, ny, nz, nzm, sstxy, t00, qv, tabs, qcl, qci, z, tabs0, qv0
+  use grid,   only: pres, presi, doisccp, domodis, domisr, dosimfilesout, pres0 
   use params, only: coszrs, ggr
   use rad,    only: tau_067, emis_105, &  ! Optical thickness at 0.67 microns, emissivity at 10.5 microns
                     tau_067_cldliq, tau_067_cldice, tau_067_snow, & ! separate optical depth for MODIS simulator

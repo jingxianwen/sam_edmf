@@ -68,13 +68,14 @@ INC_NETCDF = ${NETCDF_DIR}/include
 LIB_NETCDF = ${NETCDF_DIR}/lib
 
 
-FF77 = ${OPENMPI_DIR}/bin/mpif90 -c -fixed -extend_source
+#FF77 = ${OPENMPI_DIR}/bin/mpif90 -c -fixed -extend_source
+FF77 = ${OPENMPI_DIR}/bin/mpif90 -c -extend_source
 FF90 = ${OPENMPI_DIR}/bin/mpif90 -c
 CC = mpicc -c -DLINUX
 
 
-FFLAGS = -O3 
-#FFLAGS = -g -ftrapuv -fpe0 -O0
+#FFLAGS = -O3 
+FFLAGS = -g -ftrapuv -fpe0 -O0
 
 FFLAGS += -I${INC_MPI} -I${INC_NETCDF}
 LD = ${OPENMPI_DIR}/bin/mpif90

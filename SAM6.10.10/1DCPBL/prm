@@ -1,8 +1,5 @@
 &SGS_TKE
 dofixedtau = .true.,
-dotkedirichlet = .true.,
-pblhthvgrad = .true.
-pblhfluxmin = .false.
 ctketau=400.,
 fixedeps=.false.,
 dosingleplume=.false.,
@@ -33,6 +30,8 @@ dodynamicocean=.false.,
 perturb_type  = -1,
 day0 = 0.,
 dosgs           = .true.,
+pblhthvgrad = .true.
+pblhfluxmin = .false.
 dodamping       = .false.,
 doupperbound    = .false.,
 docloud         = .true.,
