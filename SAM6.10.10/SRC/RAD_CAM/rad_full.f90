@@ -456,11 +456,12 @@ subroutine rad_full()
           end if
           if (.not.doradnoqi) then
             qi_rad(i,j,k)=qi_rad(i,j,k)+qci(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
+            qs_rad(i,j,k)=qs_rad(i,j,k)+SnowMassMixingRatio(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
           else
             qi_rad(i,j,k)=0.
+            qs_rad(i,j,k)=0.
           end if
-          qs_rad(i,j,k)=qs_rad(i,j,k)+SnowMassMixingRatio(i,j,k)/(cfrac_tot(i,j,k)+1.d-8)
-          if ((doradnoqc.or.doradnoqi).and.qi_rad(i,j,k).lt.1d-05.and.qc_rad(i,j,k).lt.1d-05) then
+          if ((doradnoqc.and.doradnoqi).or.(qi_rad(i,j,k).lt.1d-05.and.qc_rad(i,j,k).lt.1d-05.and.qs_rad(i,j,k).lt.1d-05)) then
               cld_rad(i,j,k) = 0.0 
           else
               cld_rad(i,j,k) = cld_rad(i,j,k)+cfrac_tot(i,j,k)
@@ -483,7 +484,7 @@ subroutine rad_full()
           else
              qi_rad(i,j,k)=0.0
           end if
-          if ((doradnoqc.or.doradnoqi).and.qi_rad(i,j,k).lt.1d-05.and.qc_rad(i,j,k).lt.1d-05) then
+          if ((doradnoqc.and.doradnoqi).or.(qi_rad(i,j,k).lt.1d-05.and.qc_rad(i,j,k).lt.1d-05)) then
               cld_rad(i,j,k) = 0.0 
           else
               cld_rad(i,j,k) = cld_rad(i,j,k)+cfrac_tot(i,j,k)
