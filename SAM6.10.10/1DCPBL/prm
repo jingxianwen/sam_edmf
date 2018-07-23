@@ -1,13 +1,24 @@
 &SGS_TKE
-dofixedtau = .false.,
+dofixedtau = .true.,
 dotkedirichlet = .true.,
 pblhthvgrad = .true.
 pblhfluxmin = .false.
+ctketau=400.,
+fixedeps=.false.,
+dosingleplume=.false.,
+pwmin=1.28,
+nup=40,
+Wc=0.5,
+alphaqt=0.32,
+alphathv=0.58,
+tauneggers=400.
+
+
 /
 
 &PARAMETERS
 
-caseid ='1DCPBL_003_a1',
+caseid ='1DCPBL',
 doconstdz=.true.,
 dz=20.
 docolumn=.true.
@@ -42,7 +53,7 @@ SFC_FLX_FXD    = .true.,
 SFC_TAU_FXD    = .true.,
 
 dokinunits=.true.,
-fluxt0 = 0.03,
+fluxt0 = 0.06,
 fluxq0 = 2.5e-05,
 tau0 = 0.,
 
